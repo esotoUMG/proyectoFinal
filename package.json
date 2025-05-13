@@ -1,0 +1,24 @@
+{
+  "name": "proyectofinal",
+  "version": "1.0.0",
+  "description": "Proyecto final: rutas turisticas y recomendaciones",
+  "main": "index.js",
+  "scripts": {
+    "gulp": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/esotoUMG/proyectoFinal.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/esotoUMG/proyectoFinal/issues"
+  },
+  "homepage": "https://github.com/esotoUMG/proyectoFinal#readme",
+  "dependencies": {
+    "gulp": "^5.0.0",
+    "sass": "^1.88.0"
+  }
+}
