@@ -4,7 +4,7 @@
   "description": "Proyecto final: rutas turisticas y recomendaciones",
   "main": "index.js",
   "scripts": {
-    "gulp": ""
+    "dev": "gulp dev"
   },
   "repository": {
     "type": "git",
@@ -17,8 +17,9 @@
     "url": "https://github.com/esotoUMG/proyectoFinal/issues"
   },
   "homepage": "https://github.com/esotoUMG/proyectoFinal#readme",
-  "dependencies": {
+  "devDependencies": {
     "gulp": "^5.0.0",
+    "gulp-sass": "^6.0.1",
     "sass": "^1.88.0"
   }
 }
