@@ -3,24 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proyecto Final</title>
+    <title>Travel Map</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cal+Sans&family=Dancing+Script:wght@400..700&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{css_path}}">
 </head>
 <body>
-    <header>
-        <div class="contenedor">
-            <nav class="enlaces">
-                <a href="#">Inicio</a>
-                <a href="">Ingresar</a>
-            </nav>
-            <h1 class="titulo">Este es el inicio de mi proyecto final</h1>
-        </div>
-    </header>
-    <main>
+    <div class="barra-lateral" id="sidebar">
+        <button class="boton-cerrar" onclick="cerrarBarra()">&times;</button>
+        <a href="#">Inicio</a>
+        <a href="#">Cargar rutas</a>
+        <a href="#">Lugares turísticos</a>
+        <a href="#">Recomendación de rutas</a>
+        <a href="#">Visualización de datos</a>
+        <a href="#">Sobre el proyecto</a>
+    </div>
 
-    </main>
-    <footer>
-        
-    </footer>
+    <div id="main">
+        <header>
+            <div class="contenedor contenido-header">
+                <button class="boton-abrir" onclick="abrirBarra()">&#9776;</button>
+                <h1>Travel<span>Map</span></h1>
+            </div>
+        </header>
+        <main>
+
+        </main>
+        <footer>
+
+        </footer>
+    </div>
+    <script src="{{js_path1}}"></script>
 </body>
 </html>
