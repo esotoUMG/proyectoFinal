@@ -4,8 +4,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    # Busca el CSS generado por Gulp
-    css_ = url_for('static', filename='css/app.css')
+    css_ = url_for('static', filename='css/app.css') #Busca el CSS generado por Gulp
     return render_template('index.html', css_path=css_)
 
 if __name__ == '__main__':
