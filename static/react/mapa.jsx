@@ -13,7 +13,7 @@ const centrar = {
 
 function componenteMapa(){
     return(
-        <LoadScript googleMapsApiKey='AIzaSyDfWSa4hkPokde5iV0kjDIn78GHwgynpTM'>
+        <LoadScript googleMapsApiKey=''>
             <GoogleMap mapContainerStyle={contenedor} center={centrar} zoom={12}>
                     <Marker position={centrar}></Marker>
                 </GoogleMap>
