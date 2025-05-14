@@ -423,11 +423,15 @@ header h1 span {
   background-color: #ffffff;
   text-align: center;
 }
-.contenido .contenido__video h1 {
+.contenido .contenido__video .informacion {
+  padding: 15rem 0 15rem 0;
+}
+.contenido .contenido__video .informacion h1 {
   font-family: "Raleway", sans-serif;
   font-size: 2.5rem;
+  padding-bottom: 3rem;
 }
-.contenido .contenido__video a {
+.contenido .contenido__video .informacion a {
   font-family: "DM Sans", sans-serif;
   text-decoration: none;
   background-color: #000000;
@@ -438,7 +442,7 @@ header h1 span {
   text-transform: uppercase;
   font-weight: bold;
 }
-.contenido .contenido__video a:hover {
+.contenido .contenido__video .informacion a:hover {
   background-color: #5dc1b9;
   cursor: pointer;
 }
