@@ -334,28 +334,6 @@ img {
   display: block;
 }
 
-header {
-  color: #000000;
-  padding: 2rem;
-  text-align: center;
-  font-size: 2.5rem;
-  border: 0;
-  width: 100%;
-  border-bottom: 1px solid #000000;
-  box-shadow: 5px 5px 10px 3px rgba(0, 0, 0, 0.2);
-}
-header h1 {
-  font-family: "Dancing Script", cursive;
-}
-header h1:hover {
-  cursor: pointer;
-  color: #5dc1b9;
-}
-header h1 span {
-  font-family: "Raleway", sans-serif;
-  font-style: none;
-}
-
 .barra-lateral {
   height: 100%;
   width: 0;
@@ -417,4 +395,64 @@ header h1 span {
 #main {
   transition: margin-left 0.3s;
   padding: 0;
+}
+
+header {
+  color: #000000;
+  padding: 2rem;
+  text-align: center;
+  font-size: 2.5rem;
+  border: 0;
+  width: 100%;
+  border-bottom: 1px solid #000000;
+  box-shadow: 5px 5px 10px 3px rgba(0, 0, 0, 0.2);
+}
+header h1 {
+  font-family: "Dancing Script", cursive;
+}
+header h1:hover {
+  cursor: pointer;
+  color: #5dc1b9;
+}
+header h1 span {
+  font-family: "Raleway", sans-serif;
+  font-style: none;
+}
+
+.contenido {
+  background-color: #ffffff;
+  text-align: center;
+}
+.contenido .contenido__video h1 {
+  font-family: "Raleway", sans-serif;
+  font-size: 2.5rem;
+}
+.contenido .contenido__video a {
+  font-family: "DM Sans", sans-serif;
+  text-decoration: none;
+  background-color: #000000;
+  color: #ffffff;
+  padding: 1rem;
+  border-radius: 1rem;
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+.contenido .contenido__video a:hover {
+  background-color: #5dc1b9;
+  cursor: pointer;
+}
+
+footer {
+  background-color: #000000;
+  text-align: center;
+  padding: 6rem;
+}
+footer h2 {
+  font-family: "DM Sans", sans-serif;
+  color: #ffffff;
+  font-size: 2rem;
+}
+footer h2 span {
+  color: #5dc1b9;
 }

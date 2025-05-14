@@ -1,0 +1,16 @@
+@use 'base/variables' as v;
+
+footer{
+    background-color: v.$negro;
+    text-align: center;
+    padding: 6rem;
+    h2{
+        font-family: v.$contenido2;
+        color: v.$blanco;
+        font-size: 2rem;
+        span{
+            color: v.$turquesa;
+        }
+    }
+    
+}

@@ -1,0 +1,27 @@
+@use 'base/variables' as v;
+
+.contenido{
+    background-color: v.$blanco;
+    text-align: center;
+    .contenido__video{
+        h1{
+            font-family: v.$subtitulo;
+            font-size: 2.5rem;
+        }
+        a{
+            font-family: v.$contenido2;
+            text-decoration: none;
+            background-color: v.$negro;
+            color: v.$blanco;
+            padding: 1rem;
+            border-radius: 1rem;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            &:hover{
+                background-color: v.$turquesa;
+                cursor: pointer;
+            }
+        }
+    }
+}
