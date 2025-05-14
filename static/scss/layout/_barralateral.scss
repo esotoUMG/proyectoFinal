@@ -22,18 +22,24 @@
         font-family: v.$contenido;
 
         &:hover{
-            color: v.$grisOscuro;
+            color: v.$turquesa;
         }
     }
 
     .boton-cerrar{
         position: relative;        
         top: 2px;
-        left: 150px;
-        font-size: 36px;
+        left: 100px;
+        font-size: 30px;
         margin-left: 50px;
+        padding: 10px 15px;
+        background-color: v.$blanco;
+        color: v.$negro;
+        cursor:pointer;
         &:hover{
-            cursor:pointer;
+            background-color: v.$turquesa;
+            color: v.$blanco;
+            transition-duration: .5s;
         }
     }   
 }
@@ -51,7 +57,8 @@
     cursor: pointer;
 
     &:hover{
-        background-color: v.$grisOscuro;
+        background-color: v.$turquesa;
+        transition: .3s;
     }
 }
 
