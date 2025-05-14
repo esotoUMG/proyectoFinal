@@ -21,5 +21,10 @@
     "gulp": "^5.0.0",
     "gulp-sass": "^6.0.1",
     "sass": "^1.88.0"
+  },
+  "dependencies": {
+    "@react-google-maps/api": "^2.20.6",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   }
 }
