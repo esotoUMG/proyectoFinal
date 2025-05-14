@@ -316,7 +316,9 @@ html {
 *,
 *:before,
 *:after {
-  box-sizing: inherit;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 .contenedor {
@@ -333,10 +335,25 @@ img {
 }
 
 header {
-  background-color: #333;
-  color: white;
-  padding: 20px;
+  color: #000000;
+  padding: 2rem;
   text-align: center;
+  font-size: 2.5rem;
+  border: 0;
+  width: 100%;
+  border-bottom: 1px solid #000000;
+  box-shadow: 5px 5px 10px 3px rgba(0, 0, 0, 0.2);
+}
+header h1 {
+  font-family: "Dancing Script", cursive;
+}
+header h1:hover {
+  cursor: pointer;
+  color: #5dc1b9;
+}
+header h1 span {
+  font-family: "Raleway", sans-serif;
+  font-style: none;
 }
 
 .barra-lateral {
@@ -346,7 +363,7 @@ header {
   z-index: 1;
   top: 0;
   left: 0;
-  background-color: #111;
+  background-color: #333333;
   overflow-x: hidden;
   transition: 0.3s;
   padding-top: 60px;
@@ -355,37 +372,42 @@ header {
   padding: 8px 8px 8px 32px;
   text-decoration: none;
   font-size: 25px;
-  color: #818181;
+  color: #ffffff;
   display: block;
   transition: 0.3s;
+  font-family: "Cal Sans", sans-serif;
 }
 .barra-lateral a:hover {
-  color: #f1f1f1;
+  color: #333333;
 }
 .barra-lateral .boton-cerrar {
-  position: absolute;
-  top: 0;
-  right: 25px;
+  position: relative;
+  top: 2px;
+  left: 150px;
   font-size: 36px;
   margin-left: 50px;
+}
+.barra-lateral .boton-cerrar:hover {
+  cursor: pointer;
 }
 
 .boton-abrir {
   font-size: 30px;
-  background-color: #111;
-  color: white;
+  background-color: #000000;
+  color: #ffffff;
   border: none;
   position: absolute;
-  top: 20px;
-  left: 20px;
+  top: 50px;
+  left: 50px;
+  align-items: center;
   padding: 10px 15px;
   cursor: pointer;
 }
 .boton-abrir:hover {
-  background-color: #444;
+  background-color: #333333;
 }
 
 #main {
   transition: margin-left 0.3s;
-  padding: 16px;
+  padding: 0;
 }

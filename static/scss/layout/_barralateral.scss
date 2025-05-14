@@ -7,7 +7,7 @@
     z-index: 1;
     top: 0;
     left: 0;
-    background-color: #111;
+    background-color: v.$grisOscuro;
     overflow-x: hidden;
     transition: 0.3s;
     padding-top: 60px;
@@ -16,41 +16,46 @@
         padding: 8px 8px 8px 32px;
         text-decoration: none;
         font-size: 25px;
-        color: #818181;
+        color: v.$blanco;
         display: block;
         transition: 0.3s;
+        font-family: v.$contenido;
 
         &:hover{
-            color: #f1f1f1;
+            color: v.$grisOscuro;
         }
     }
 
     .boton-cerrar{
-        position: absolute;
-        top: 0;
-        right: 25px;
+        position: relative;        
+        top: 2px;
+        left: 150px;
         font-size: 36px;
         margin-left: 50px;
+        &:hover{
+            cursor:pointer;
+        }
     }   
 }
 
 .boton-abrir{
     font-size: 30px;
-    background-color: #111;
-    color: white;
+    background-color: v.$negro;
+    color: v.$blanco;
     border: none;
     position: absolute;
-    top: 20px;
-    left: 20px;
+    top: 50px;
+    left: 50px;
+    align-items: center;
     padding: 10px 15px;
     cursor: pointer;
 
     &:hover{
-        background-color: #444;
+        background-color: v.$grisOscuro;
     }
 }
 
 #main{
     transition: margin-left .3s;
-    padding: 16px;
+    padding: 0;
 }
