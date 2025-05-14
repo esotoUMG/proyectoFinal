@@ -1,97 +1,181 @@
 import math
+from modelos.lugar import Lugar  # Importar clase Lugar desde su módulo
 
-# CLASE NODO: Representa un nodo dentro del Árbol B.
+# Clase NodoLista: Nodo individual de una lista enlazada
+class NodoLista:
+    def __init__(self, dato):
+        self.dato = dato
+        self.siguiente = None
+
+# Clase Lista: Lista enlazada personalizada (sin listas nativas)
+class Lista:
+    def __init__(self):
+        self.primero = None
+        self._longitud = 0
+
+    def insertar(self, dato, pos=None):
+        nuevo = NodoLista(dato)
+        if self.primero is None or pos == 0:
+            nuevo.siguiente = self.primero
+            self.primero = nuevo
+        else:
+            anterior = None
+            actual = self.primero
+            indice = 0
+            while actual and (pos is None or indice < pos):
+                anterior = actual
+                actual = actual.siguiente
+                indice += 1
+            nuevo.siguiente = actual
+            if anterior:
+                anterior.siguiente = nuevo
+        self._longitud += 1
+
+    def eliminar(self, pos):
+        if self.primero is None:
+            return
+        actual = self.primero
+        if pos == 0:
+            self.primero = actual.siguiente
+        else:
+            anterior = None
+            indice = 0
+            while actual and indice < pos:
+                anterior = actual
+                actual = actual.siguiente
+                indice += 1
+            if anterior and actual:
+                anterior.siguiente = actual.siguiente
+        self._longitud -= 1
+
+    def obtener(self, pos):
+        actual = self.primero
+        indice = 0
+        while actual:
+            if indice == pos:
+                return actual.dato
+            actual = actual.siguiente
+            indice += 1
+        return None
+
+    def reemplazar(self, pos, nuevo_valor):
+        actual = self.primero
+        indice = 0
+        while actual:
+            if indice == pos:
+                actual.dato = nuevo_valor
+                return
+            actual = actual.siguiente
+            indice += 1
+
+    def longitud(self):
+        return self._longitud
+
+    def insertar_ordenado(self, dato):
+        actual = self.primero
+        indice = 0
+        while actual:
+            if dato < actual.dato:
+                break
+            actual = actual.siguiente
+            indice += 1
+        self.insertar(dato, indice)
+
+    def recorrer(self):
+        actual = self.primero
+        resultado = []
+        while actual:
+            resultado.append(actual.dato)
+            actual = actual.siguiente
+        return resultado
+
+
+# Clase Nodo: Nodo del Árbol B
 class Nodo:
     def __init__(self, grado, hoja=False):
-        self.grado = grado       # Grado del árbol B (número máximo de hijos por nodo)
-        self.hoja = hoja         # Determina si el nodo es una hoja (si tiene hijos o no)
-        self.claves = []         # Lista de claves almacenadas en el nodo
-        self.hijos = []          # Lista de hijos (solo presente si el nodo no es hoja)
+        self.grado = grado
+        self.hoja = hoja
+        self.claves = Lista()
+        self.hijos = Lista()
 
-# CLASE ARBOL B: Representa un Árbol B, una estructura de datos balanceada.
-class Btree:
+
+# Clase BTree: Árbol B usando Lista personalizada
+class BTree:
     def __init__(self, grado):
-        self.grado = grado                               # Grado del árbol B
-        self.raiz = Nodo(grado, True)                    # Raíz del árbol, inicialmente una hoja
-        self.max_claves = grado - 1                      # Número máximo de claves en un nodo
-        self.min_claves = math.ceil((grado + 1) / 2) - 1  # Número mínimo de claves en un nodo (para balanceo)
+        self.grado = grado
+        self.raiz = Nodo(grado, True)
+        self.max_claves = grado - 1
+        self.min_claves = math.ceil((grado + 1) / 2) - 1
 
-    # Método para dividir un hijo cuando está lleno y no cabe una nueva clave.
-    def dividirHijo(self, padre, i):
-        grado = self.grado
-        y = padre.hijos[i]          # Nodo hijo que será dividido
-        z = Nodo(grado, y.hoja)     # Nuevo nodo que tomará parte de las claves de y
-        medio = len(y.claves) // 2  # Indice de la clave media
-
-        # Insertar la clave media en el padre
-        padre.claves.insert(i, y.claves[medio])
-        padre.hijos.insert(i + 1, z)  # Añadir el nuevo hijo
-
-        # Repartir las claves entre el nodo original y el nuevo
-        z.claves = y.claves[medio + 1:]
-        y.claves = y.claves[:medio]
-
-        # Si el nodo y no es hoja, también se deben dividir los hijos
-        if not y.hoja:
-            z.hijos = y.hijos[medio + 1:]
-            y.hijos = y.hijos[:medio + 1]
-
-    # Método recursivo que realiza la inserción de una clave en el nodo adecuado después de dividir.
-    def _insertar_post_division(self, nodo, k):
-        i = len(nodo.claves) - 1
-        if nodo.hoja:  # Si el nodo es una hoja, se inserta la clave directamente
-            nodo.claves.append(None)
-            while i >= 0 and k < nodo.claves[i]:
-                nodo.claves[i + 1] = nodo.claves[i]  # Desplazar las claves mayores para hacer espacio
-                i -= 1
-            nodo.claves[i + 1] = k  # Insertar la nueva clave
-        else:
-            # Si el nodo no es hoja, buscar el hijo adecuado para la clave
-            while i >= 0 and k < nodo.claves[i]:
-                i -= 1
-            i += 1
-            self._insertar_post_division(nodo.hijos[i], k)  # Llamar recursivamente para insertar en el hijo
-
-            # Si el hijo ha excedido el número máximo de claves, se debe dividir
-            if len(nodo.hijos[i].claves) > self.max_claves:
-                self.dividirHijo(nodo, i)  # Dividir el hijo y ajustar el árbol
-
-    # Método para insertar una clave en el árbol B.
-    def insertar(self, k):
+    def insertar(self, lugar):
         raiz = self.raiz
-        self._insertar_post_division(raiz, k)  # Llamada para insertar la clave en la raíz
-        if len(self.raiz.claves) > self.max_claves:  # Si la raíz está llena, dividirla
-            s = Nodo(self.grado, False)  # Crear una nueva raíz
-            s.hijos.append(self.raiz)    # Hacer que la antigua raíz sea un hijo de la nueva raíz
-            self.dividirHijo(s, 0)       # Dividir la nueva raíz
-            self.raiz = s                # La nueva raíz ahora es la raíz del árbol
-
-    # MÉTODO PARA BUSCAR NODOS DENTRO DEL ÁRBOL
-    def buscar(self, k):
-        return self._buscar_en_nodo(self.raiz, k)  # Llamada para buscar la clave en el árbol
-
-    # Método recursivo para buscar la clave en un nodo.
-    def _buscar_en_nodo(self, nodo, k):
-        i = 0
-        while i < len(nodo.claves) and k > nodo.claves[i]:
-            i += 1
-        if i < len(nodo.claves) and k == nodo.claves[i]:  # Si la clave se encuentra en el nodo
-            return True
-        elif nodo.hoja:  # Si es hoja, la clave no se encuentra
-            return False
+        if raiz.claves.longitud() == self.max_claves:
+            nueva_raiz = Nodo(self.grado, False)
+            nueva_raiz.hijos.insertar(raiz)
+            self._dividir_hijo(nueva_raiz, 0)
+            self._insertar_no_lleno(nueva_raiz, lugar)
+            self.raiz = nueva_raiz
         else:
-            return self._buscar_en_nodo(nodo.hijos[i], k)  # Buscar en el hijo correspondiente
+            self._insertar_no_lleno(raiz, lugar)
 
-    # MÉTODO DE ELIMINACIÓN DE NODOS
-    def eliminar(self, k):
-        return self._eliminar_de_nodo(self.raiz, k)  # Llamada para eliminar la clave
+    def _insertar_no_lleno(self, nodo, lugar):
+        i = nodo.claves.longitud() - 1
+        if nodo.hoja:
+            nodo.claves.insertar_ordenado(lugar)
+        else:
+            while i >= 0 and lugar < nodo.claves.obtener(i):
+                i -= 1
+            i += 1
+            hijo = nodo.hijos.obtener(i)
+            if hijo.claves.longitud() == self.max_claves:
+                self._dividir_hijo(nodo, i)
+                if lugar > nodo.claves.obtener(i):
+                    i += 1
+            self._insertar_no_lleno(nodo.hijos.obtener(i), lugar)
 
-    # Método recursivo para eliminar la clave de un nodo.
-    def _eliminar_de_nodo(self, nodo, k):
-        if k in nodo.claves:  # Si la clave se encuentra en el nodo, eliminarla
-            nodo.claves.remove(k)
-            return True
-        for hijo in nodo.hijos:  # Buscar en los hijos si la clave no está en el nodo
-            if self._eliminar_de_nodo(hijo, k):
-                return True  # Si la clave fue eliminada en algún hijo
-        return False  # Si la clave no se encontró en el árbol
+    def _dividir_hijo(self, padre, i):
+        hijo = padre.hijos.obtener(i)
+        nuevo = Nodo(self.grado, hijo.hoja)
+        medio = self.grado // 2
+
+        clave_media = hijo.claves.obtener(medio)
+        padre.claves.insertar(clave_media, i)
+        padre.hijos.insertar(nuevo, i + 1)
+
+        for j in range(medio + 1, hijo.claves.longitud()):
+            nuevo.claves.insertar(hijo.claves.obtener(j))
+        for j in range(hijo.claves.longitud() - 1, medio - 1, -1):
+            hijo.claves.eliminar(j)
+
+        if not hijo.hoja:
+            for j in range(medio + 1, hijo.hijos.longitud()):
+                nuevo.hijos.insertar(hijo.hijos.obtener(j))
+            for j in range(hijo.hijos.longitud() - 1, medio, -1):
+                hijo.hijos.eliminar(j)
+
+    def buscar(self, id_lugar):
+        return self._buscar_en_nodo(self.raiz, id_lugar)
+
+    def _buscar_en_nodo(self, nodo, id_lugar):
+        i = 0
+        while i < nodo.claves.longitud() and id_lugar > nodo.claves.obtener(i).id:
+            i += 1
+        if i < nodo.claves.longitud() and nodo.claves.obtener(i).id == id_lugar:
+            return nodo.claves.obtener(i)
+        elif nodo.hoja:
+            return None
+        else:
+            return self._buscar_en_nodo(nodo.hijos.obtener(i), id_lugar)
+
+    def eliminar(self, id_lugar):
+        return self._eliminar_de_nodo(self.raiz, id_lugar)
+
+    def _eliminar_de_nodo(self, nodo, id_lugar):
+        for i in range(nodo.claves.longitud()):
+            if nodo.claves.obtener(i).id == id_lugar:
+                nodo.claves.eliminar(i)
+                return True
+        for i in range(nodo.hijos.longitud()):
+            if self._eliminar_de_nodo(nodo.hijos.obtener(i), id_lugar):
+                return True
+        return False
