@@ -1,4 +1,4 @@
-from backend.modelos.lugar import LugarNodo
+from backend.modelos.lugar import Lugar
 from backend.modelos.utilidadesGrafo import UtilidadesGrafo
 # CLASE GRAFO TURISTICO: Representar un grafo de lugares turísticos.
 
@@ -17,7 +17,7 @@ class GrafoTuristico:
                         origen.latitud, origen.longitud,
                         destino.latitud, destino.longitud
                     )
-                    tiempo = UtilidadesGrafo.tiempo_traslado(distancia)
+                    tiempo = UtilidadesGrafo.tiempoTraslado(distancia)
                     origen.agregar_adyacente(destino, tiempo)
 
     def obtener_nodos(self):
