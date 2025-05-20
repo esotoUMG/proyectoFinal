@@ -1,7 +1,7 @@
 import csv
 import io
 from backend.modelos.lugar import Lugar
-from backend.modelos.calificacion import Calificacion
+from backend.modelos.calificacion import Calificacion 
 
 # Función para cargar lugares desde archivo CSV
 def cargar_lugares_csv(archivo, arbol):
