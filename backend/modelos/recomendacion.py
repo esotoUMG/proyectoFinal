@@ -1,7 +1,7 @@
 from backend.modelos.lugar import Lugar
 from backend.modelos.utilidadesGrafo import UtilidadesGrafo
-# CLASE GRAFO TURISTICO: Representar un grafo de lugares turísticos.
 
+# CLASE GRAFO TURISTICO: Representar un grafo de lugares turísticos.
 class GrafoTuristico:
     def __init__(self):
         self.nodos = {}  # Diccionario {id: LugarNodo}
