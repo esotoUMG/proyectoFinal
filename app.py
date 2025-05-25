@@ -12,8 +12,9 @@ arbol = BTree(grado=3)
 def home():
     js1_ = url_for('static', filename='js/scripts.js')
     css_ = url_for('static', filename='css/app.css')
-    main = url_for('static', filename='react/main.jsx')
-    return render_template('index.html', css_path=css_, js_path1=js1_, react = main)
+    mapa = url_for('static', filename='js/mapa.js')
+    return render_template('index.html', css_path=css_, js_path1=js1_, mapa = mapa)
+
 
 # API: Cargar lugares desde archivo CSV
 @app.route('/api/cargar-lugares', methods=['POST'])
