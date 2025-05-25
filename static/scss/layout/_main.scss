@@ -1,5 +1,11 @@
 @use 'base/variables' as v;
 
+h2{
+    font-family: v.$subtitulo;
+    font-size: 2.5rem;
+    
+}
+
 .contenido {
     background-color: v.$blanco;
     text-align: center;
@@ -71,3 +77,5 @@
     border: 2px solid v.$grisClaro;
     border-radius: 8px;
 }
+
+

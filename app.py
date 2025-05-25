@@ -8,12 +8,20 @@ app.config['TEMPLATES_AUTO_RELOAD'] = True  # Forzar recarga de plantillas
 # Instancia global del Árbol B
 arbol = BTree(grado=3)
 
-@app.route('/')
+#Paginas web
+@app.route('/') #index.html
 def home():
-    js1_ = url_for('static', filename='js/scripts.js')
+    js = url_for('static', filename='js/scripts.js')
     css_ = url_for('static', filename='css/app.css')
     mapa = url_for('static', filename='js/mapa.js')
-    return render_template('index.html', css_path=css_, js_path1=js1_, mapa = mapa)
+    return render_template('index.html', css_path=css_, js_path=js, mapa = mapa)
+
+@app.route('/cargar')#cargar.html
+def cargar():
+    css = url_for('static', filename='css/app.css')
+    js = url_for('static', filename='js/scripts.js')
+    return render_template('cargar.html', css_path=css, js_path=js)
+
 
 
 # API: Cargar lugares desde archivo CSV
