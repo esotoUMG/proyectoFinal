@@ -1,4 +1,6 @@
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, request, jsonify
+from flask import Flask, request, render_template, url_for, Response
+import json
 from backend.arbolB import BTree
 from backend.carga_csv import cargar_lugares_csv, cargar_calificaciones_csv
 
@@ -23,18 +25,35 @@ def cargar():
     return render_template('cargar.html', css_path=css, js_path=js)
 
 
-
-# API: Cargar lugares desde archivo CSV
 @app.route('/api/cargar-lugares', methods=['POST'])
 def cargar_lugares():
     if 'archivo' not in request.files:
-        return jsonify({'error': 'No se envió ningún archivo.'}), 400
+        return Response(json.dumps({'error': 'No se envió ningún archivo.'}, ensure_ascii=False), content_type='application/json', status=400)
+
     archivo = request.files['archivo']
     try:
+        # Cargar lugares en el árbol B
         cargar_lugares_csv(archivo, arbol)
-        return jsonify({'mensaje': 'Lugares cargados correctamente.'}), 200
+
+        # Recuperar lugares del árbol
+        lugares = []
+        for lugar in arbol.obtener_lugares():
+            lugares.append({
+                "id": lugar.id,
+                "nombre": lugar.nombre,
+                "tipo": lugar.tipo,
+                "latitud": lugar.latitud,
+                "longitud": lugar.longitud,
+                "precio": lugar.precio,
+                "calificacion": lugar.calificacion,
+                "tiempo": lugar.tiempo_estadia or 0.0
+            })
+
+        # Retornar JSON plano y con acentos correctos
+        return Response(json.dumps({"lugares": lugares}, ensure_ascii=False), content_type="application/json")
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return Response(json.dumps({'error': str(e)}, ensure_ascii=False), content_type="application/json", status=500)
+
 
 
 # API: Cargar calificaciones desde archivo CSV
