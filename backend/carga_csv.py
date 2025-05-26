@@ -4,27 +4,22 @@ from backend.modelos.lugar import Lugar
 from backend.modelos.calificacion import Calificacion 
 
 # Función para cargar lugares desde archivo CSV
-def cargar_lugares_csv(archivo, arbol):
-    """
-    Recibe un archivo CSV y un Árbol B.
-    Crea objetos Lugar y los inserta en el Árbol.
-    """
-    contenido = archivo.read().decode('utf-8')
-    lector = csv.DictReader(io.StringIO(contenido))
-
-    for fila in lector:
-        if all(k in fila for k in ["id", "nombre", "tipo", "latitud", "longitud", "precio", "calificacion"]):
-            lugar = Lugar(
-                id=fila['id'],
-                nombre=fila['nombre'],
-                tipo=fila['tipo'],
-                latitud=fila['latitud'],
-                longitud=fila['longitud'],
-                precio=fila['precio'],
-                calificacion=fila['calificacion'],
-                tiempo_estadia=fila.get('tiempo_estadia')
-            )
-            arbol.insertar(lugar)
+def cargar_lugares_csv(archivo, arbol_b):
+    decoded = archivo.read().decode('utf-8-sig').splitlines()
+    reader = csv.DictReader(decoded)
+    
+    for fila in reader:
+        lugar = Lugar(
+            id=fila['id'],
+            nombre=fila['nombre'],
+            tipo=fila['tipo'],
+            latitud=fila['latitud'],
+            longitud=fila['longitud'],
+            precio=fila['precio'],
+            calificacion=fila['calificacion'],
+            tiempo_estadia=fila.get('tiempo')  # puede ser None
+        )
+        arbol_b.insertar(lugar)
 
 # Función para cargar calificaciones desde archivo CSV
 def cargar_calificaciones_csv(archivo, arbol):

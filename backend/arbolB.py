@@ -179,3 +179,16 @@ class BTree:
             if self._eliminar_de_nodo(nodo.hijos.obtener(i), id_lugar):
                 return True
         return False
+        
+    def obtener_lugares(self):
+        lugares = []
+        self._recorrer(self.raiz, lugares)
+        return lugares
+
+    def _recorrer(self, nodo, lista):
+        for i in range(nodo.claves.longitud()):
+            lista.append(nodo.claves.obtener(i))
+        if not nodo.hoja:
+            for i in range(nodo.hijos.longitud()):
+                self._recorrer(nodo.hijos.obtener(i), lista)
+
