@@ -173,7 +173,6 @@ header {
   
 /* --- Scroll fixed header style --- */
 header.fixed {
-
     position: fixed;
     display: flex;
     align-items: center;
@@ -185,7 +184,6 @@ header.fixed {
     width: 100%;
     left: 0;
     top: 0;
-  
     .header-top {
       flex: 1;
       display: flex;
@@ -233,19 +231,19 @@ header.fixed {
           background: none;
           border: none;
           cursor: pointer;
-
           display: flex;
           align-items: center;
           justify-content: center;
           color: black;
           background-color: v.$turquesa;
-        border: 2px solid v.$turquesa;
-        color: v.$blanco;
-        &:hover{
-            background-color: v.$turquesa-claro;
-            color: v.$blanco;
-            border-color: v.$turquesa-claro; 
-        }
+          border: 2px solid v.$turquesa;
+          color: v.$blanco;
+
+          &:hover{
+              background-color: v.$turquesa-claro;
+              color: v.$blanco;
+              border-color: v.$turquesa-claro; 
+          }
         }
       }      
   }
