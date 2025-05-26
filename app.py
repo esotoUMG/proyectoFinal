@@ -10,19 +10,32 @@ app.config['TEMPLATES_AUTO_RELOAD'] = True  # Forzar recarga de plantillas
 # Instancia global del Árbol B
 arbol = BTree(grado=3)
 
-#Paginas web
-@app.route('/') #index.html
+# Rutas web
+@app.route('/')  # Página completa
 def home():
-    js = url_for('static', filename='js/scripts.js')
-    css_ = url_for('static', filename='css/app.css')
-    mapa = url_for('static', filename='js/mapa.js')
-    return render_template('index.html', css_path=css_, js_path=js, mapa = mapa)
+    css_path = url_for('static', filename='css/app.css')
+    js_path = url_for('static', filename='js/scripts.js')
+    return render_template('index.html', css_path=css_path, js_path=js_path, ocultar=False)
 
-@app.route('/cargar')#cargar.html
+@app.route('/cargar')  # Página completa
 def cargar():
-    css = url_for('static', filename='css/app.css')
-    js = url_for('static', filename='js/scripts.js')
-    return render_template('cargar.html', css_path=css, js_path=js)
+    css_path = url_for('static', filename='css/app.css')
+    js_path = url_for('static', filename='js/scripts.js')
+    return render_template('cargar.html', css_path=css_path, js_path=js_path, ocultar=True)
+
+@app.route('/lugares')  # Página completa
+def lugares():
+    css_path = url_for('static', filename='css/app.css')
+    js_path = url_for('static', filename='js/scripts.js')
+    return render_template('lugares.html', css_path=css_path, js_path=js_path, ocultar=False)
+
+@app.route('/hospedajes')  # Página completa
+def hospedajes():
+    css_path = url_for('static', filename='css/app.css')
+    js_path = url_for('static', filename='js/scripts.js')
+    return render_template('hospedajes.html', css_path=css_path, js_path=js_path, ocultar=False)
+
+
 
 
 @app.route('/api/cargar-lugares', methods=['POST'])
