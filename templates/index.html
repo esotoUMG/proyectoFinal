@@ -1,60 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Travel Map</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cal+Sans&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Dancing+Script:wght@400..700&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{css_path}}">
-</head>
-<body>
-    <div class="barra-lateral" id="sidebar">
-        <button class="boton-cerrar" onclick="cerrarBarra()">&#9776;</button>
-        <a href="/">Inicio</a>
-        <a href="/cargar">Cargar rutas</a>
-        <a href="#">Lugares turísticos</a>
-        <a href="#">Recomendación de rutas</a>
-        <a href="#">Visualización de datos</a>
-        <a href="#">Sobre el proyecto</a>
-    </div>
+{% extends "base.html" %}
 
-    <div id="main">
-        <header>
-            <div class="contenedor contenido-header">
-                <button class="boton-abrir" onclick="abrirBarra()">&#9776;</button>
-                <div class="titulo" href="/">
-                    <h1>Travel<span>Map</span></h1>
-                </div>
-            </div>
-        </header>
-        <main class="contenido">
-            <div class="contenido__video">
-                <div class="video"></div>
-                <video autoplay muted loop>
-                    <source src="{{ url_for('static', filename='video/turismo.mp4') }}" type="video/mp4">
-                </video>
-                <div class="informacion">
-                    <h1>Descubre las mejores rutas turísticas</h1>
-                    <a href="#">Explorar Ahora</a>
-                </div>
-            </div>
-            <div class="contenido__destinos">
-                <h2>Destinos Populares</h2>
-            </div>
-            <div class="contenido__rutas">
-                <h2>Rutas Destacadas</h2>
-                <div class="contenedor__mapa" id="contenedor__mapa"></div>
-            </div>
-        </main>
-        <footer>
-             <h2>Proyecto Final Programación III. <span>2025.</span></h2>
-        </footer>
-    </div>
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="{{mapa}}"></script>
-    <script src="{{js_path}}"></script>
-</body>
-</html>
+{% block title %}Inicio{% endblock %}
+
+{% block contenido %}
+  <div class="contenido__destinos">
+      <h2>Destinos Populares</h2>
+  </div>
+  <div class="contenido__rutas">
+      <h2>Rutas Destacadas</h2>
+      <div class="contenedor__mapa" id="contenedor__mapa"></div>
+  </div>
+{% endblock %}
