@@ -35,9 +35,7 @@ def hospedajes():
     js_path = url_for('static', filename='js/scripts.js')
     return render_template('hospedajes.html', css_path=css_path, js_path=js_path, ocultar=False)
 
-
-
-
+#visualización carga lugares
 @app.route('/api/cargar-lugares', methods=['POST'])
 def cargar_lugares():
     if 'archivo' not in request.files:
