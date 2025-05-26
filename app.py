@@ -8,7 +8,37 @@ app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True  # Forzar recarga de plantillas
 
 # Instancia global del Árbol B
-arbol = BTree(grado=3)
+arbol = BTree(grado=5)
+
+#Carga automatica del CSV al iniciar el servidor
+try:
+    with open('data/lugaresyhospedaje.csv', 'rb') as archivo_csv:
+        cargar_lugares_csv(archivo_csv, arbol)
+        print("Lugares cargados correctamente")
+except Exception as e:
+    print(f"Error al cargar: {e}")
+
+#visualización carga lugares
+@app.route('/api/lugares', methods=['GET'])
+def obtener_lugares():
+    try:
+        lugares = []
+        for lugar in arbol.obtener_lugares():
+            lugares.append({
+                "id": lugar.id,
+                "nombre": lugar.nombre,
+                "tipo": lugar.tipo,
+                "latitud": lugar.latitud,
+                "longitud": lugar.longitud,
+                "precio": lugar.precio,
+                "calificacion": lugar.calificacion,
+                "tiempo": lugar.tiempo_estadia or 0.0
+            })
+
+        return Response(json.dumps({"lugares": lugares}, ensure_ascii=False), content_type="application/json")
+    except Exception as e:
+        return Response(json.dumps({'error': str(e)}, ensure_ascii=False), content_type="application/json", status=500)
+
 
 # Rutas web
 @app.route('/')  # Página completa
@@ -34,37 +64,6 @@ def hospedajes():
     css_path = url_for('static', filename='css/app.css')
     js_path = url_for('static', filename='js/scripts.js')
     return render_template('hospedajes.html', css_path=css_path, js_path=js_path, ocultar=False)
-
-#visualización carga lugares
-@app.route('/api/cargar-lugares', methods=['POST'])
-def cargar_lugares():
-    if 'archivo' not in request.files:
-        return Response(json.dumps({'error': 'No se envió ningún archivo.'}, ensure_ascii=False), content_type='application/json', status=400)
-
-    archivo = request.files['archivo']
-    try:
-        # Cargar lugares en el árbol B
-        cargar_lugares_csv(archivo, arbol)
-
-        # Recuperar lugares del árbol
-        lugares = []
-        for lugar in arbol.obtener_lugares():
-            lugares.append({
-                "id": lugar.id,
-                "nombre": lugar.nombre,
-                "tipo": lugar.tipo,
-                "latitud": lugar.latitud,
-                "longitud": lugar.longitud,
-                "precio": lugar.precio,
-                "calificacion": lugar.calificacion,
-                "tiempo": lugar.tiempo_estadia or 0.0
-            })
-
-        # Retornar JSON plano y con acentos correctos
-        return Response(json.dumps({"lugares": lugares}, ensure_ascii=False), content_type="application/json")
-    except Exception as e:
-        return Response(json.dumps({'error': str(e)}, ensure_ascii=False), content_type="application/json", status=500)
-
 
 
 # API: Cargar calificaciones desde archivo CSV

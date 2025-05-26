@@ -10,13 +10,15 @@ def cargar_lugares_csv(archivo, arbol_b):
     
     for fila in reader:
         lugar = Lugar(
-            id=fila['id'],
-            nombre=fila['nombre'],
-            tipo=fila['tipo'],
-            latitud=fila['latitud'],
-            longitud=fila['longitud'],
-            precio=fila['precio'],
-            calificacion=fila['calificacion'],
+            id=fila['Id'],
+            departamento=fila['Departamento'],
+            municipio=fila['Municipio'],
+            nombre=fila['Nombre'],
+            tipo=fila['Tipo'],
+            direccion=fila['Dirección'],
+            latitud=fila['Latitud'],
+            longitud=fila['Longitud'],
+            calificacion=fila['Calificación en Google'],
             tiempo_estadia=fila.get('tiempo')  # puede ser None
         )
         arbol_b.insertar(lugar)
