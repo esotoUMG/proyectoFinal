@@ -1,31 +1,89 @@
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, request, jsonify
+from flask import Flask, request, render_template, url_for, Response
+import json
 from backend.arbolB import BTree
 from backend.carga_csv import cargar_lugares_csv, cargar_calificaciones_csv
+from backend.modelos.utilidadesGrafo import UtilidadesGrafo
 
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True  # Forzar recarga de plantillas
 
-# Instancia global del Árbol B
-arbol = BTree(grado=3)
+#Diccionario para crear arboles segun el tipo de actividad
+arbol_lugares = BTree(grado=5)     # Para turismo, comida, entretenimiento
+arbol_hospedaje = BTree(grado=5)  # Para hospedaje
 
-@app.route('/')
-def home():
-    js1_ = url_for('static', filename='js/scripts.js')
-    css_ = url_for('static', filename='css/app.css')
-    main = url_for('static', filename='react/main.jsx')
-    return render_template('index.html', css_path=css_, js_path1=js1_, react = main)
 
-# API: Cargar lugares desde archivo CSV
-@app.route('/api/cargar-lugares', methods=['POST'])
-def cargar_lugares():
-    if 'archivo' not in request.files:
-        return jsonify({'error': 'No se envió ningún archivo.'}), 400
-    archivo = request.files['archivo']
+#Carga automatica del CSV al iniciar el servidor
+try:
+    with open('data/datos.csv', 'rb') as archivo_csv:
+        cargar_lugares_csv(archivo_csv, arbol_lugares, arbol_hospedaje)
+        print("Lugares y hospedajes cargados correctamente")
+        
+    # Exportar árboles justo después de cargar
+    UtilidadesGrafo.exportarArbol(arbol_lugares, "arbol_lugares")
+    UtilidadesGrafo.exportarArbol(arbol_hospedaje, "arbol_hospedajes")
+
+except Exception as e:
+    print(f"Error al cargar: {e}")
+
+
+#visualización carga lugares
+@app.route('/api/lugares', methods=['GET'])
+def obtener_lugares():
     try:
-        cargar_lugares_csv(archivo, arbol)
-        return jsonify({'mensaje': 'Lugares cargados correctamente.'}), 200
+        lugares = []
+
+        for lugar in arbol_lugares.obtener_lugares():
+            lugares.append({
+                "id": lugar.id,
+                "nombre": lugar.nombre,
+                "tipo": lugar.tipo,
+                "latitud": lugar.latitud,
+                "longitud": lugar.longitud,
+                "calificacion": lugar.calificacion,
+                "tiempo": lugar.tiempo_estadia or 0.0
+            })
+
+        for lugar in arbol_hospedaje.obtener_lugares():
+            lugares.append({
+                "id": lugar.id,
+                "nombre": lugar.nombre,
+                "tipo": lugar.tipo,
+                "latitud": lugar.latitud,
+                "longitud": lugar.longitud,
+                "calificacion": lugar.calificacion,
+                "tiempo": lugar.tiempo_estadia or 0.0
+            })
+
+        return Response(json.dumps({"lugares": lugares}, ensure_ascii=False), content_type="application/json")
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return Response(json.dumps({'error': str(e)}, ensure_ascii=False), content_type="application/json", status=500)
+
+
+# Rutas web
+@app.route('/')  # Página completa
+def home():
+    css_path = url_for('static', filename='css/app.css')
+    js_path = url_for('static', filename='js/scripts.js')
+    return render_template('index.html', css_path=css_path, js_path=js_path, ocultar=False)
+
+@app.route('/cargar')  # Página completa
+def cargar():
+    css_path = url_for('static', filename='css/app.css')
+    js_path = url_for('static', filename='js/scripts.js')
+    return render_template('cargar.html', css_path=css_path, js_path=js_path, ocultar=True)
+
+@app.route('/lugares')  # Página completa
+def lugares():
+    css_path = url_for('static', filename='css/app.css')
+    js_path = url_for('static', filename='js/scripts.js')
+    return render_template('lugares.html', css_path=css_path, js_path=js_path, ocultar=False)
+
+@app.route('/hospedajes')  # Página completa
+def hospedajes():
+    css_path = url_for('static', filename='css/app.css')
+    js_path = url_for('static', filename='js/scripts.js')
+    return render_template('hospedajes.html', css_path=css_path, js_path=js_path, ocultar=False)
 
 
 # API: Cargar calificaciones desde archivo CSV

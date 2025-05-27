@@ -4,27 +4,32 @@ from backend.modelos.lugar import Lugar
 from backend.modelos.calificacion import Calificacion 
 
 # Función para cargar lugares desde archivo CSV
-def cargar_lugares_csv(archivo, arbol):
-    """
-    Recibe un archivo CSV y un Árbol B.
-    Crea objetos Lugar y los inserta en el Árbol.
-    """
-    contenido = archivo.read().decode('utf-8')
-    lector = csv.DictReader(io.StringIO(contenido))
+def cargar_lugares_csv(archivo, arbol_lugares, arbol_hospedaje):
+    decoded = archivo.read().decode('utf-8-sig').splitlines()
+    reader = csv.DictReader(decoded)
 
-    for fila in lector:
-        if all(k in fila for k in ["id", "nombre", "tipo", "latitud", "longitud", "precio", "calificacion"]):
-            lugar = Lugar(
-                id=fila['id'],
-                nombre=fila['nombre'],
-                tipo=fila['tipo'],
-                latitud=fila['latitud'],
-                longitud=fila['longitud'],
-                precio=fila['precio'],
-                calificacion=fila['calificacion'],
-                tiempo_estadia=fila.get('tiempo_estadia')
-            )
-            arbol.insertar(lugar)
+    for fila in reader:
+        lugar = Lugar(
+            id=fila['ï»¿Id'] if 'ï»¿Id' in fila else fila.get('Id'),  
+            departamento=fila['Departamento'],
+            municipio=fila['Municipio'],
+            nombre=fila['Nombre'],
+            tipo=fila['Tipo'],
+            direccion=fila['Dirección'],
+            latitud=fila['Latitud'],
+            longitud=fila['Longitud'],
+            calificacion=fila['Calificación en Google'],
+            tiempo_estadia=fila.get('tiempo')
+        )
+
+        tipo = lugar.tipo.strip().lower()
+        if tipo in ['turismo', 'comida', 'entretenimiento']:
+            arbol_lugares.insertar(lugar)
+        elif tipo in ['hospedaje', 'hotel']:
+            arbol_hospedaje.insertar(lugar)
+        else:
+            print(f"Tipo no reconocido para lugar: {lugar.nombre} -> '{lugar.tipo}'")
+
 
 # Función para cargar calificaciones desde archivo CSV
 def cargar_calificaciones_csv(archivo, arbol):

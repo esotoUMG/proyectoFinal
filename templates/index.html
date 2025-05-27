@@ -1,55 +1,65 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Travel Map</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cal+Sans&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Dancing+Script:wght@400..700&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{css_path}}">
-</head>
-<body>
-    <div class="barra-lateral" id="sidebar">
-        <button class="boton-cerrar" onclick="cerrarBarra()">&#9776;</button>
-        <a href="#">Inicio</a>
-        <a href="#">Cargar rutas</a>
-        <a href="#">Lugares turísticos</a>
-        <a href="#">Recomendación de rutas</a>
-        <a href="#">Visualización de datos</a>
-        <a href="#">Sobre el proyecto</a>
-    </div>
+{% extends "base.html" %}
 
-    <div id="main">
-        <header>
-            <div class="contenedor contenido-header">
-                <button class="boton-abrir" onclick="abrirBarra()">&#9776;</button>
-                <div class="titulo" href="index.html">
-                    <h1>Travel<span>Map</span></h1>
-                </div>
-            </div>
-        </header>
-        <main class="contenido">
-            <div class="contenido__video">
-                <div class="video"></div>
-                <div class="informacion">
-                    <h1>Descubre las mejores rutas turísticas turísticas</h1>
-                    <a href="#">Explorar Ahora</a>
-                </div>
-            </div>
-            <div class="contenido__destinos">
-                <h2>Destinos Populares</h2>
-            </div>
-            <div class="contenido__rutas">
-                <h2>Rutas Destacadas</h2>
-                <div class="contenedor__mapa" id="contenedor__mapa"></div>
-            </div>
-        </main>
-        <footer>
-             <h2>Proyecto Final Programación III. <span>2025.</span></h2>
-        </footer>
-    </div>
-    <script src="{{js_path1}}"></script>
-    <script src="{{react}}"></script>
-</body>
-</html>
+{% block title %}Inicio{% endblock %}
+
+{% block contenido %}
+  <div class="contenido__destinos">
+    <h2>Destinos Populares</h2>
+    <ul id="lista-lugares" class="destinos-lista"></ul> <!-- Aquí se inyectan los lugares -->
+  </div>
+
+  <div class="contenido__rutas">
+    <h2>Hospedajes Destacados</h2>
+    <div class="contenedor__mapa" id="contenedor__mapa"></div>
+  </div>
+
+  <style>
+    .destinos-lista {
+      list-style: none;
+      padding: 0;
+    }
+    .destinos-lista li {
+      background: #f5f5f5;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+  </style>
+
+  <!-- Script para cargar los lugares -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      fetch('/api/lugares')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Error al cargar los lugares');
+          }
+          return response.json();
+        })
+        .then(data => {
+          const lista = document.getElementById('lista-lugares');
+          if (!data.lugares || data.lugares.length === 0) {
+            lista.innerHTML = '<li>No hay lugares disponibles.</li>';
+            return;
+          }
+
+          data.lugares.forEach(lugar => {
+            const item = document.createElement('li');
+            item.innerHTML = `
+              <strong>${lugar.nombre}</strong><br>
+              Tipo: ${lugar.tipo}<br>
+              Precio: Q${lugar.precio}<br>
+              Calificación: ${lugar.calificacion}
+            `;
+            lista.appendChild(item);
+          });
+        })
+        .catch(error => {
+          console.error('Error al obtener lugares:', error);
+          const lista = document.getElementById('lista-lugares');
+          lista.innerHTML = '<li>Error al cargar los lugares.</li>';
+        });
+    });
+  </script>
+{% endblock %}

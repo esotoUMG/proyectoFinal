@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Travel Map{% endblock %}</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cal+Sans&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Dancing+Script:wght@400..700&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
+
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="{{ css_path }}" />
+</head>
+<body>
+
+    <header>
+        <div class="header-top">
+          <div class="logo">
+            <a href="/">Travel<span>Map</span></a>
+          </div>
+      
+          <nav class="menu opciones">
+            <a href="/lugares" data-page="/lugares"><i class="fa-solid fa-location-dot"></i> Lugares</a>
+            <a href="/hospedajes" data-page="/hospedajes"><i class="fa-solid fa-hotel"></i> Hospedajes</a>
+          </nav>
+
+          <div class="anfitrion">
+            <a href="/cargar">Conviértete en anfitrión</a>
+          </div>
+        </div>
+      
+
+      
+        {% if not ocultar %}
+        <form id="filtros-form">
+          <div class="input-busqueda">
+            <input type="text" name="busqueda" placeholder="Buscar..." />
+          </div>
+          <div id="selects-container">
+            <!-- Selects dinámicos acá -->
+          </div>
+          <button type="submit" aria-label="Buscar">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </form>
+        {% endif %}
+        
+      </header>
+      
+    <main class="contenido" id="contenedor">
+        {% block contenido %}{% endblock %}
+    </main>
+
+    <footer>
+        <h2>Proyecto Final Programación III. <span>2025.</span></h2>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="{{ js_path }}"></script>
+</body>
+</html>
