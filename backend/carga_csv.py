@@ -22,14 +22,13 @@ def cargar_lugares_csv(archivo, arbol_lugares, arbol_hospedaje):
             tiempo_estadia=fila.get('tiempo')
         )
 
-        tipo = lugar.tipo.lower()
+        tipo = lugar.tipo.strip().lower()
         if tipo in ['turismo', 'comida', 'entretenimiento']:
             arbol_lugares.insertar(lugar)
-        elif tipo == 'hospedaje':
+        elif tipo in ['hospedaje', 'hotel']:
             arbol_hospedaje.insertar(lugar)
         else:
-            # Opcional: manejar tipos no contemplados o ignorar
-            pass
+            print(f"Tipo no reconocido para lugar: {lugar.nombre} -> '{lugar.tipo}'")
 
 
 # Función para cargar calificaciones desde archivo CSV

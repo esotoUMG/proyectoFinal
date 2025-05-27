@@ -16,9 +16,8 @@ arbol_hospedaje = BTree(grado=5)  # Para hospedaje
 #Carga automatica del CSV al iniciar el servidor
 try:
     with open('data/datos.csv', 'rb') as archivo_csv:
-        cargar_lugares_csv(archivo_csv, arbol_lugares)
-        cargar_lugares_csv(archivo_csv, arbol_hospedaje)  # si son CSVs separados o filtras dentro
-        print("Lugares cargados correctamente")
+        cargar_lugares_csv(archivo_csv, arbol_lugares, arbol_hospedaje)
+        print("Lugares y hospedajes cargados correctamente")
         
     # Exportar árboles justo después de cargar
     UtilidadesGrafo.exportarArbol(arbol_lugares, "arbol_lugares")
@@ -31,54 +30,30 @@ except Exception as e:
 #visualización carga lugares
 @app.route('/api/lugares', methods=['GET'])
 def obtener_lugares():
-    tipo = request.args.get('tipo', '').lower()
-
     try:
         lugares = []
-        if tipo in ['turismo', 'comida', 'entretenimiento']:
-            for lugar in arbol_lugares.obtener_lugares():
-                lugares.append({
-                    "id": lugar.id,
-                    "nombre": lugar.nombre,
-                    "tipo": lugar.tipo,
-                    "latitud": lugar.latitud,
-                    "longitud": lugar.longitud,
-                    "calificacion": lugar.calificacion,
-                    "tiempo": lugar.tiempo_estadia or 0.0
-                })
-        elif tipo == 'hospedaje':
-            for lugar in arbol_hospedaje.obtener_lugares():
-                lugares.append({
-                    "id": lugar.id,
-                    "nombre": lugar.nombre,
-                    "tipo": lugar.tipo,
-                    "latitud": lugar.latitud,
-                    "longitud": lugar.longitud,
-                    "calificacion": lugar.calificacion,
-                    "tiempo": lugar.tiempo_estadia or 0.0
-                })
-        else:
-            # Si no se especifica tipo, puedes devolver todos mezclados
-            for lugar in arbol_lugares.obtener_lugares():
-                lugares.append({
-                    "id": lugar.id,
-                    "nombre": lugar.nombre,
-                    "tipo": lugar.tipo,
-                    "latitud": lugar.latitud,
-                    "longitud": lugar.longitud,
-                    "calificacion": lugar.calificacion,
-                    "tiempo": lugar.tiempo_estadia or 0.0
-                })
-            for lugar in arbol_hospedaje.obtener_lugares():
-                lugares.append({
-                    "id": lugar.id,
-                    "nombre": lugar.nombre,
-                    "tipo": lugar.tipo,
-                    "latitud": lugar.latitud,
-                    "longitud": lugar.longitud,
-                    "calificacion": lugar.calificacion,
-                    "tiempo": lugar.tiempo_estadia or 0.0
-                })
+
+        for lugar in arbol_lugares.obtener_lugares():
+            lugares.append({
+                "id": lugar.id,
+                "nombre": lugar.nombre,
+                "tipo": lugar.tipo,
+                "latitud": lugar.latitud,
+                "longitud": lugar.longitud,
+                "calificacion": lugar.calificacion,
+                "tiempo": lugar.tiempo_estadia or 0.0
+            })
+
+        for lugar in arbol_hospedaje.obtener_lugares():
+            lugares.append({
+                "id": lugar.id,
+                "nombre": lugar.nombre,
+                "tipo": lugar.tipo,
+                "latitud": lugar.latitud,
+                "longitud": lugar.longitud,
+                "calificacion": lugar.calificacion,
+                "tiempo": lugar.tiempo_estadia or 0.0
+            })
 
         return Response(json.dumps({"lugares": lugares}, ensure_ascii=False), content_type="application/json")
     except Exception as e:
