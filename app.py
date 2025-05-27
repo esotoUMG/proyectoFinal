@@ -77,7 +77,20 @@ def cargar():
 def lugares():
     css_path = url_for('static', filename='css/app.css')
     js_path = url_for('static', filename='js/scripts.js')
-    return render_template('lugares.html', css_path=css_path, js_path=js_path, ocultar=False)
+
+    # Obtener lugares desde el árbol
+    lugares_data = []
+
+    for lugar in arbol_lugares.obtener_lugares():
+        lugares_data.append(lugar)
+
+    return render_template(
+        'lugares.html',
+        lugares=lugares_data,
+        css_path=css_path,
+        js_path=js_path,
+        ocultar=False
+    )
 
 @app.route('/hospedajes')  # Página completa
 def hospedajes():

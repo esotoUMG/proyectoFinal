@@ -3,12 +3,10 @@ function toggleSearchbar(href) {
     const filtrosForm = document.getElementById('filtros-form');
     if (!filtrosForm) return;
 
-    console.log(`toggleSearchbar: href=${href} -> ${(href === '/cargar' ? 'ocultar' : 'mostrar')}`);
-
     if (href === '/cargar') {
-        filtrosForm.style.display = 'none';  // Ocultar formulario
+        filtrosForm.style.display = 'none';
     } else {
-        filtrosForm.style.display = '';      // Mostrar formulario (usa estilo CSS por defecto)
+        filtrosForm.style.display = '';
     }
 }
 
@@ -57,7 +55,34 @@ function actualizarFiltros(tipo) {
     }
 }
 
-// --- Función para cargar contenido y actualizar filtros y estado ---
+// --- Función para cargar lugares desde la API y mostrarlos ---
+function cargarLugaresDesdeAPI() {
+    fetch('/api/lugares')
+        .then(res => res.json())
+        .then(data => {
+            const lista = document.getElementById('lista-lugares');
+            if (!lista) return;
+
+            lista.innerHTML = ""; // Limpiar anterior
+
+            data.lugares.forEach(lugar => {
+                const item = document.createElement('div');
+                item.classList.add('lugar-card');
+                item.innerHTML = `
+                    <h3>${lugar.nombre}</h3>
+                    <p>Tipo: ${lugar.tipo}</p>
+                    <p>Calificación: ${lugar.calificacion}</p>
+                    <p>Tiempo de estadía: ${lugar.tiempo} horas</p>
+                `;
+                lista.appendChild(item);
+            });
+        })
+        .catch(error => {
+            console.error("Error al cargar lugares:", error);
+        });
+}
+
+// --- Función para cargar contenido dinámicamente ---
 function cargarContenido(e) {
     e.preventDefault();
 
@@ -68,13 +93,9 @@ function cargarContenido(e) {
     document.querySelectorAll('.opciones a, .anfitrion a').forEach(el => el.classList.remove('activo'));
     enlace.classList.add('activo');
 
-    // Guardar en localStorage
     localStorage.setItem('pagina-activa', href);
-
-    // Mostrar u ocultar searchbar según href
     toggleSearchbar(href);
 
-    // Cambiar filtros según tipo
     if (href.includes("hospedajes")) {
         actualizarFiltros("hospedajes");
     } else if (href.includes("lugares")) {
@@ -83,7 +104,6 @@ function cargarContenido(e) {
         actualizarFiltros(null);
     }
 
-    // Cargar contenido dinámico
     fetch(href)
         .then(response => {
             if (!response.ok) throw new Error("No se pudo cargar la página");
@@ -95,6 +115,11 @@ function cargarContenido(e) {
             const contenido = doc.querySelector('main#contenedor');
             if (contenido) {
                 document.getElementById('contenedor').innerHTML = contenido.innerHTML;
+
+                // 🔁 Volver a cargar los lugares desde la API si estamos en /lugares
+                if (href.includes("lugares")) {
+                    cargarLugaresDesdeAPI();
+                }
             } else {
                 throw new Error("No se encontró el contenido esperado");
             }
@@ -105,15 +130,14 @@ function cargarContenido(e) {
         });
 }
 
-// --- Agregar event listeners a enlaces ---
+// --- Agregar event listeners a enlaces del menú ---
 document.querySelectorAll('.opciones a, .anfitrion a').forEach(link => {
     link.addEventListener('click', cargarContenido);
 });
 
-// --- Restaurar estado al cargar la página ---
+// --- Restaurar estado al recargar la página ---
 window.addEventListener('DOMContentLoaded', () => {
     const activa = localStorage.getItem('pagina-activa') || window.location.pathname;
-
     const linkActivo = document.querySelector(`.opciones a[href="${activa}"], .anfitrion a[href="${activa}"]`);
     if (linkActivo) {
         linkActivo.classList.add('activo');
@@ -125,14 +149,14 @@ window.addEventListener('DOMContentLoaded', () => {
         actualizarFiltros("hospedajes");
     } else if (activa.includes("lugares")) {
         actualizarFiltros("lugares");
+        cargarLugaresDesdeAPI(); 
     } else {
         actualizarFiltros(null);
     }
 });
 
-// --- Manejo del scroll para fijar header y mostrar solo la searchbar ---
+// --- Manejo del scroll para fijar header ---
 const header = document.querySelector('header');
-const filtrosForm = document.getElementById('filtros-form');
 const menu = document.querySelector('.menu.opciones');
 
 window.addEventListener('scroll', () => {
@@ -142,7 +166,6 @@ window.addEventListener('scroll', () => {
         header.classList.remove('fixed');
     }
 
-    // Cerrar menú grande al scrollear para evitar que quede abierto
     if (menu.classList.contains('menu-grande')) {
         menu.classList.remove('menu-grande');
     }
