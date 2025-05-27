@@ -77,6 +77,7 @@ def cargar():
 def lugares():
     css_path = url_for('static', filename='css/app.css')
     js_path = url_for('static', filename='js/scripts.js')
+    lugaresjs = url_for('static', filename='js/lugares.js')
 
     # Obtener lugares desde el árbol
     lugares_data = []
@@ -89,6 +90,7 @@ def lugares():
         lugares=lugares_data,
         css_path=css_path,
         js_path=js_path,
+        lugaresjs = lugaresjs,
         ocultar=False
     )
 

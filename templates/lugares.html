@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Inicio{% endblock %}
+{% block title %}Travel Map{% endblock %}
 
 {% block contenido %}
+
+<body>
   <div class="contenido__destinos">
     <h2>Destinos Populares</h2>
     <ul id="lista-lugares" class="destinos-lista"></ul> <!-- Aquí se inyectan los lugares -->
@@ -12,54 +14,10 @@
     <h2>Hospedajes Destacados</h2>
     <div class="contenedor__mapa" id="contenedor__mapa"></div>
   </div>
+</body>
 
-  <style>
-    .destinos-lista {
-      list-style: none;
-      padding: 0;
-    }
-    .destinos-lista li {
-      background: #f5f5f5;
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-  </style>
 
   <!-- Script para cargar los lugares -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      fetch('/api/lugares')
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Error al cargar los lugares');
-          }
-          return response.json();
-        })
-        .then(data => {
-          const lista = document.getElementById('lista-lugares');
-          if (!data.lugares || data.lugares.length === 0) {
-            lista.innerHTML = '<li>No hay lugares disponibles.</li>';
-            return;
-          }
-
-          data.lugares.forEach(lugar => {
-            const item = document.createElement('li');
-            item.innerHTML = `
-              <strong>${lugar.nombre}</strong><br>
-              Tipo: ${lugar.tipo}<br>
-              Precio: Q${lugar.precio}<br>
-              Calificación: ${lugar.calificacion}
-            `;
-            lista.appendChild(item);
-          });
-        })
-        .catch(error => {
-          console.error('Error al obtener lugares:', error);
-          const lista = document.getElementById('lista-lugares');
-          lista.innerHTML = '<li>Error al cargar los lugares.</li>';
-        });
-    });
-  </script>
+  <script src="{{ js_path }}"></script>
+  <script src="{{ lugaresjs }}"></script>
 {% endblock %}

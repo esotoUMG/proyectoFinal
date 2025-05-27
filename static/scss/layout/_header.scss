@@ -184,6 +184,10 @@ header.fixed {
     width: 100%;
     left: 0;
     top: 0;
+
+    a{
+      font-size: 1.5rem;
+    }
     .header-top {
       flex: 1;
       display: flex;

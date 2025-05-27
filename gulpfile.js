@@ -6,10 +6,13 @@ import gulpSass from 'gulp-sass';
 const sass = gulpSass(dartSass);
 
 export function css(done) {
-    // Asegúrate de que la ruta sea correcta
-    src('static/scss/**/*.scss', {sourcemaps:true})  // Busca todos los archivos SCSS
-        .pipe(sass().on('error', sass.logError))
-        .pipe(dest('static/css', {sourcemaps:true}));  // Genera el archivo en static/css/
+    src('static/scss/app.scss', { sourcemaps: true }) // Solo compila el archivo principal
+        .pipe(
+            sass({
+                includePaths: ['static/scss', 'static/scss/base', 'static/scss/layout']
+            }).on('error', sass.logError)
+        )
+        .pipe(dest('static/css', { sourcemaps: '.' }));
     done();
 }
 
