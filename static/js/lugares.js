@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    fetch('/api/lugares')
+    fetch('/api/lugares?tipo=lugares')
       .then(response => {
         if (!response.ok) {
           throw new Error('Error al cargar los lugares');
@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
           item.innerHTML = `
             <strong>${lugar.nombre}</strong><br>
             Tipo: ${lugar.tipo}<br>
-            Precio: Q${lugar.precio}<br>
+            Dirección: Q${lugar.direccion}<br>
             Calificación: ${lugar.calificacion}
           `;
           lista.appendChild(item);
