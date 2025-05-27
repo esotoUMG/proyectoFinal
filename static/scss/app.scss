@@ -1,2 +1,2 @@
-@use 'base'; //Llamando a todos los archivos que se encuentren en la carpeta base
-@use 'layout';//Llamando a todos los archivos que se encuentre en la carpeta layout
+@forward 'base'; //Llamando a todos los archivos que se encuentren en la carpeta base
+@forward 'layout';//Llamando a todos los archivos que se encuentre en la carpeta layout

@@ -12,7 +12,7 @@ export function css(done) {
                 includePaths: ['static/scss', 'static/scss/base', 'static/scss/layout']
             }).on('error', sass.logError)
         )
-        .pipe(dest('static/css', { sourcemaps: '.' }));
+        .pipe(dest('static/css', { sourcemaps: '.' })) ;
     done();
 }
 

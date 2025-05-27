@@ -173,27 +173,33 @@ header {
   
 /* --- Scroll fixed header style --- */
 header.fixed {
-    position: fixed;
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4rem 2rem;
+  background: white;
+  z-index: 1000;
+  max-width: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+
+  .header-top {
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 4rem 2rem;
-    background: white;
-    z-index: 1000;
-    max-width: 100%;
-    width: 100%;
-    left: 0;
-    top: 0;
-
     a{
-      font-size: 1.5rem;
+      font-size: 3rem;
     }
-    .header-top {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+  }
+
+  .anfitrion{
+    a{
+      font-size: 1.2rem;
     }
+  }
   
     #filtros-form {
         position: absolute;
