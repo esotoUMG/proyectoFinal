@@ -12,11 +12,12 @@ arbol = BTree(grado=5)
 
 #Carga automatica del CSV al iniciar el servidor
 try:
-    with open('data/lugaresyhospedaje.csv', 'rb') as archivo_csv:
+    with open('data/datos.csv', 'rb') as archivo_csv:
         cargar_lugares_csv(archivo_csv, arbol)
-        print("Lugares cargados correctamente")
+        print("Lugares cargados correctamente")  # DEBE MOSTRAR ESTO
 except Exception as e:
-    print(f"Error al cargar: {e}")
+    print(f"Error al cargar: {e}")  # SI FALLA, MUESTRA ESTO
+
 
 #visualización carga lugares
 @app.route('/api/lugares', methods=['GET'])
@@ -30,7 +31,6 @@ def obtener_lugares():
                 "tipo": lugar.tipo,
                 "latitud": lugar.latitud,
                 "longitud": lugar.longitud,
-                "precio": lugar.precio,
                 "calificacion": lugar.calificacion,
                 "tiempo": lugar.tiempo_estadia or 0.0
             })

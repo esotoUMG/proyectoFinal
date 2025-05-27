@@ -7,10 +7,10 @@ from backend.modelos.calificacion import Calificacion
 def cargar_lugares_csv(archivo, arbol_b):
     decoded = archivo.read().decode('utf-8-sig').splitlines()
     reader = csv.DictReader(decoded)
-    
+
     for fila in reader:
         lugar = Lugar(
-            id=fila['Id'],
+            id=fila['ï»¿Id'] if 'ï»¿Id' in fila else fila.get('Id'),  # detectar el campo correcto
             departamento=fila['Departamento'],
             municipio=fila['Municipio'],
             nombre=fila['Nombre'],
@@ -19,9 +19,10 @@ def cargar_lugares_csv(archivo, arbol_b):
             latitud=fila['Latitud'],
             longitud=fila['Longitud'],
             calificacion=fila['Calificación en Google'],
-            tiempo_estadia=fila.get('tiempo')  # puede ser None
+            tiempo_estadia=fila.get('tiempo')
         )
         arbol_b.insertar(lugar)
+
 
 # Función para cargar calificaciones desde archivo CSV
 def cargar_calificaciones_csv(archivo, arbol):
