@@ -147,4 +147,3 @@ window.addEventListener('scroll', () => {
         menu.classList.remove('menu-grande');
     }
 });
-

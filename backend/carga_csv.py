@@ -4,13 +4,13 @@ from backend.modelos.lugar import Lugar
 from backend.modelos.calificacion import Calificacion 
 
 # Función para cargar lugares desde archivo CSV
-def cargar_lugares_csv(archivo, arbol_b):
+def cargar_lugares_csv(archivo, arbol_lugares, arbol_hospedaje):
     decoded = archivo.read().decode('utf-8-sig').splitlines()
     reader = csv.DictReader(decoded)
 
     for fila in reader:
         lugar = Lugar(
-            id=fila['ï»¿Id'] if 'ï»¿Id' in fila else fila.get('Id'),  # detectar el campo correcto
+            id=fila['ï»¿Id'] if 'ï»¿Id' in fila else fila.get('Id'),  
             departamento=fila['Departamento'],
             municipio=fila['Municipio'],
             nombre=fila['Nombre'],
@@ -21,7 +21,15 @@ def cargar_lugares_csv(archivo, arbol_b):
             calificacion=fila['Calificación en Google'],
             tiempo_estadia=fila.get('tiempo')
         )
-        arbol_b.insertar(lugar)
+
+        tipo = lugar.tipo.lower()
+        if tipo in ['turismo', 'comida', 'entretenimiento']:
+            arbol_lugares.insertar(lugar)
+        elif tipo == 'hospedaje':
+            arbol_hospedaje.insertar(lugar)
+        else:
+            # Opcional: manejar tipos no contemplados o ignorar
+            pass
 
 
 # Función para cargar calificaciones desde archivo CSV
