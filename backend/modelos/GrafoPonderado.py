@@ -262,28 +262,37 @@ def recalculate_graph():
         current = current.next
 
 def load_places_csv(file):
-    stream = io.StringIO(file.stream.read().decode("UTF8"), newline=None)
-    csv_input = csv.DictReader(stream)
-    for row in csv_input:
-        # Validate row keys based on type_entity
-        id = row.get('Identificador') or row.get('Id') or row.get('id')
-        name = row.get('Nombre') or row.get('name')
-        type_entity = row.get('Tipo') or row.get('Tipo de entidad') or row.get('TipoEntidad') or row.get('type_entity')
-        lat = row.get('Latitud') or row.get('Latitude') or row.get('lat')
-        lon = row.get('Longitud') or row.get('Longitude') or row.get('lon')
-        price = row.get('Precio') or row.get('price')
-        avg_rating = row.get('Calificación promedio') or row.get('Calificacion') or row.get('rating') or 0
-        if not (id and name and type_entity and lat and lon and price):
-            continue
+    try:
+        stream = io.StringIO(file.stream.read().decode("UTF8"), newline=None)
+        csv_input = csv.DictReader(stream)
+        for row in csv_input:
+            # Validate row keys based on type_entity
+            id = row.get('Identificador') or row.get('Id') or row.get('id')
+            name = row.get('Nombre') or row.get('name')
+            type_entity = row.get('Tipo') or row.get('Tipo de entidad') or row.get('TipoEntidad') or row.get('type_entity')
+            lat = row.get('Latitud') or row.get('Latitude') or row.get('lat')
+            lon = row.get('Longitud') or row.get('Longitude') or row.get('lon')
+            price = row.get('Precio') or row.get('price')
+            avg_rating = row.get('Calificación promedio') or row.get('Calificacion') or row.get('rating') or 0
+            
+            if not (id and name and type_entity and lat and lon and price):
+                continue
 
-        if type_entity == "Turístico":
-            stay_time = row.get('Tiempo de estadía') or row.get('stay_time') or 1
-            place = TouristPlace(id, name, lat, lon, price, float(avg_rating), stay_time)
-        else:
-            place = Place(id, name, type_entity, lat, lon, price, float(avg_rating))
+            if type_entity == "Turístico":
+                stay_time = row.get('Tiempo de estadía') or row.get('stay_time') or 1
+                place = TouristPlace(id, name, lat, lon, price, float(avg_rating), stay_time)
+            else:
+                place = Place(id, name, type_entity, lat, lon, price, float(avg_rating))
 
-        places_tree.insert(id, place)
-        add_place_to_graph(place)
+            places_tree.insert(id, place)
+            add_place_to_graph(place)
+            print(f"Lugar cargado: {name} ({type_entity}) - ID: {id}, Lat: {lat}, Lon: {lon}, Precio: Q{price}, Calificación: {avg_rating}")
+            print(place)
+
+    except Exception as e:
+        raise ValueError(f"Error al procesar el archivo CSV: {str(e)}")
+        print(f"Error al procesar el archivo CSV: {str(e)}")
+
 
 @app.route('/')
 def index():
@@ -296,7 +305,6 @@ def index():
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
- integrity="sha512-xodZBntM13Mz7f1oXZ6ZYwGyzF3Kn8yx3Twk2QsAmro++9BaTku0Jc8PcqhBj+0J/l3vZ6YN20oNQmRo3eJEHQ=="
  crossorigin=""/>
 <style>
   body { font-family: Arial, sans-serif; padding:10px; background:#f5f5f5; }
@@ -335,7 +343,6 @@ def index():
 <div id="mapid"></div>
 
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
- integrity="sha512-nMMMyDTYF9Kj6z5C+8R9YwNbpZTp9dQs5b+de0PML2Xj4zFBHcreEBGhGpT3Qw7rNLOOtbE6w73fXTox87KwZw=="
  crossorigin=""></script>
 <script>
 let map = L.map('mapid').setView([4.6, -74.07], 6);  // Colombia default
@@ -366,7 +373,7 @@ document.getElementById('upload-form').onsubmit = async function(e){
       .then(data => {
         markersLayer.clearLayers();
         data.places.forEach(p=>{
-          L.marker([p.lat, p.lon]).addTo(markersLayer).bindPopup(\`\${p.name} (\${p.type_entity})<br>Precio: Q\${p.price} <br>Calificación: \${p.avg_rating.toFixed(2)}\`);
+          //L.marker([p.lat, p.lon]).addTo(markersLayer).bindPopup(\`\${p.name} (\${p.type_entity})<br>Precio: Q\${p.price} <br>Calificación: \${p.avg_rating.toFixed(2)}\`);
         });
       });
   }
@@ -388,7 +395,7 @@ document.getElementById('recommendation-form').onsubmit = async function(e){
   if(data.recommendations && data.recommendations.length > 0){
     let bounds = [];
     data.recommendations.forEach(p=>{
-      let marker = L.marker([p.lat, p.lon]).addTo(markersLayer).bindPopup(\`\${p.name}<br>Precio: Q\${p.price}<br>Calificación: \${p.avg_rating.toFixed(2)}<br>Tiempo de estadía: \${p.stay_time || "-"} hrs\`);
+      //let marker = L.marker([p.lat, p.lon]).addTo(markersLayer).bindPopup(\`\${p.name}<br>Precio: Q\${p.price}<br>Calificación: \${p.avg_rating.toFixed(2)}<br>Tiempo de estadía: \${p.stay_time || "-"} hrs\`);
       bounds.push([p.lat, p.lon]);
     });
     map.fitBounds(bounds);
@@ -402,6 +409,8 @@ document.getElementById('recommendation-form').onsubmit = async function(e){
 </html>
 """)
 
+# ... (rest of imports and code unchanged)
+
 @app.route('/upload_csv', methods=['POST'])
 def upload_csv():
     file = request.files.get('file')
@@ -411,7 +420,11 @@ def upload_csv():
         load_places_csv(file)
         return jsonify({'success': True, 'message': 'CSV cargado con éxito. Lugares actualizados.'})
     except Exception as e:
+        # Log error server side for troubleshooting (print for now)
+        print("Error al procesar CSV:", e)
         return jsonify({'success': False, 'message': f'Error procesando CSV: {str(e)}'})
+
+
 
 @app.route('/all_places')
 def all_places():
