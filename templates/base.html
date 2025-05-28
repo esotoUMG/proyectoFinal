@@ -57,8 +57,11 @@
     </header>
       
     <main class="contenido" id="contenedor">
-        {% block contenido %}{% endblock %}
-        <div class ="contenedor" id="mapid" style="width: 500px; height: 500px;" >Mapa</div>
+        {% block contenido %}
+        <!--AQUI VA EL CONTENIDO DE CADA PESTAÑA
+            -------- NO TOCAR --------
+        -->
+        {% endblock %}
     </main>
 
     <footer>
@@ -66,6 +69,22 @@
     </footer>
 
     <!-- Scripts -->
+<<<<<<< HEAD
+    {% block scripts %}
+      <script src="{{ js_path }}"></script>
+      <!-- <script src="{{ jsH }}"></script>
+      <script src="{{ lugaresjs }}"></script> -->
+    {% endblock %}
+=======
     <script src="{{ js_path }}"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" crossorigin=""></script>
+    <script>
+        let map = L.map('mapid').setView([14.63491, -90.51893], 13); 
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 15,
+        attribution: '© OpenStreetMap contributors'
+        }).addTo(map);</script>
+>>>>>>> 4198d3d1c774e3a297546377206825c17f71352c
 </body>
 </html>
