@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>{% block title %}Travel Map{% endblock %}</title>
 
     <!-- Font Awesome -->
@@ -23,37 +23,38 @@
 
     <header>
         <div class="header-top">
-          <div class="logo">
-            <a href="/lugares">Travel<span>Map</span></a>
-          </div>
-      
-          <nav class="menu opciones">
-            <a href="/lugares" data-page="/lugares"><i class="fa-solid fa-location-dot"></i> Lugares</a>
-            <a href="/hospedajes" data-page="/hospedajes"><i class="fa-solid fa-hotel"></i> Hospedajes</a>
-          </nav>
-
-          <div class="anfitrion">
-            <a href="/cargar">Conviértete en anfitrión</a>
-          </div>
+            <div class="logo">
+                <a href="/lugares">Travel<span>Map</span></a>
+            </div>
+        
+            <nav class="menu opciones">
+              <a href="{{ url_for('lugares') }}" class="{% if request.path.startswith('/lugares') %}activo{% endif %}">
+                <i class="fa-solid fa-location-dot"></i> Lugares
+              </a>
+              <a href="{{ url_for('hospedajes') }}" class="{% if request.path.startswith('/hospedajes') %}activo{% endif %}" data-page="/hospedajes">
+                <i class="fa-solid fa-hotel"></i> Hospedajes
+              </a>
+            </nav>            
+            
+            <div class="anfitrion">
+                <a href="/cargar">Conviértete en anfitrión</a>
+            </div>
         </div>
-      
 
-      
         {% if not ocultar %}
         <form id="filtros-form">
-          <div class="input-busqueda">
-            <input type="text" name="busqueda" placeholder="Buscar..." />
-          </div>
-          <div id="selects-container">
-            <!-- Selects dinámicos acá -->
-          </div>
-          <button type="submit" aria-label="Buscar">
-            <i class="fa-solid fa-magnifying-glass"></i>
-          </button>
+            <div class="input-busqueda">
+                <input type="text" name="busqueda" placeholder="Buscar..." />
+            </div>
+            <div id="selects-container">
+                <!-- Selects dinámicos acá -->
+            </div>
+            <button type="submit" aria-label="Buscar">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
         </form>
         {% endif %}
-        
-      </header>
+    </header>
       
     <main class="contenido" id="contenedor">
         {% block contenido %}{% endblock %}
@@ -64,6 +65,10 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="{{ js_path }}"></script>
+    {% block scripts %}
+      <script src="{{ js_path }}"></script>
+      <!-- <script src="{{ jsH }}"></script>
+      <script src="{{ lugaresjs }}"></script> -->
+    {% endblock %}
 </body>
 </html>

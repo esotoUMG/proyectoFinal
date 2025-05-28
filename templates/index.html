@@ -1,22 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %}Travel Map{% endblock %}
+{% block title %}Lugares - Travel Map{% endblock %}
 
 {% block contenido %}
-
-<body>
   <section>
     <div class="contenido__destinos">
       <h2>Destinos Populares</h2>
-      <ul id="lista-lugares" class="destinos-lista"></ul> <!-- Aquí se inyectan los lugares -->
+      <!-- Aquí va el contenedor general donde se crean los carruseles -->
+      <div id="contenedor"></div>
     </div>
   </section>
+{% endblock %}
 
-
-</body>
-
-
-  <!-- Script para cargar los lugares -->
+{% block scripts %}
   <script src="{{ js_path }}"></script>
   <script src="{{ lugaresjs }}"></script>
 {% endblock %}
