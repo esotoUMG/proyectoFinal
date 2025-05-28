@@ -2,259 +2,279 @@
 @use 'base/variables' as v;
 
 header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  padding: 3rem 0;           // padding original
+  margin: 0;
+  border-bottom: 1px solid v.$negro;
+  box-shadow: 5px 5px 10px 3px rgba(0, 0, 0, 0.2);
+  color: v.$negro;
+  position: relative;
+  z-index: 10;
+  background: white;
+  transition: padding 0.7s ease-in-out;
+  will-change: padding;
+
+  .header-top {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    justify-content: space-between;
+    align-items: center;
     width: 100%;
-    padding: 5rem 0;
-    margin: 0;
-    border-bottom: 1px solid v.$negro;
-    box-shadow: 5px 5px 10px 3px rgba(0, 0, 0, 0.2);
-    color: v.$negro;
-    position: relative;
-    z-index: 10;
-    background: white;
-    transition: padding 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  
-    .header-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-      padding-left: 8rem;
-      padding-right: 5rem;
-      transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-  
-    .logo a {
+    padding-left: 8rem;
+    padding-right: 5rem;
+  }
+
+  .logo {
+    a {
       font-family: v.$titulo_;
       font-size: 4rem;
       font-weight: bold;
       color: v.$negro;
       text-decoration: none;
-      transition: color 0.3s ease;
-  
+      transition: color 0.3s ease, font-size 0.7s ease, transform 0.7s ease;
+      display: inline-block;
+
       &:hover {
         cursor: pointer;
         color: v.$turquesa;
       }
-  
+
       span {
         font-family: v.$subtitulo;
         font-style: normal;
       }
     }
-  
+  }
+
+  a {
+    font-family: v.$subtitulo;
+    font-size: 2rem;
+    text-decoration: none;
+    color: v.$negro;
+  }
+
+  .opciones {
+    display: flex;
+    gap: 3rem;
+    padding-top: 1rem;
+
     a {
-      font-family: v.$subtitulo;
-      font-size: 2rem;
-      text-decoration: none;
+      position: relative;
+      padding-bottom: 0.5rem;
+      transition: color 0.3s ease;
       color: v.$negro;
-    }
-  
-    .opciones {
-      display: flex;
-      gap: 3rem;
-      padding-top: 1rem;
-  
-      a {
-        position: relative;
-        padding-bottom: 0.5rem;
-        transition: color 0.3s ease;
-        color: v.$negro;
-        text-decoration: none;
-  
-        &.activo {
-          font-weight: bold;
-  
-          &::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background-color: v.$turquesa;
-            border-radius: 2px;
-          }
-        }
-  
-        i {
-          margin-right: 0.5rem;
-        }
-      }
-    }
-  
-    .anfitrion {
-      padding-top: 0.5rem;
-      padding-right: 5rem;
-  
-      a {
-        display: inline-block;
-        padding: 1rem 1rem;
-        border-radius: 10px;
-        transition: background-color 0.3s ease;
-        color: v.$negro;
-        text-decoration: none;
-        font-family: v.$contenido2; 
-        font-size: 1.8rem;
-  
-        &:hover {
-          background-color: rgba(0, 0, 0, 0.1);
-          cursor: pointer;
-        }
-      }
-    }
-  
-    #filtros-form {
-      font-family: v.$contenido2;
-      margin: 3rem auto 0;
-      width: 100%;
-      max-width: 900px;
-      display: flex;
-      gap: 0;
-      justify-content: center;
-      background: white;
-      border-radius: 9999px;
-      box-shadow: 0 2px 10px rgb(0 0 0 / 0.1);
-      overflow: hidden;
-      padding: 0.6rem 0.8rem;
-      transition: margin 0.5s cubic-bezier(0.4, 0, 0.2, 1), border-radius 0.5s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  
-      .input-busqueda {
-        flex: 1 1 250px;
-        position: relative;
-  
-        input {
+      text-decoration: none;
+
+      &.activo {
+        font-weight: bold;
+
+        &::after {
+          content: "";
+          position: absolute;
+          bottom: 0;
+          left: 0;
           width: 100%;
-          padding: 1.3rem 2.5rem 1.3rem 3rem;
-          font-size: 1.6rem;
-          border: none;
-          border-radius: 9999px 0 0 9999px;
-          outline: none;
-          box-sizing: border-box;
+          height: 3px;
+          background-color: v.$turquesa;
+          border-radius: 2px;
         }
       }
-  
-      select {
-        flex: 0 0 150px;
-        font-size: 1.6rem;
-        padding: 1.3rem 1.5rem;
-        border: none;
-        outline: none;
-        background: none;
-        border-left: 1px solid #ddd;
-        cursor: pointer;
-        box-sizing: border-box;
-      }
-  
-      button {
-        flex: 0 0 50px;
-        background-color: v.$turquesa;
-        border: 2px solid v.$turquesa;
-        color: v.$blanco;
-        cursor: pointer;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.8rem;
-        padding: 0;
-        transition: background-color 0.3s ease, border-color 0.3s ease;
-  
-        &:hover {
-          background-color: v.$turquesa-claro;
-          color: v.$blanco;
-          border-color: v.$turquesa-claro;
-        }
+
+      i {
+        margin-right: 0.5rem;
       }
     }
   }
-  
+
+  .anfitrion {
+    padding-top: 0.5rem;
+    padding-right: 5rem;
+
+    a {
+      display: inline-block;
+      padding: 1rem 1rem;
+      border-radius: 10px;
+      transition: background-color 0.3s ease;
+      color: v.$negro;
+      text-decoration: none;
+      font-family: v.$contenido2;
+      font-size: 1.8rem;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+      }
+    }
+  }
+
+  #filtros-form {
+    font-family: v.$contenido2;
+    margin: 3rem auto 0;
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    gap: 0;
+    justify-content: center;
+    background: white;
+    border-radius: 9999px;
+    box-shadow: 0 2px 10px rgb(0 0 0 / 0.1);
+    overflow: hidden;
+    padding: 0.6rem 0.8rem;
+    transition:
+      margin 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+      border-radius 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+    .input-busqueda {
+      flex: 1 1 250px;
+      position: relative;
+
+      input {
+        width: 100%;
+        padding: 1.3rem 2.5rem 1.3rem 3rem;
+        font-size: 1.6rem;
+        border: none;
+        border-radius: 9999px 0 0 9999px;
+        outline: none;
+        box-sizing: border-box;
+      }
+    }
+
+    select {
+      flex: 0 0 150px;
+      font-size: 1.6rem;
+      padding: 1.3rem 1.5rem;
+      border: none;
+      outline: none;
+      background: none;
+      border-left: 1px solid #ddd;
+      cursor: pointer;
+      box-sizing: border-box;
+    }
+
+    button {
+      flex: 0 0 50px;
+      background-color: v.$turquesa;
+      border: 2px solid v.$turquesa;
+      color: v.$blanco;
+      cursor: pointer;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      padding: 0;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+
+      &:hover {
+        background-color: v.$turquesa-claro;
+        color: v.$blanco;
+        border-color: v.$turquesa-claro;
+      }
+    }
+  }
+}
+
 /* --- Scroll fixed header style --- */
 header.fixed {
   position: fixed;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 4rem 2rem;
+  padding: 3.2rem 0;              // padding original sin cambios
   background: white;
   z-index: 1000;
   max-width: 100%;
   width: 100%;
   left: 0;
   top: 0;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+  transition: padding 0.7s ease-in-out, box-shadow 0.7s ease-in-out;
 
   .header-top {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    a{
+
+    a {
       font-size: 3rem;
+      transition: font-size 0.7s ease;
     }
   }
 
-  .anfitrion{
-    a{
+  .logo {
+    a {
+      font-size: 2.8rem;
+      transform: scale(0.9);
+      transition: font-size 0.7s ease, transform 0.7s ease;
+    }
+  }
+
+  .anfitrion {
+    a {
       font-size: 1.2rem;
+      transition: font-size 0.7s ease;
     }
   }
-  
-    #filtros-form {
-        position: absolute;
-        left: 50%;
-        top: 40px;
-        transform: translate(-50%, -50%);
-        width: 100rem;
-        height: 7rem;
-        background: white;
-        padding: 0.2rem 0.8rem;
-        border-radius: 9999px;
-        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        z-index: 1001;
-      
-        .input-busqueda input {
-          font-size: 1.3rem;
-          padding: 0.6rem 1.2rem 0.6rem 2rem;
-          border: none;
-          outline: none;
-          width: 100%;
-        }
-      
-        select {
-          flex: 0 0 100px;
-          font-size: 1.3rem;
-          padding: 0.5rem;
-          border: none;
-          background: transparent;
-          outline: none;
-        }
-      
-        button {
-          flex: 0 0 36px;
-          height: 36px;
-          font-size: 1.4rem;
-          background: none;
-          border: none;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: black;
-          background-color: v.$turquesa;
-          border: 2px solid v.$turquesa;
-          color: v.$blanco;
 
-          &:hover{
-              background-color: v.$turquesa-claro;
-              color: v.$blanco;
-              border-color: v.$turquesa-claro; 
-          }
-        }
-      }      
+  #filtros-form {
+    position: absolute;
+    left: 50%;
+    top: 40px;
+    transform: translate(-50%, -50%);
+    width: 100rem;
+    height: 7rem;
+    background: white;
+    padding: 0.2rem 0.8rem;
+    border-radius: 9999px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    z-index: 1001;
+
+    .input-busqueda {
+      input {
+        font-size: 1.3rem;
+        padding: 0.6rem 1.2rem 0.6rem 2rem;
+        border: none;
+        outline: none;
+        width: 100%;
+        transition: font-size 0.7s ease;
+      }
+    }
+
+    select {
+      flex: 0 0 100px;
+      font-size: 1.3rem;
+      padding: 0.5rem;
+      border: none;
+      background: transparent;
+      outline: none;
+      transition: font-size 0.7s ease;
+    }
+
+    button {
+      flex: 0 0 36px;
+      height: 36px;
+      font-size: 1.4rem;
+      background-color: v.$turquesa;
+      border: 2px solid v.$turquesa;
+      color: v.$blanco;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background-color 0.3s ease, border-color 0.3s ease, font-size 0.7s ease;
+
+      &:hover {
+        background-color: v.$turquesa-claro;
+        border-color: v.$turquesa-claro;
+      }
+    }
   }
-  
+}

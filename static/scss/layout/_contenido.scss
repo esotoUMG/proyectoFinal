@@ -1,82 +1,131 @@
 @use 'base/variables' as v;
 
-/* Contenedor general del carrusel */
-.carrusel-container {
-    margin: 2rem 2rem;
-    position: relative;
-  }
-  
-  /* Título del carrusel */
-  .carrusel-titulo {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
-    font-weight: 700;
-  }
-  
-  /* Contenedor scroll horizontal */
-  .carrusel {
-    display: flex;
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    gap: 15px;
-    padding-bottom: 10px;
-    scrollbar-width: thin; /* Firefox */
-  }
-  
-  .carrusel::-webkit-scrollbar {
-    height: 8px;
-  }
-  
-  .carrusel::-webkit-scrollbar-thumb {
-    background-color: rgba(0,0,0,0.3);
-    border-radius: 4px;
-  }
-  
-  /* Tarjetas de cada lugar */
-  .lugar-card {
-    min-width: 220px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 0 8px rgba(0,0,0,0.1);
-    padding: 15px;
-    flex-shrink: 0;
-  }
-  
-  /* Flechas para scroll */
-  .flecha {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: #007BFF;
-    border: none;
-    color: white;
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
+/* --------------------------------------- */
+/* Estilos generales para carrusel        */
+/* --------------------------------------- */
+.carrusel-contenedor {
+  margin: 2.5rem 4rem;
+  position: relative;
+}
+
+.carrusel-titulo {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  font-weight: 700;
+  font-family: v.$subtitulo;
+  cursor: default;
+
+  &.clickeable {
     cursor: pointer;
-    font-size: 1.2rem;
-    user-select: none;
-    z-index: 10;
-    opacity: 0.8;
-    transition: opacity 0.3s ease;
-  }
-  
-  .flecha:hover {
-    opacity: 1;
-  }
-  
-  .flecha.izquierda {
-    left: 0;
-  }
-  
-  .flecha.derecha {
-    right: 0;
-  }
-  
-  /* Responsive: ocultar flechas y permitir scroll táctil */
-  @media (max-width: 600px) {
-    .flecha {
-      display: none;
+    color: v.$negro;
+    transition: text-decoration 0.3s ease;
+
+    &:hover {
+      text-decoration: underline;
     }
   }
-  
+}
+
+.carrusel {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  padding-bottom: 1rem;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.carrusel::-webkit-scrollbar {
+  display: none;
+}
+
+.lugar-card {
+  font-family: v.$contenido2;
+  width: 20rem;
+  height: 20rem;
+  background-color: v.$blanco;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+  padding: 2rem;
+  flex-shrink: 0;
+}
+
+/* --------------------------------------- */
+/* Flechas carrusel                       */
+/* --------------------------------------- */
+.flecha {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: v.$turquesa;
+  border: none;
+  color: v.$blanco;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.2rem;
+  user-select: none;
+  z-index: 10;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  &.izquierda {
+    left: 0;
+  }
+
+  &.derecha {
+    right: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .flecha {
+    display: none;
+  }
+}
+
+/* --------------------------------------- */
+/* Grid completo (para /lugares/filtrar/) */
+/* --------------------------------------- */
+.grid-lugares {
+  margin: 2.5rem 6rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+/* Reutiliza lugar-card pero adaptado a grid */
+.grid-lugares .lugar-card {
+  width: 100%;
+  height: auto;
+  flex-shrink: 0;
+  width: 30rem;
+  height: 20rem;
+  margin: 1rem 0;
+}
+
+/* Responsive grid */
+@media (max-width: 1200px) {
+  .grid-lugares {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .grid-lugares {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .grid-lugares {
+    grid-template-columns: 1fr;
+  }
+}

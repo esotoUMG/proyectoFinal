@@ -1,4 +1,3 @@
-@charset "UTF-8";
 /*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */
 /* Document
    ========================================================================== */
@@ -403,7 +402,7 @@ header {
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
-  padding: 5rem 0;
+  padding: 3rem 0;
   margin: 0;
   border-bottom: 1px solid #000000;
   box-shadow: 5px 5px 10px 3px rgba(0, 0, 0, 0.2);
@@ -411,7 +410,8 @@ header {
   position: relative;
   z-index: 10;
   background: white;
-  transition: padding 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: padding 0.7s ease-in-out;
+  will-change: padding;
 }
 header .header-top {
   display: flex;
@@ -420,7 +420,6 @@ header .header-top {
   width: 100%;
   padding-left: 8rem;
   padding-right: 5rem;
-  transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 header .logo a {
   font-family: "Dancing Script", cursive;
@@ -428,7 +427,8 @@ header .logo a {
   font-weight: bold;
   color: #000000;
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: color 0.3s ease, font-size 0.7s ease, transform 0.7s ease;
+  display: inline-block;
 }
 header .logo a:hover {
   cursor: pointer;
@@ -555,13 +555,15 @@ header.fixed {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 4rem 2rem;
+  padding: 3.2rem 0;
   background: white;
   z-index: 1000;
   max-width: 100%;
   width: 100%;
   left: 0;
   top: 0;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+  transition: padding 0.7s ease-in-out, box-shadow 0.7s ease-in-out;
 }
 header.fixed .header-top {
   flex: 1;
@@ -571,9 +573,16 @@ header.fixed .header-top {
 }
 header.fixed .header-top a {
   font-size: 3rem;
+  transition: font-size 0.7s ease;
+}
+header.fixed .logo a {
+  font-size: 2.8rem;
+  transform: scale(0.9);
+  transition: font-size 0.7s ease, transform 0.7s ease;
 }
 header.fixed .anfitrion a {
   font-size: 1.2rem;
+  transition: font-size 0.7s ease;
 }
 header.fixed #filtros-form {
   position: absolute;
@@ -597,6 +606,7 @@ header.fixed #filtros-form .input-busqueda input {
   border: none;
   outline: none;
   width: 100%;
+  transition: font-size 0.7s ease;
 }
 header.fixed #filtros-form select {
   flex: 0 0 100px;
@@ -605,78 +615,87 @@ header.fixed #filtros-form select {
   border: none;
   background: transparent;
   outline: none;
+  transition: font-size 0.7s ease;
 }
 header.fixed #filtros-form button {
   flex: 0 0 36px;
   height: 36px;
   font-size: 1.4rem;
-  background: none;
-  border: none;
+  background-color: #5dc1b9;
+  border: 2px solid #5dc1b9;
+  color: #ffffff;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: black;
-  background-color: #5dc1b9;
-  border: 2px solid #5dc1b9;
-  color: #ffffff;
+  border-radius: 50%;
+  transition: background-color 0.3s ease, border-color 0.3s ease, font-size 0.7s ease;
 }
 header.fixed #filtros-form button:hover {
   background-color: #74d0c9;
-  color: #ffffff;
   border-color: #74d0c9;
 }
 
-/* Contenedor general del carrusel */
-.carrusel-container {
-  margin: 2rem 2rem;
+/* --------------------------------------- */
+/* Estilos generales para carrusel        */
+/* --------------------------------------- */
+.carrusel-contenedor {
+  margin: 2.5rem 4rem;
   position: relative;
 }
 
-/* Título del carrusel */
 .carrusel-titulo {
-  font-size: 1.5rem;
+  font-size: 2rem;
   margin-bottom: 10px;
   font-weight: 700;
+  font-family: "Raleway", sans-serif;
+  cursor: default;
+}
+.carrusel-titulo.clickeable {
+  cursor: pointer;
+  color: #000000;
+  transition: text-decoration 0.3s ease;
+}
+.carrusel-titulo.clickeable:hover {
+  text-decoration: underline;
 }
 
-/* Contenedor scroll horizontal */
 .carrusel {
   display: flex;
   overflow-x: auto;
   scroll-behavior: smooth;
-  gap: 15px;
-  padding-bottom: 10px;
-  scrollbar-width: thin; /* Firefox */
+  gap: 1.5rem;
+  padding: 1.5rem;
+  padding-bottom: 1rem;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .carrusel::-webkit-scrollbar {
-  height: 8px;
+  display: none;
 }
 
-.carrusel::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.3);
-  border-radius: 4px;
-}
-
-/* Tarjetas de cada lugar */
 .lugar-card {
-  min-width: 220px;
-  background-color: #fff;
+  font-family: "DM Sans", sans-serif;
+  width: 20rem;
+  height: 20rem;
+  background-color: #ffffff;
   border-radius: 8px;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
-  padding: 15px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+  padding: 2rem;
   flex-shrink: 0;
 }
 
-/* Flechas para scroll */
+/* --------------------------------------- */
+/* Flechas carrusel                       */
+/* --------------------------------------- */
 .flecha {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background-color: #007BFF;
+  background-color: #5dc1b9;
   border: none;
-  color: white;
+  color: #ffffff;
   width: 35px;
   height: 35px;
   border-radius: 50%;
@@ -687,23 +706,55 @@ header.fixed #filtros-form button:hover {
   opacity: 0.8;
   transition: opacity 0.3s ease;
 }
-
 .flecha:hover {
   opacity: 1;
 }
-
 .flecha.izquierda {
   left: 0;
 }
-
 .flecha.derecha {
   right: 0;
 }
 
-/* Responsive: ocultar flechas y permitir scroll táctil */
 @media (max-width: 600px) {
   .flecha {
     display: none;
+  }
+}
+/* --------------------------------------- */
+/* Grid completo (para /lugares/filtrar/) */
+/* --------------------------------------- */
+.grid-lugares {
+  margin: 2.5rem 6rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+/* Reutiliza lugar-card pero adaptado a grid */
+.grid-lugares .lugar-card {
+  width: 100%;
+  height: auto;
+  flex-shrink: 0;
+  width: 30rem;
+  height: 20rem;
+  margin: 1rem 0;
+}
+
+/* Responsive grid */
+@media (max-width: 1200px) {
+  .grid-lugares {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 768px) {
+  .grid-lugares {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 480px) {
+  .grid-lugares {
+    grid-template-columns: 1fr;
   }
 }
 footer {
