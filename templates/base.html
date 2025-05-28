@@ -58,6 +58,7 @@
       
     <main class="contenido" id="contenedor">
         {% block contenido %}{% endblock %}
+        <div class ="contenedor" id="mapid" style="width: 500px; height: 500px;" >Mapa</div>
     </main>
 
     <footer>
@@ -65,10 +66,6 @@
     </footer>
 
     <!-- Scripts -->
-    {% block scripts %}
-      <script src="{{ js_path }}"></script>
-      <!-- <script src="{{ jsH }}"></script>
-      <script src="{{ lugaresjs }}"></script> -->
-    {% endblock %}
+    <script src="{{ js_path }}"></script>
 </body>
 </html>

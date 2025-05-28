@@ -1,15 +1,20 @@
 from flask import Flask, render_template, url_for, request, jsonify, Response
 import json
+from backend import arbolB
 from backend.arbolB import BTree
 from backend.carga_csv import cargar_lugares_csv, cargar_calificaciones_csv
 from backend.modelos.utilidadesGrafo import UtilidadesGrafo
+from backend.modelos.GrafoPonderado import GrafoPonderado  # Importar clase GrafoPonderado para el manejo de rutas
 
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True  # Recarga automática de plantillas
 
-arbol_lugares = BTree(grado=5)
-arbol_hospedaje = BTree(grado=5)
+#Diccionario para crear arboles segun el tipo de actividad
+arbol_lugares = BTree(grado=5)     # Para turismo, comida, entretenimiento
+arbol_hospedaje = BTree(grado=5)  # Para hospedaje
 
+
+#Carga automatica del CSV al iniciar el servidor
 try:
     with open('data/datos.csv', 'rb') as archivo_csv:
         cargar_lugares_csv(archivo_csv, arbol_lugares, arbol_hospedaje)
@@ -27,15 +32,35 @@ except Exception as e:
 @app.route('/api/lugares', methods=['GET'])
 def obtener_lugares():
     try:
-        lugares = [{
-            "id": lugar.id,
-            "nombre": lugar.nombre,
-            "tipo": lugar.tipo,
-            "latitud": lugar.latitud,
-            "longitud": lugar.longitud,
-            "calificacion": lugar.calificacion,
-            "direccion": lugar.direccion
-        } for lugar in arbol_lugares.obtener_lugares()]
+
+        tipo = request.args.get('tipo', default='todos')
+        lugares = []
+
+        if tipo in ['todos', 'lugares']:
+            for lugar in arbol_lugares.obtener_lugares():
+                lugares.append({
+                    "id": lugar.id,
+                    "nombre": lugar.nombre,
+                    "tipo": lugar.tipo,
+                    "latitud": lugar.latitud,
+                    "longitud": lugar.longitud,
+                    "calificacion": lugar.calificacion,
+                    "direccion": lugar.direccion
+                })
+
+        if tipo in ['todos', 'hospedajes']:
+            for lugar in arbol_hospedaje.obtener_lugares():
+                lugares.append({
+                    "id": lugar.id,
+                    "nombre": lugar.nombre,
+                    "tipo": lugar.tipo,
+                    "latitud": lugar.latitud,
+                    "longitud": lugar.longitud,
+                    "calificacion": lugar.calificacion,
+                    "direccion": lugar.direccion
+                })
+        
+
         return Response(json.dumps({"lugares": lugares}, ensure_ascii=False), content_type="application/json")
     except Exception as e:
         return Response(json.dumps({'error': str(e)}, ensure_ascii=False), content_type="application/json", status=500)
@@ -109,8 +134,19 @@ def cargar_calificaciones():
 
     archivo = request.files['archivo']
     try:
-        cargar_calificaciones_csv(archivo, arbol_lugares)
+        cargar_calificaciones_csv(archivo, arbol)
         return jsonify({'mensaje': 'Calificaciones cargadas correctamente.'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/rutas', methods=['GET'])
+def obtener_rutas():
+    origen = request.args.get('origen')
+    if not origen:
+        return jsonify({'error': 'Parámetro "origen" requerido'}), 400
+    try:
+        distancias = grafo.dijkstra(origen)
+        return jsonify({'distancias': distancias}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
