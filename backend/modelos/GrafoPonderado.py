@@ -1,5 +1,6 @@
 import heapq
-
+import graphviz
+from graphviz import Digraph
 # Grafo ponderado utilizando el algoritmo de Dijkstra
 class GrafoPonderado:
     def __init__(self):
@@ -27,32 +28,25 @@ class GrafoPonderado:
                     distancias[vecino] = distancia
                     heapq.heappush(cola_prioridad, (distancia, vecino))
         return distancias
-    def graficar_grafo(places_graph):
+    
+    def graficar_grafo(self):
         dot = Digraph(comment="Grafo de lugares turísticos")
 
         # Agregar nodos
-        current = places_graph.head
-        while current:
-            label = f"{current.data.name}\n{current.key}"
-            dot.node(current.key, label)
-            current = current.next
+        for vertice in self.grafo:
+            dot.node(vertice, vertice)  # Puedes cambiar el label si tienes nombres
 
-        # Agregar aristas
-        current = places_graph.head
-        added_edges = set()
-        while current:
-            edge = current.edges_head
-            while edge:
-                # Evitar duplicar aristas en grafos no dirigidos
-                edge_key = tuple(sorted((current.key, edge.to_node.key)))
-                if edge_key not in added_edges:
-                    weight_str = f"{edge.weight:.2f} min"
-                    dot.edge(current.key, edge.to_node.key, label=weight_str)
-                    added_edges.add(edge_key)
-                edge = edge.next
-            current = current.next
+        # Agregar aristas (evitando duplicados)
+        aristas_agregadas = set()
+        for vertice, vecinos in self.grafo.items():
+            for vecino, peso in vecinos:
+                # Evitar duplicar aristas en grafo no dirigido
+                arista = tuple(sorted((vertice, vecino)))
+                if arista not in aristas_agregadas:
+                    dot.edge(vertice, vecino, label=f"{peso:.2f} min")
+                    aristas_agregadas.add(arista)
 
-        # Guardar como archivo
+        # Guardar como archivo PNG
         output_path = "static/grafo_ponderado"
         dot.render(output_path, format="png", cleanup=True)
         return f"/{output_path}.png"
