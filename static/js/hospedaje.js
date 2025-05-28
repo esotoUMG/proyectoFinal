@@ -26,82 +26,102 @@ function cargarHospedajesDesdeAPI() {
                 return;
             }
 
-            const hospedajesFiltrados = data.hospedajes
-                .filter(h => h.calificacion >= 4.7 && h.calificacion <= 5)
-                .sort((a, b) => b.calificacion - a.calificacion);
+            // Función para crear título clickeable para filtros
+            const crearTituloClickeable = (titulo, itemsTipo, filtroParametros = {}) => {
+                const h2 = document.createElement('h2');
+                h2.classList.add('carrusel-titulo');
+                h2.textContent = titulo;
 
-            if (hospedajesFiltrados.length === 0) {
-                contenedor.innerHTML = "<p>No hay hospedajes con calificación alta (4.7 a 5).</p>";
-                return;
-            }
+                if (itemsTipo.length > 7) {
+                    h2.classList.add('clickeable');
+                    h2.title = "Ver todos";
+                    h2.style.cursor = "pointer";
+                    h2.addEventListener('click', () => {
+                        const params = new URLSearchParams();
+                        if (filtroParametros.tipo) params.append('tipo', filtroParametros.tipo);
+                        if (filtroParametros.departamento) params.append('departamento', filtroParametros.departamento);
 
-            const seccion = document.createElement('div');
-            seccion.classList.add('carrusel-contenedor');
-
-            const h2 = document.createElement('h2');
-            h2.classList.add('carrusel-titulo');
-            h2.textContent = "Hospedajes mejor calificados";
-
-            if (hospedajesFiltrados.length > 7) {
-                h2.classList.add('clickeable');
-                h2.title = "Ver todos";
-                h2.style.cursor = "pointer";
-                h2.addEventListener('click', () => {
-                    const params = new URLSearchParams({
-                        tipo: 'Hospedaje',
-                        calificacion_min: 4.7,
-                        calificacion_max: 5
+                        const url = `/hospedajes/filtro?${params.toString()}`;
+                        window.location.href = url;
                     });
-                    window.location.href = `/hospedajes/filtro?${params.toString()}`;
-                });
-            }
+                }
 
-            seccion.appendChild(h2);
+                return h2;
+            };
 
-            const carrusel = document.createElement('div');
-            carrusel.classList.add('carrusel');
+            // Función para crear carrusel con flechas
+            const crearCarrusel = (hospedajesArray, titulo, filtroParametros = {}) => {
+                const seccion = document.createElement('div');
+                seccion.classList.add('carrusel-contenedor');
 
-            const hospedajesAMostrar = hospedajesFiltrados.slice(0, 7);
+                const h2 = crearTituloClickeable(titulo, hospedajesArray, filtroParametros);
+                seccion.appendChild(h2);
 
-            hospedajesAMostrar.forEach(hospedaje => {
-                const item = document.createElement('div');
-                item.classList.add('lugar-card');
-                item.innerHTML = `
-                    <h3>${hospedaje.nombre}</h3>
-                    <p>Tipo: ${hospedaje.tipo}</p>
-                    <p>Dirección: ${hospedaje.direccion}</p>
-                    <p>Ubicación: ${hospedaje.municipio} ${hospedaje.departamento}</p>
-                    <p>Calificación: ${hospedaje.calificacion}</p>
-                `;
-                carrusel.appendChild(item);
-            });
+                const carrusel = document.createElement('div');
+                carrusel.classList.add('carrusel');
 
-            // Mostrar flechas solo si hay más de 5 elementos
-            if (hospedajesAMostrar.length > 5) {
-                const btnIzq = document.createElement('button');
-                btnIzq.classList.add('flecha', 'izquierda');
-                btnIzq.setAttribute('aria-label', 'Anterior');
-                btnIzq.innerHTML = '&#8592;';
-                btnIzq.addEventListener('click', () => {
-                    carrusel.scrollBy({ left: -250, behavior: 'smooth' });
+                const hospedajesAMostrar = hospedajesArray.slice(0, 7);
+
+                hospedajesAMostrar.forEach(hospedaje => {
+                    const item = document.createElement('div');
+                    item.classList.add('lugar-card');
+                    item.innerHTML = `
+                        <h3>${hospedaje.nombre}</h3>
+                        <p>Tipo: ${hospedaje.tipo}</p>
+                        <p>Dirección: ${hospedaje.direccion}</p>
+                        <p>Ubicación: ${hospedaje.municipio} ${hospedaje.departamento}</p>
+                        <p>Calificación: ${hospedaje.calificacion}</p>
+                    `;
+                    carrusel.appendChild(item);
                 });
 
-                const btnDer = document.createElement('button');
-                btnDer.classList.add('flecha', 'derecha');
-                btnDer.setAttribute('aria-label', 'Siguiente');
-                btnDer.innerHTML = '&#8594;';
-                btnDer.addEventListener('click', () => {
-                    carrusel.scrollBy({ left: 250, behavior: 'smooth' });
-                });
+                if (hospedajesAMostrar.length > 5) {
+                    const btnIzq = document.createElement('button');
+                    btnIzq.classList.add('flecha', 'izquierda');
+                    btnIzq.setAttribute('aria-label', 'Anterior');
+                    btnIzq.innerHTML = '&#8592;';
+                    btnIzq.addEventListener('click', () => {
+                        carrusel.scrollBy({ left: -250, behavior: 'smooth' });
+                    });
 
-                seccion.appendChild(btnIzq);
-                seccion.appendChild(carrusel);
-                seccion.appendChild(btnDer);
-            } else {
-                seccion.appendChild(carrusel);
-            }
+                    const btnDer = document.createElement('button');
+                    btnDer.classList.add('flecha', 'derecha');
+                    btnDer.setAttribute('aria-label', 'Siguiente');
+                    btnDer.innerHTML = '&#8594;';
+                    btnDer.addEventListener('click', () => {
+                        carrusel.scrollBy({ left: 250, behavior: 'smooth' });
+                    });
 
-            contenedor.appendChild(seccion);
+                    seccion.appendChild(btnIzq);
+                    seccion.appendChild(carrusel);
+                    seccion.appendChild(btnDer);
+                } else {
+                    seccion.appendChild(carrusel);
+                }
+
+                return seccion;
+            };
+
+            // Función para filtrar y agregar carrusel con filtro y título
+            const filtrarYLlenarCarrusel = (titulo, filtroFn, filtroParametros = {}) => {
+                const hospedajesFiltrados = data.hospedajes.filter(filtroFn);
+                if (hospedajesFiltrados.length) {
+                    contenedor.appendChild(crearCarrusel(hospedajesFiltrados, titulo, filtroParametros));
+                }
+            };
+
+            // FILTROS para hospadesajes
+            filtrarYLlenarCarrusel(
+                "Hospedajes en Guatemala",
+                h => h.departamento.toLowerCase() === 'guatemala',
+                { tipo: 'hotel', departamento: 'Guatemala' }
+            );
+
+            filtrarYLlenarCarrusel(
+                "Todos los hospedajes",
+                _ => true,
+                { tipo: 'hotel' }
+            );
         })
         .catch(error => {
             console.error("Error al cargar hospedajes:", error);

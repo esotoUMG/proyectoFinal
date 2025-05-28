@@ -741,22 +741,13 @@ header.fixed #filtros-form button:hover {
   margin: 1rem 0;
 }
 
-/* Responsive grid */
-@media (max-width: 1200px) {
-  .grid-lugares {
-    grid-template-columns: repeat(3, 1fr);
-  }
+.contenido-titulo {
+  font-family: "Raleway", sans-serif;
+  margin-left: 6rem;
+  margin-top: 4rem;
+  font-size: 2.2rem;
 }
-@media (max-width: 768px) {
-  .grid-lugares {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-@media (max-width: 480px) {
-  .grid-lugares {
-    grid-template-columns: 1fr;
-  }
-}
+
 footer {
   background-color: #000000;
   text-align: center;

@@ -140,7 +140,6 @@ def lugares_filtrados():
     )
 
 
-
 @app.route('/hospedajes')
 def hospedajes():
     css_path = url_for('static', filename='css/app.css')
@@ -151,12 +150,59 @@ def hospedajes():
 
     return render_template(
         'hospedajes.html',
-        hospedajes=hospedajes_data,  # <-- plural aquí, coincide con el template
+        hospedajes=hospedajes_data,  
         css_path=css_path,
         js_path=js_path,
         jsH=jsH,
         ocultar=False
     )
+
+@app.route('/hospedajes/filtro')
+def hospedajes_filtrados():
+    tipo = request.args.get('tipo')
+    departamento = request.args.get('departamento')
+
+    if not tipo:
+        return "Falta el parámetro 'tipo'", 400
+
+    tipo = tipo.strip().lower()
+    departamento = departamento.strip().lower() if departamento else None
+
+    todos_hospedajes = arbol_hospedaje.obtener_lugares()
+
+    if departamento and departamento != 'todo':
+        hospedajes_filtrados = [
+            h for h in todos_hospedajes
+            if h.tipo.strip().lower() == tipo and h.departamento.strip().lower() == departamento
+        ]
+    else:
+        hospedajes_filtrados = [
+            h for h in todos_hospedajes
+            if h.tipo.strip().lower() == tipo
+        ]
+
+    if not hospedajes_filtrados:
+        return render_template('hospedajes_filtro.html', 
+                               hospedajes=[],
+                               tipo=tipo,
+                               departamento=departamento if departamento else "Todos",
+                               mensaje="No se encontraron hospedajes que coincidan con el filtro.")
+
+    css_path = url_for('static', filename='css/app.css')
+    js_path = url_for('static', filename='js/scripts.js')
+    hospedajesjs = url_for('static', filename='js/hospedaje.js')
+
+    return render_template(
+        'hospedajes_filtro.html',
+        hospedajes=hospedajes_filtrados,
+        tipo=tipo,
+        departamento=departamento if departamento else "Todos",
+        css_path=css_path,
+        js_path=js_path,
+        hospedajesjs=hospedajesjs
+    )
+
+
 
 @app.route('/api/cargar-calificaciones', methods=['POST'])
 def cargar_calificaciones():
