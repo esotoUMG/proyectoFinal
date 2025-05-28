@@ -133,6 +133,13 @@ def obtener_rutas():
         return jsonify({'distancias': distancias}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+# @app.route("/grafo")
+# def mostrar_grafo():
+#     image_path = graficar_grafo(places_graph)
+#     return render_template_string(f"""
+#     <h2>Visualización del Grafo Ponderado</h2>
+#     <img src="{image_path}" alt="Grafo Ponderado">
+#     """)
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)
