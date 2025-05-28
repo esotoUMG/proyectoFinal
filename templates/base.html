@@ -57,6 +57,7 @@
       
     <main class="contenido" id="contenedor">
         {% block contenido %}{% endblock %}
+        <div class ="contenedor" id="mapid" style="width: 500px; height: 500px;" >Mapa</div>
     </main>
 
     <footer>
@@ -65,5 +66,13 @@
 
     <!-- Scripts -->
     <script src="{{ js_path }}"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" crossorigin=""></script>
+    <script>
+        let map = L.map('mapid').setView([14.63491, -90.51893], 13); 
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 15,
+        attribution: '© OpenStreetMap contributors'
+        }).addTo(map);</script>
 </body>
 </html>
