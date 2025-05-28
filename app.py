@@ -31,29 +31,34 @@ except Exception as e:
 @app.route('/api/lugares', methods=['GET'])
 def obtener_lugares():
     try:
+
+        tipo = request.args.get('tipo', default='todos')
         lugares = []
 
-        for lugar in arbol_lugares.obtener_lugares():
-            lugares.append({
-                "id": lugar.id,
-                "nombre": lugar.nombre,
-                "tipo": lugar.tipo,
-                "latitud": lugar.latitud,
-                "longitud": lugar.longitud,
-                "calificacion": lugar.calificacion,
-                "tiempo": lugar.tiempo_estadia or 0.0
-            })
+        if tipo in ['todos', 'lugares']:
+            for lugar in arbol_lugares.obtener_lugares():
+                lugares.append({
+                    "id": lugar.id,
+                    "nombre": lugar.nombre,
+                    "tipo": lugar.tipo,
+                    "latitud": lugar.latitud,
+                    "longitud": lugar.longitud,
+                    "calificacion": lugar.calificacion,
+                    "direccion": lugar.direccion
+                })
 
-        for lugar in arbol_hospedaje.obtener_lugares():
-            lugares.append({
-                "id": lugar.id,
-                "nombre": lugar.nombre,
-                "tipo": lugar.tipo,
-                "latitud": lugar.latitud,
-                "longitud": lugar.longitud,
-                "calificacion": lugar.calificacion,
-                "tiempo": lugar.tiempo_estadia or 0.0
-            })
+        if tipo in ['todos', 'hospedajes']:
+            for lugar in arbol_hospedaje.obtener_lugares():
+                lugares.append({
+                    "id": lugar.id,
+                    "nombre": lugar.nombre,
+                    "tipo": lugar.tipo,
+                    "latitud": lugar.latitud,
+                    "longitud": lugar.longitud,
+                    "calificacion": lugar.calificacion,
+                    "direccion": lugar.direccion
+                })
+        
 
         return Response(json.dumps({"lugares": lugares}, ensure_ascii=False), content_type="application/json")
     except Exception as e:
@@ -77,6 +82,7 @@ def cargar():
 def lugares():
     css_path = url_for('static', filename='css/app.css')
     js_path = url_for('static', filename='js/scripts.js')
+    lugaresjs = url_for('static', filename='js/lugares.js')
 
     # Obtener lugares desde el árbol
     lugares_data = []
@@ -89,6 +95,7 @@ def lugares():
         lugares=lugares_data,
         css_path=css_path,
         js_path=js_path,
+        lugaresjs = lugaresjs,
         ocultar=False
     )
 
@@ -112,4 +119,4 @@ def cargar_calificaciones():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="127.0.0.1", port=5000, debug=True)

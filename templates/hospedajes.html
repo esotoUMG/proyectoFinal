@@ -3,6 +3,49 @@
 {% block title %}Travel Map{% endblock %}
 
 {% block contenido %}
-<h2>Hospedajes que puedes rentar</h2>
-<p>Contenido de lugares aquí...</p>
+<head>
+      <!-- Font Awesome -->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+      <!-- Leaflet -->
+      <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  
+      <!-- Google Fonts -->
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+      <link href="https://fonts.googleapis.com/css2?family=Cal+Sans&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Dancing+Script:wght@400..700&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
+  
+      <!-- CSS Personalizado -->
+      <link rel="stylesheet" href="{{ css_path }}" />
+</head>
+<body>
+  <div class="contenido__destinos">
+    <h2>Destinos Populares</h2>
+    <ul id="lista-lugares" class="destinos-lista"></ul> <!-- Aquí se inyectan los lugares -->
+  </div>
+
+  <div class="contenido__rutas">
+    <h2>Hospedajes Destacados</h2>
+    <div class="contenedor__mapa" id="contenedor__mapa"></div>
+  </div>
+
+  <style>
+    .destinos-lista {
+      list-style: none;
+      padding: 0;
+    }
+    .destinos-lista li {
+      background: #f5f5f5;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+  </style>
+</body>
+
+
+  <!-- Script para cargar los lugares -->
+  <script src="{{ js_path }}"></script>
+  <script src="{{ lugaresjs }}"></script>
 {% endblock %}
