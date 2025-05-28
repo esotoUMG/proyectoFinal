@@ -120,16 +120,16 @@ const header = document.querySelector('header');
 const menu = document.querySelector('.menu.opciones');
 
 window.addEventListener('scroll', () => {
-    if (window.scrollY > 100) {
-        header.classList.add('fixed');
+    if (window.scrollY > 150) {
+      header.classList.add('fixed');
     } else {
-        header.classList.remove('fixed');
+      header.classList.remove('fixed');
     }
-
+  
     if (menu.classList.contains('menu-grande')) {
-        menu.classList.remove('menu-grande');
+      menu.classList.remove('menu-grande');
     }
-});
+  });
 
 //CAMBIAR LA BARRA DE NAVEGACION SEGUN LA OPCION QUE HAYA ELEGIDO EL USUARIO
 document.addEventListener('DOMContentLoaded', () => {

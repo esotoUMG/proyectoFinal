@@ -32,38 +32,26 @@ except Exception as e:
 @app.route('/api/lugares', methods=['GET'])
 def obtener_lugares():
     try:
-
-        tipo = request.args.get('tipo', default='todos')
+        # Siempre devolvemos solo lugares (sin hospedajes)
         lugares = []
+        for lugar in arbol_lugares.obtener_lugares():
+            lugares.append({
+                "id": lugar.id,
+                "nombre": lugar.nombre,
+                "tipo": lugar.tipo,
+                "latitud": lugar.latitud,
+                "longitud": lugar.longitud,
+                "municipio": lugar.municipio,
+                "departamento": lugar.departamento,
+                "calificacion": lugar.calificacion,
+                "direccion": lugar.direccion
+            })
 
-        if tipo in ['todos', 'lugares']:
-            for lugar in arbol_lugares.obtener_lugares():
-                lugares.append({
-                    "id": lugar.id,
-                    "nombre": lugar.nombre,
-                    "tipo": lugar.tipo,
-                    "latitud": lugar.latitud,
-                    "longitud": lugar.longitud,
-                    "calificacion": lugar.calificacion,
-                    "direccion": lugar.direccion
-                })
+        return jsonify({"lugares": lugares})
 
-        if tipo in ['todos', 'hospedajes']:
-            for lugar in arbol_hospedaje.obtener_lugares():
-                lugares.append({
-                    "id": lugar.id,
-                    "nombre": lugar.nombre,
-                    "tipo": lugar.tipo,
-                    "latitud": lugar.latitud,
-                    "longitud": lugar.longitud,
-                    "calificacion": lugar.calificacion,
-                    "direccion": lugar.direccion
-                })
-        
-
-        return Response(json.dumps({"lugares": lugares}, ensure_ascii=False), content_type="application/json")
     except Exception as e:
-        return Response(json.dumps({'error': str(e)}, ensure_ascii=False), content_type="application/json", status=500)
+        return jsonify({'error': str(e)}), 500
+
 
 @app.route('/api/hospedajes', methods=['GET'])
 def obtener_hospedajes():
@@ -74,12 +62,15 @@ def obtener_hospedajes():
             "tipo": hospedaje.tipo,
             "latitud": hospedaje.latitud,
             "longitud": hospedaje.longitud,
+            "municipio": hospedaje.municipio,
+            "departamento": hospedaje.departamento,
             "calificacion": hospedaje.calificacion,
             "direccion": hospedaje.direccion
         } for hospedaje in arbol_hospedaje.obtener_lugares()]
-        return Response(json.dumps({"hospedajes": hospedajes}, ensure_ascii=False), content_type="application/json")
+        return jsonify({"hospedajes": hospedajes})
     except Exception as e:
-        return Response(json.dumps({'error': str(e)}, ensure_ascii=False), content_type="application/json", status=500)
+        return jsonify({'error': str(e)}), 500
+
 
 @app.route('/')
 def home():
@@ -109,6 +100,46 @@ def lugares():
         lugaresjs=lugaresjs,
         ocultar=False
     )
+
+@app.route('/lugares/filtro')
+def lugares_filtrados():
+    tipo = request.args.get('tipo')
+    departamento = request.args.get('departamento')
+
+    if not tipo:
+        return "Falta el parámetro 'tipo'", 400
+
+    tipo = tipo.strip().lower()
+    departamento = departamento.strip().lower() if departamento else None
+
+    if departamento and departamento != 'todo':
+        # Filtra por tipo y departamento
+        lugares_filtrados = [
+            lugar for lugar in arbol_lugares.obtener_lugares()
+            if lugar.tipo.strip().lower() == tipo and lugar.departamento.strip().lower() == departamento
+        ]
+    else:
+        # Solo filtra por tipo (todos los departamentos)
+        lugares_filtrados = [
+            lugar for lugar in arbol_lugares.obtener_lugares()
+            if lugar.tipo.strip().lower() == tipo
+        ]
+
+    css_path = url_for('static', filename='css/app.css')
+    js_path = url_for('static', filename='js/scripts.js')
+    lugaresjs = url_for('static', filename='js/lugar.js')
+
+    return render_template(
+        'lugares_filtro.html',
+        lugares=lugares_filtrados,
+        tipo=tipo,
+        departamento=departamento if departamento else "Todos",
+        css_path=css_path,
+        js_path=js_path,
+        lugaresjs=lugaresjs
+    )
+
+
 
 @app.route('/hospedajes')
 def hospedajes():

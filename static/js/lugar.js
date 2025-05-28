@@ -1,11 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Solo cargar lugares si estamos en la página de lugares (evitar llamada innecesaria)
     if (window.location.pathname.includes('lugares')) {
         cargarLugaresDesdeAPI();
     }
 });
 
-// --- Función para cargar lugares desde la API y mostrarlos ---
 function cargarLugaresDesdeAPI() {
     console.log("Cargando lugares...");
 
@@ -15,98 +13,157 @@ function cargarLugaresDesdeAPI() {
             return res.json();
         })
         .then(data => {
-            // Cambié el id aquí porque ahora usaremos un contenedor principal donde se pondrán las secciones
             const mainContenedor = document.getElementById('contenedor');
-            if (!mainContenedor) {
-                console.warn("No se encontró el contenedor 'contenedor'");
+            const seccionCompletaContenedor = document.getElementById('seccion-completa');
+
+            if (!mainContenedor || !seccionCompletaContenedor) {
+                console.warn("No se encontró alguno de los contenedores");
                 return;
             }
 
-            mainContenedor.innerHTML = ""; // Limpiar contenido previo
+            mainContenedor.innerHTML = "";
+            seccionCompletaContenedor.innerHTML = "";
 
             if (!data.lugares || data.lugares.length === 0) {
                 mainContenedor.innerHTML = "<p>No hay lugares disponibles.</p>";
                 return;
             }
 
-            // Filtrar y ordenar según los tipos que vienen en el CSV
-            const comida = data.lugares
-                .filter(l => l.tipo === 'Comida')
-                .sort((a, b) => b.calificacion - a.calificacion);
+            // Crear título clickeable, recibe filtroParametros para armar URL solo con lo que quieres
+            const crearTituloClickeable = (titulo, lugaresTipo, filtroParametros = {}) => {
+                const h2 = document.createElement('h2');
+                h2.classList.add('carrusel-titulo');
+                h2.textContent = titulo;
 
-            const entretenimiento = data.lugares.filter(l => l.tipo === 'Entretenimiento');
-            const turismo = data.lugares.filter(l => l.tipo === 'Turismo');
+                if (lugaresTipo.length > 7) {
+                    h2.classList.add('clickeable');
+                    h2.title = "Ver todos";
+                    h2.style.cursor = "pointer";
+                    h2.addEventListener('click', () => {
+                        const params = new URLSearchParams();
 
-            // Crear y agregar secciones carrusel sólo si hay datos en esa categoría
-            if (comida.length > 0) {
-                mainContenedor.appendChild(crearSeccionCarrusel("Recomendación de Restaurantes", comida));
-            }
-            if (entretenimiento.length > 0) {
-                mainContenedor.appendChild(crearSeccionCarrusel("Recomendación de Lugares Recreativos", entretenimiento));
-            }
-            if (turismo.length > 0) {
-                mainContenedor.appendChild(crearSeccionCarrusel("Recomendación de Lugares Turísticos", turismo));
-            }
+                        if (filtroParametros.tipo) {
+                            params.append('tipo', filtroParametros.tipo);
+                        }
+                        if (filtroParametros.departamento) {
+                            params.append('departamento', filtroParametros.departamento);
+                        }
+                        if (filtroParametros.calificacion_min !== undefined) {
+                            params.append('calificacion_min', filtroParametros.calificacion_min);
+                        }
+                        if (filtroParametros.calificacion_max !== undefined) {
+                            params.append('calificacion_max', filtroParametros.calificacion_max);
+                        }
+
+                        const queryString = params.toString();
+                        const url = queryString ? `/lugares/filtro?${queryString}` : `/lugares/filtro`;
+                        console.log("URL a redirigir:", url);
+                        window.location.href = url;
+                    });
+                }
+                return h2;
+            };
+
+            // Crear carrusel con flechas
+            const crearSeccionCarruselConTitulo = (titulo, lugares, limite = 7, filtroParametros = {}) => {
+                const contenedor = document.createElement('div');
+                contenedor.classList.add('carrusel-contenedor');
+            
+                const tituloElem = crearTituloClickeable(titulo, lugares, filtroParametros);
+                contenedor.appendChild(tituloElem);
+            
+                const carrusel = document.createElement('div');
+                carrusel.classList.add('carrusel');
+            
+                lugares.slice(0, limite).forEach(lugar => {
+                    const item = document.createElement('div');
+                    item.classList.add('lugar-card');
+                    item.innerHTML = `
+                        <h3>${lugar.nombre}</h3>
+                        <p>Dirección: ${lugar.direccion}</p>
+                        <p>Ubicación: ${lugar.municipio} ${lugar.departamento}</p>
+                        <p>Calificación: ${lugar.calificacion}</p>
+                    `;
+                    carrusel.appendChild(item);
+                });
+            
+                // Solo agregar flechas si hay más de 5 lugares
+                if (lugares.length > 5) {
+                    const btnIzq = document.createElement('button');
+                    btnIzq.classList.add('flecha', 'izquierda');
+                    btnIzq.setAttribute('aria-label', 'Anterior');
+                    btnIzq.innerHTML = '&#8592;';
+                    btnIzq.addEventListener('click', () => {
+                        carrusel.scrollBy({ left: -250, behavior: 'smooth' });
+                    });
+            
+                    const btnDer = document.createElement('button');
+                    btnDer.classList.add('flecha', 'derecha');
+                    btnDer.setAttribute('aria-label', 'Siguiente');
+                    btnDer.innerHTML = '&#8594;';
+                    btnDer.addEventListener('click', () => {
+                        carrusel.scrollBy({ left: 250, behavior: 'smooth' });
+                    });
+            
+                    contenedor.appendChild(btnIzq);
+                    contenedor.appendChild(carrusel);
+                    contenedor.appendChild(btnDer);
+                } else {
+                    // Si no hay más de 5, solo se muestra el carrusel sin flechas
+                    contenedor.appendChild(carrusel);
+                }
+            
+                return contenedor;
+            };
+            
+
+            // Función para filtrar y agregar carrusel, recibe filtroFn y filtroParametros para la URL
+            const filtrarYLlenarCarrusel = (titulo, filtroFn, filtroParametros = {}) => {
+                const lugaresFiltrados = data.lugares.filter(filtroFn)
+                    .sort((a, b) => b.calificacion - a.calificacion);
+                if (lugaresFiltrados.length) {
+                    mainContenedor.appendChild(crearSeccionCarruselConTitulo(titulo, lugaresFiltrados, 7, filtroParametros));
+                }
+            };
+
+            //FILTROS
+            filtrarYLlenarCarrusel(
+                "Restaurantes populares en la Capital",
+                l => l.tipo === 'Comida' && l.departamento.toLowerCase() === 'guatemala',
+                { tipo: 'Comida', departamento: 'Guatemala' }
+            );
+
+            filtrarYLlenarCarrusel(
+                "Lugares turísticos en Guatemala",
+                l => l.tipo === 'Turismo',
+                { tipo: 'Turismo' }
+            );
+
+            filtrarYLlenarCarrusel(
+                "Restaurantes conocidos en el Interior",
+                l => l.tipo === 'Comida' && l.departamento.toLowerCase() !== 'guatemala',
+                { tipo: 'Comida' }
+            );
+
+            filtrarYLlenarCarrusel(
+                "Entretenimiento para todos",
+                l => l.tipo === 'Entretenimiento',
+                { tipo: 'Entretenimiento' }
+            );
+
+            filtrarYLlenarCarrusel(
+                "Lugares turísticos mejores calificados",
+                l => l.tipo === 'Turismo' && l.calificacion >= 4.8 && l.calificacion <= 5,
+                { tipo: 'Turismo', calificacion_min: 4.8, calificacion_max: 5 }
+            );
+            
+
         })
         .catch(error => {
             console.error("Error al cargar lugares:", error);
             const mainContenedor = document.getElementById('contenedor');
-            if (mainContenedor) mainContenedor.innerHTML = "<p>Error al cargar lugares.</p>";
+            if (mainContenedor) {
+                mainContenedor.innerHTML = "<p>Error al cargar lugares.</p>";
+            }
         });
-}
-
-// --- Función para crear una sección tipo carrusel con flechas ---
-function crearSeccionCarrusel(titulo, lugares) {
-    // Crear contenedor general
-    const contenedor = document.createElement('div');
-    contenedor.classList.add('carrusel-container');
-  
-    // Crear título
-    const h2 = document.createElement('h2');
-    h2.classList.add('carrusel-titulo');
-    h2.textContent = titulo;
-  
-    // Crear flechas para navegar
-    const btnIzq = document.createElement('button');
-    btnIzq.classList.add('flecha', 'izquierda');
-    btnIzq.setAttribute('aria-label', 'Anterior');
-    btnIzq.innerHTML = '&#8592;';
-  
-    const btnDer = document.createElement('button');
-    btnDer.classList.add('flecha', 'derecha');
-    btnDer.setAttribute('aria-label', 'Siguiente');
-    btnDer.innerHTML = '&#8594;';
-  
-    // Crear contenedor horizontal scrollable
-    const carrusel = document.createElement('div');
-    carrusel.classList.add('carrusel');
-  
-    // Crear las tarjetas de lugares
-    lugares.forEach(lugar => {
-      const item = document.createElement('div');
-      item.classList.add('lugar-card');
-      item.innerHTML = `
-        <h3>${lugar.nombre}</h3>
-        <p>Tipo: ${lugar.tipo}</p>
-        <p>Dirección: ${lugar.direccion}</p>
-        <p>Calificación: ${lugar.calificacion}</p>
-      `;
-      carrusel.appendChild(item);
-    });
-  
-    // Agregar elementos al contenedor principal de la sección
-    contenedor.appendChild(h2);
-    contenedor.appendChild(btnIzq);
-    contenedor.appendChild(carrusel);
-    contenedor.appendChild(btnDer);
-  
-    // Agregar funcionalidad flechas para hacer scroll horizontal suave
-    btnIzq.addEventListener('click', () => {
-      carrusel.scrollBy({ left: -250, behavior: 'smooth' });
-    });
-    btnDer.addEventListener('click', () => {
-      carrusel.scrollBy({ left: 250, behavior: 'smooth' });
-    });
-  
-    return contenedor;
 }

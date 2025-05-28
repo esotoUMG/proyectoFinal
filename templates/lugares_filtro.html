@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Lugares filtrados - Travel Map{% endblock %}
+
+{% block contenido %}
+  <section>
+    <h2>Lugares: {{ tipo|title }} en {{ departamento|title }}</h2>
+    <div class="lista-lugares">
+      {% if lugares %}
+      <div class="grid-lugares">
+        {% for lugar in lugares %}
+          <div class="lugar-card">
+            <h3>{{ lugar.nombre }}</h3>
+            <p>Tipo: {{ lugar.tipo }}</p>
+            <p>Dirección: {{ lugar.direccion }}</p>
+            <p>Ubicación: {{ lugar.municipio }} {{ lugar.departamento }}</p>
+            <p>Calificación: {{ lugar.calificacion }}</p>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p>No se encontraron lugares para este filtro.</p>
+    {% endif %}
+    
+    </div>
+  </section>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ js_path }}"></script>
+{% endblock %}
