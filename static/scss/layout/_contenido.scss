@@ -124,3 +124,26 @@
     font-size: 2.2rem;
   }
 }
+
+.estrella {
+  font-size: 1rem;
+  color: #ccc; 
+  margin-right: 2px;
+  display: inline-block;
+  position: relative;
+}
+
+.estrella.llena {
+  color: gold;
+}
+
+.estrella.vacia {
+  color: #ccc;
+}
+
+.estrella.media {
+  background: linear-gradient(90deg, gold 50%, #ccc 50%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+}

@@ -48,12 +48,21 @@ function mostrarInfoLugar(lugar) {
         return;
     }
 
+    const precio = lugar.precio === 0 ? 'Gratis' : `Desde Q ${lugar.precio}`
+    const calificacion = lugar.calificacion
+    const estrellas = generarEstrellasHTML(calificacion)
+
+
     contenedor.innerHTML = `
         <h2>${lugar.nombre}</h2>
-        <p><strong>Dirección:</strong> ${lugar.direccion}</p>
-        <p><strong>Ubicación:</strong> ${lugar.municipio}, ${lugar.departamento}</p>
-        <p><strong>Tipo:</strong> ${lugar.tipo}</p>
-        <p><strong>Calificación:</strong> ${lugar.calificacion}</p>
+        <p> ${lugar.direccion}</p>
+        <p> ${lugar.municipio}, ${lugar.departamento}</p>
+        <p> ${lugar.tipo}</p>
+        <p>
+            <span class="calificacion-valor">${calificacion.toFixed(1)}</span>
+            <span class="estrellas">${estrellas}</span>
+        </p>
+        <p>${precio}</p>
     `;
 
     // Llama manualmente a initMap para volver a inicializar el mapa
@@ -63,6 +72,29 @@ function mostrarInfoLugar(lugar) {
         console.error("initMap no está definida");
     }
 }
+
+// Función auxiliar para generar estrellas según la calificación
+const generarEstrellasHTML = (calificacion) => {
+
+    const maxEstrellas = 5;
+    let estrellas = '';
+
+    for (let i = 1; i <= maxEstrellas; i++) {
+        if (calificacion >= i) {
+            // estrella llena
+            estrellas += '<span class="estrella llena">&#9733;</span>';
+        } else if (calificacion >= i - 0.5) {
+            // estrella media
+            estrellas += '<span class="estrella media">&#9733;</span>';
+        } else {
+            // estrella vacía
+            estrellas += '<span class="estrella vacia">&#9734;</span>';
+        }
+    }
+
+    return estrellas;
+};
+
 
 
 function mostrarRecomendaciones(recomendaciones) {
@@ -84,17 +116,14 @@ function mostrarRecomendaciones(recomendaciones) {
 
     recomendaciones.slice(0, 5).forEach(lugar => {
         const card = document.createElement('div');
-        card.classList.add('recomendaciones-card');
+        card.classList.add('recomendaciones-card'); 
+        
         card.innerHTML = `
             <h4>${lugar.nombre}</h4>
             <p>${lugar.direccion}</p>
             <p>${lugar.municipio}, ${lugar.departamento}</p>
             <p>Calificación: ${lugar.calificacion}</p>
         `;
-
-        card.addEventListener('click', () => {
-            redirigirADetalleConFiltros(lugar.nombre);
-        });
 
         lista.appendChild(card);
     });
@@ -104,7 +133,7 @@ function mostrarRecomendaciones(recomendaciones) {
 
 function agregarListenerTarjetasPrincipales() {
     // Selecciona todas las tarjetas de la lista principal (asegúrate que tengan la clase lugar-card)
-    const tarjetas = document.querySelectorAll('.lugar-card');
+    const tarjetas = document.querySelectorAll('.recomendaciones-card');
     if (!tarjetas.length) return;
 
     tarjetas.forEach(card => {

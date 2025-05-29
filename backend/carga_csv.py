@@ -20,7 +20,8 @@ def cargar_lugares_csv(archivo, arbol_lugares, arbol_hospedaje):
             latitud=fila['Latitud'],
             longitud=fila['Longitud'],
             calificacion=fila['Calificación en Google'],
-            tiempo_estadia=fila.get('tiempo')
+            precio = fila.get ('Precio'),
+            tiempo=fila.get('Tiempo estadia')
         )
 
         tipo = lugar.tipo.strip().lower()
@@ -54,16 +55,22 @@ def cargar_calificaciones_csv(archivo, arbol):
 
 #Guardar datos en CSV
 def guardar_lugar_en_csv(lugar_nuevo, ruta_csv):
-
     campos = ['Id', 'Departamento', 'Municipio', 'Nombre', 'Tipo', 'Dirección',
-                'Latitud', 'Longitud', 'Calificación en Google', 'tiempo']
+              'Latitud', 'Longitud', 'Calificación en Google', 'Tiempo estadia', 'Precio']
 
     archivo_existe = os.path.isfile(ruta_csv)
+
+    # Verificar si el archivo no termina en salto de línea
+    if archivo_existe:
+        with open(ruta_csv, 'rb+') as f:
+            f.seek(-1, os.SEEK_END)
+            last_char = f.read(1)
+            if last_char != b'\n':
+                f.write(b'\n')
 
     with open(ruta_csv, mode='a', newline='', encoding='utf-8') as archivo:
         writer = csv.DictWriter(archivo, fieldnames=campos)
 
-        # Escribir encabezado si el archivo no existía
         if not archivo_existe:
             writer.writeheader()
 
@@ -77,5 +84,6 @@ def guardar_lugar_en_csv(lugar_nuevo, ruta_csv):
             'Latitud': lugar_nuevo.latitud,
             'Longitud': lugar_nuevo.longitud,
             'Calificación en Google': lugar_nuevo.calificacion,
-            'tiempo': lugar_nuevo.tiempo_estadia if lugar_nuevo.tiempo_estadia is not None else ''
+            'Tiempo estadia': lugar_nuevo.tiempo if lugar_nuevo.tiempo is not None else '',
+            'Precio': lugar_nuevo.precio
         })

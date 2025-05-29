@@ -60,33 +60,44 @@ function cargarHospedajesDesdeAPI() {
             const crearCarrusel = (hospedajesArray, titulo, filtroParametros = {}) => {
                 const seccion = document.createElement('div');
                 seccion.classList.add('carrusel-contenedor');
-
+            
                 const h2 = crearTituloClickeable(titulo, hospedajesArray, filtroParametros);
                 seccion.appendChild(h2);
-
+            
                 const carrusel = document.createElement('div');
                 carrusel.classList.add('carrusel');
-
+            
                 const hospedajesAMostrar = hospedajesArray.slice(0, 7);
-
+            
                 hospedajesAMostrar.forEach(hospedaje => {
                     const item = document.createElement('div');
                     item.classList.add('lugar-card');
+            
+                    // Calcular estrellas
+                    const estrellasHTML = generarEstrellasHTML(hospedaje.calificacion);
+            
+                    // Precio
+                    const precio = hospedaje.precio == 0 ? "Gratis" : `Desde Q ${hospedaje.precio}`;
+            
                     item.innerHTML = `
                         <h3>${hospedaje.nombre}</h3>
-                        <p>Tipo: ${hospedaje.tipo}</p>
-                        <p>Dirección: ${hospedaje.direccion}</p>
-                        <p>Ubicación: ${hospedaje.municipio} ${hospedaje.departamento}</p>
-                        <p>Calificación: ${hospedaje.calificacion}</p>
+                        <p><strong><i>${hospedaje.tipo}</i></strong></p>
+                        <p>${hospedaje.direccion}</p>
+                        <p>${hospedaje.municipio} ${hospedaje.departamento}</p>
+                        <p>
+                            <span class="calificacion-valor">${hospedaje.calificacion.toFixed(1)}</span>
+                            <span class="estrellas">${estrellasHTML}</span>
+                        </p>
+                        <p>${precio}</p>
                     `;
-
+            
                     item.addEventListener('click', () => {
                         window.location.href = `/hospedajes/detalle?nombre=${encodeURIComponent(hospedaje.nombre)}`;
                     });
-
+            
                     carrusel.appendChild(item);
                 });
-
+            
                 if (hospedajesAMostrar.length > 5) {
                     const btnIzq = document.createElement('button');
                     btnIzq.classList.add('flecha', 'izquierda');
@@ -95,7 +106,7 @@ function cargarHospedajesDesdeAPI() {
                     btnIzq.addEventListener('click', () => {
                         carrusel.scrollBy({ left: -250, behavior: 'smooth' });
                     });
-
+            
                     const btnDer = document.createElement('button');
                     btnDer.classList.add('flecha', 'derecha');
                     btnDer.setAttribute('aria-label', 'Siguiente');
@@ -103,16 +114,39 @@ function cargarHospedajesDesdeAPI() {
                     btnDer.addEventListener('click', () => {
                         carrusel.scrollBy({ left: 250, behavior: 'smooth' });
                     });
-
+            
                     seccion.appendChild(btnIzq);
                     seccion.appendChild(carrusel);
                     seccion.appendChild(btnDer);
                 } else {
                     seccion.appendChild(carrusel);
                 }
-
+            
                 return seccion;
             };
+            
+            // Función auxiliar para generar estrellas según la calificación
+            const generarEstrellasHTML = (calificacion) => {
+
+                const maxEstrellas = 5;
+                let estrellas = '';
+
+                for (let i = 1; i <= maxEstrellas; i++) {
+                    if (calificacion >= i) {
+                        // estrella llena
+                        estrellas += '<span class="estrella llena">&#9733;</span>';
+                    } else if (calificacion >= i - 0.5) {
+                        // estrella media
+                        estrellas += '<span class="estrella media">&#9733;</span>';
+                    } else {
+                        // estrella vacía
+                        estrellas += '<span class="estrella vacia">&#9734;</span>';
+                    }
+                }
+            
+                return estrellas;
+            };
+            
 
             const filtrarYLlenarCarrusel = (titulo, filtroFn, filtroParametros = {}) => {
                 const hospedajesFiltrados = data.hospedajes.filter(filtroFn);

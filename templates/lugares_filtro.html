@@ -11,9 +11,32 @@
         {% for lugar in lugares %}
           <div class="lugar-card" data-nombre="{{ lugar.nombre }}">
             <h3>{{ lugar.nombre }}</h3>
-            <p>Dirección: {{ lugar.direccion }}</p>
-            <p>Ubicación: {{ lugar.municipio }} {{ lugar.departamento }}</p>
-            <p>Calificación: {{ lugar.calificacion }}</p>
+            <p> {{ lugar.direccion }}</p>
+            <p> {{ lugar.municipio }} {{ lugar.departamento }}</p>
+            <p>
+              Calificación: {{ lugar.calificacion }} 
+              <span class="estrellas">
+                {% set cal = lugar.calificacion %}
+                {% for i in range(1, 6) %}
+                  {% if cal >= i %}
+                    <span class="estrella llena">&#9733;</span>
+                  {% elif cal + 0.5 >= i %}
+                    <span class="estrella media">&#9733;</span>
+                  {% else %}
+                    <span class="estrella vacia">&#9734;</span>
+                  {% endif %}
+                {% endfor %}
+              </span>
+            </p>
+            <p>
+              Precio: 
+              {% if lugar.precio == 0 %}
+                Gratis
+              {% else %}
+                Desde Q {{ lugar.precio }}
+              {% endif %}
+            </p>
+            
           </div>
         {% endfor %}
       </div>

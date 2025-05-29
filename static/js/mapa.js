@@ -17,16 +17,11 @@ function initMap() {
   let directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true });
   directionsRenderer.setMap(mapa);
 
-  // Variable para controlar el infoWindow abierto actualmente (solo 1 a la vez)
   let currentInfoWindow = null;
 
-  // Función para crear un infoWindow sin botón cerrar (sin "x")
   function createInfoWindowSinCerrar(content) {
-    // Crear un InfoWindow con la opción disableAutoPan para que no cierre al hacer click fuera
     const infowindow = new google.maps.InfoWindow({
       content,
-      // Ojo, la API no tiene opción oficial para quitar la "x" pero podemos ocultarla con CSS:
-      // Agrega un id o clase al contenido para aplicar estilo
     });
     return infowindow;
   }
@@ -38,10 +33,8 @@ function initMap() {
       title: titulo
     });
 
-    // Crear contenido del infoWindow
     const contentString = `<div><b>${titulo}</b></div>`;
 
-    // Crear infoWindow, distinto para lugar principal y para recomendaciones
     let infowindow;
     if (esLugarPrincipal) {
       infowindow = createInfoWindowSinCerrar(contentString);
@@ -51,38 +44,28 @@ function initMap() {
       });
     }
 
-    // Listener para toggle infoWindow en marcadores de recomendación
     marker.addListener("click", () => {
       if (esLugarPrincipal) {
-        // Lugar principal: infoWindow siempre abierto, no cerrar ni toggle
         if (!infowindow.getMap()) {
           infowindow.open(mapa, marker);
         }
         return;
       }
 
-      // Si ya hay un infoWindow abierto y es este mismo, cerrarlo (toggle)
       if (currentInfoWindow === infowindow) {
         infowindow.close();
         currentInfoWindow = null;
       } else {
-        // Si hay otro infoWindow abierto, cerrar primero
         if (currentInfoWindow) currentInfoWindow.close();
-
-        // Abrir este infoWindow y asignarlo como actual
         infowindow.open(mapa, marker);
         currentInfoWindow = infowindow;
-
-        // Ejecutar función adicional si existe
         if (onClick) onClick(coords);
       }
     });
 
-    // Mostrar infoWindow del lugar principal inmediatamente sin botón cerrar
     if (mostrarInfoInmediata && esLugarPrincipal) {
       infowindow.open(mapa, marker);
-      currentInfoWindow = infowindow; // Para evitar cerrar con otros clicks
-      // También ocultamos la 'x' con CSS abajo
+      currentInfoWindow = infowindow;
     }
 
     return marker;
@@ -106,21 +89,7 @@ function initMap() {
     });
   }
 
-  // Ubicación del usuario
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const userCoords = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude
-        };
-        addMarker(userCoords, "Tu ubicación");
-      },
-      () => {
-        console.warn("No se pudo obtener la ubicación del usuario.");
-      }
-    );
-  }
+  // Ya no solicitamos ni marcamos la ubicación del usuario aquí
 
   // Lugar principal
   fetch(`/api/lugar?nombre=${encodeURIComponent(nombreLugar)}`)
@@ -138,14 +107,14 @@ function initMap() {
             lugarPrincipalCoords,
             data.lugar.nombre,
             null,
-            true, // Mostrar info inmediatamente
-            true  // Es lugar principal (infoWindow siempre visible y sin "x")
+            true,
+            true
           ).setAnimation(google.maps.Animation.DROP);
         }
       }
     });
 
-  // Recomendaciones
+  // Recomendaciones lugar
   fetch(`/api/recomendaciones?nombre=${encodeURIComponent(nombreLugar)}`)
     .then(res => res.json())
     .then(data => {
@@ -157,6 +126,48 @@ function initMap() {
             addMarker(
               { lat, lng },
               lugar.nombre,
+              (coords) => trazarRuta(coords)
+            );
+          }
+        });
+      }
+    });
+
+  // Hospedaje principal
+  fetch(`/api/hospedaje?nombre=${encodeURIComponent(nombreLugar)}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.lugar) {
+        const lat = parseFloat(data.lugar.latitud);
+        const lng = parseFloat(data.lugar.longitud);
+        if (!isNaN(lat) && !isNaN(lng)) {
+          const hospedajePrincipalCoords = { lat, lng };
+          mapa.setCenter(hospedajePrincipalCoords);
+          mapa.setZoom(15);
+
+          addMarker(
+            hospedajePrincipalCoords,
+            data.lugar.nombre,
+            null,
+            true,
+            true
+          ).setAnimation(google.maps.Animation.DROP);
+        }
+      }
+    });
+
+  // Recomendaciones hospedajes
+  fetch(`/api/recomendaciones_hospedajes?nombre=${encodeURIComponent(nombreLugar)}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.recomendaciones) {
+        data.recomendaciones.forEach(hospedaje => {
+          const lat = parseFloat(hospedaje.latitud);
+          const lng = parseFloat(hospedaje.longitud);
+          if (!isNaN(lat) && !isNaN(lng)) {
+            addMarker(
+              { lat, lng },
+              hospedaje.nombre,
               (coords) => trazarRuta(coords)
             );
           }

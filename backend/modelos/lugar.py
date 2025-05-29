@@ -2,8 +2,8 @@ from .calificacion import Calificacion
 
 # CLASE LUGAR: Representar un lugar turístico o de hospedaje.
 class Lugar:
-    def __init__(self, id, departamento, municipio, nombre, tipo, direccion, latitud, longitud, calificacion, tiempo_estadia=None):
-        self.id = id
+    def __init__(self, id, departamento, municipio, nombre, tipo, direccion, latitud, longitud, calificacion, tiempo, precio):
+        self.id = int(id)  # Forzar que id sea entero
         self.departamento = departamento
         self.municipio = municipio
         self.nombre = nombre
@@ -12,7 +12,8 @@ class Lugar:
         self.latitud = float(latitud)
         self.longitud = float(longitud)
         self.calificacion = float(calificacion)
-        self.tiempo_estadia = float(tiempo_estadia) if tiempo_estadia else None
+        self.tiempo = float(tiempo) if tiempo else None
+        self.precio = float(precio)
         self.calificaciones = []  # Lista de calificaciones individuales
 
     def agregar_calificacion(self, puntaje, comentario=None):

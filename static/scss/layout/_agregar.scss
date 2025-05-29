@@ -1,0 +1,35 @@
+@use 'base/variables' as v;
+
+.cargar{
+    margin: 4rem 6rem 7.6rem 6rem;
+    h2{
+        font-family: v.$subtitulo;
+        font-size: 2.2rem;
+    }
+}
+.opciones{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    margin-top: 3rem;
+    &-grid{
+        margin: 0 3rem;
+        font-family: v.$contenido;
+        border: 1px solid v.$gris_;
+        border-radius: 1rem;
+        padding: 5rem;
+        cursor: pointer;
+        transition: transform 0.3s ease-in-out;
+        i{
+            font-size: 10rem;
+        }
+        h1{
+            padding-top: 4rem;
+            font-size: 4.5rem;
+        }
+        &:hover{
+            color: v.$turquesa;
+            transform: scale(1.05);
+            box-shadow: 1px 1px 10px v.$gris_;
+        }
+    }
+}

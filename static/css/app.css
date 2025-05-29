@@ -753,6 +753,29 @@ header.fixed #filtros-form button:hover {
   font-size: 2.2rem;
 }
 
+.estrella {
+  font-size: 1rem;
+  color: #ccc;
+  margin-right: 2px;
+  display: inline-block;
+  position: relative;
+}
+
+.estrella.llena {
+  color: gold;
+}
+
+.estrella.vacia {
+  color: #ccc;
+}
+
+.estrella.media {
+  background: linear-gradient(90deg, gold 50%, #ccc 50%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+}
+
 footer {
   background-color: #000000;
   text-align: center;
@@ -765,4 +788,93 @@ footer h2 {
 }
 footer h2 span {
   color: #5dc1b9;
+}
+
+#info-detallada {
+  border-bottom: 1px solid #e6e6e6;
+  padding: 2rem 1.5rem;
+  margin: 0 1.5rem;
+}
+#info-detallada h2 {
+  font-family: "Cal Sans", sans-serif;
+  font-size: 3rem;
+  padding-bottom: 0.2rem;
+}
+#info-detallada p {
+  font-family: "Raleway", sans-serif;
+  font-size: 1.6rem;
+}
+
+#recomendaciones-cercanas {
+  margin: 1.2rem 5rem 0 5rem;
+  background-color: #f0f0f0;
+  border-radius: 2rem;
+  padding: 4rem;
+  text-align: center;
+}
+#recomendaciones-cercanas h3 {
+  font-family: "DM Sans", sans-serif;
+  font-size: 2rem;
+  font-weight: 600;
+  padding-bottom: 2rem;
+}
+
+.recomendaciones-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.recomendaciones-card {
+  cursor: pointer;
+  text-align: center;
+}
+.recomendaciones-card h4 {
+  font-family: "Cal Sans", sans-serif;
+  font-size: 1.5rem;
+}
+.recomendaciones-card p {
+  font-family: "Raleway", sans-serif;
+  font-size: 1rem;
+}
+.recomendaciones-card:hover {
+  box-shadow: 1px 1px 10px #000000;
+  border-radius: 2rem;
+  padding: 1rem;
+  transition: 0.4s ease;
+}
+
+.cargar {
+  margin: 4rem 6rem 7.6rem 6rem;
+}
+.cargar h2 {
+  font-family: "Raleway", sans-serif;
+  font-size: 2.2rem;
+}
+
+.opciones {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  margin-top: 3rem;
+}
+.opciones-grid {
+  margin: 0 3rem;
+  font-family: "Cal Sans", sans-serif;
+  border: 1px solid #e6e6e6;
+  border-radius: 1rem;
+  padding: 5rem;
+  cursor: pointer;
+  transition: transform 0.3s ease-in-out;
+}
+.opciones-grid i {
+  font-size: 10rem;
+}
+.opciones-grid h1 {
+  padding-top: 4rem;
+  font-size: 4.5rem;
+}
+.opciones-grid:hover {
+  color: #5dc1b9;
+  transform: scale(1.05);
+  box-shadow: 1px 1px 10px #e6e6e6;
 }/*# sourceMappingURL=app.css.map */
