@@ -33,26 +33,6 @@ def cargar_lugares_csv(archivo, arbol_lugares, arbol_hospedaje):
             print(f"Tipo no reconocido para lugar: {lugar.nombre} -> '{lugar.tipo}'")
 
 
-# Función para cargar calificaciones desde archivo CSV
-def cargar_calificaciones_csv(archivo, arbol):
-    """
-    Recibe un archivo CSV con calificaciones.
-    Busca el lugar en el Árbol y le agrega la calificación.
-    """
-    contenido = archivo.read().decode('utf-8')
-    lector = csv.DictReader(io.StringIO(contenido))
-
-    for fila in lector:
-        if "id" in fila and "puntaje" in fila:
-            id_lugar = fila['id']
-            puntaje = fila['puntaje']
-            comentario = fila.get('comentario')
-
-            lugar = arbol.buscar(id_lugar)
-            if lugar:
-                lugar.agregar_calificacion(float(puntaje), comentario)
-
-
 #Guardar datos en CSV
 def guardar_lugar_en_csv(lugar_nuevo, ruta_csv):
     campos = ['Id', 'Departamento', 'Municipio', 'Nombre', 'Tipo', 'Dirección',
@@ -87,3 +67,67 @@ def guardar_lugar_en_csv(lugar_nuevo, ruta_csv):
             'Tiempo estadia': lugar_nuevo.tiempo if lugar_nuevo.tiempo is not None else '',
             'Precio': lugar_nuevo.precio
         })
+
+
+
+
+# Función para cargar calificaciones desde archivo CSV
+def cargar_calificaciones_csv(archivo, arbol):
+    """
+    Recibe un archivo CSV con calificaciones.
+    Busca el lugar en el Árbol y le agrega la calificación.
+    """
+    contenido = archivo.read().decode('utf-8')
+    lector = csv.DictReader(io.StringIO(contenido))
+
+    for fila in lector:
+        if "Id" in fila and "Puntaje" in fila:
+            try:
+                id_lugar = int(fila['Id'])
+                puntaje = float(fila['Puntaje'])
+                comentario = fila.get('Comentario', '')
+
+                lugar = arbol.buscar(id_lugar)
+                if lugar:
+                    lugar.agregar_calificacion(puntaje, comentario)
+            except ValueError:
+                # Ignorar filas con datos inválidos
+                continue
+
+def guardar_calificacion_en_csv(ruta_csv, id_lugar, puntaje, comentario):
+    archivo_existe = os.path.isfile(ruta_csv)
+
+    with open(ruta_csv, mode='a', newline='', encoding='utf-8') as archivo:
+        escritor = csv.writer(archivo)
+
+        if not archivo_existe:
+            escritor.writerow(['Id', 'Puntaje', 'Comentario'])
+
+        escritor.writerow([id_lugar, puntaje, comentario])
+
+
+        
+def actualizar_calificacion_promedio_csv(ruta_csv_lugares, arbol):
+    """
+    Lee el CSV original de lugares, actualiza la columna de calificación
+    con el promedio almacenado en los objetos Lugar del árbol, y sobrescribe el archivo.
+    """
+    filas_actualizadas = []
+
+    with open(s_lugares, mode='r', encoding='utf-8') as archivo:
+        lector = csv.DictReader(archivo)
+        campos = lector.fieldnames
+
+        for fila in lector:
+            id_lugar = int(fila['Id'])
+            lugar = arbol.buscar(id_lugar)
+            if lugar:
+                # Actualizar solo la calificación promedio en la fila
+                fila['Calificación en Google'] = f"{lugar.calificacion:.2f}"
+            filas_actualizadas.append(fila)
+
+    # Sobrescribir archivo con las filas actualizadas
+    with open(ruta_csv_lugares, mode='w', newline='', encoding='utf-8') as archivo:
+        escritor = csv.DictWriter(archivo, fieldnames=campos)
+        escritor.writeheader()
+        escritor.writerows(filas_actualizadas)

@@ -1,6 +1,5 @@
 from .calificacion import Calificacion
 
-
 # CLASE LUGAR: Representar un lugar turístico o de hospedaje.
 class Lugar:
     def __init__(self, id, departamento, municipio, nombre, tipo, direccion, latitud, longitud, calificacion, tiempo, precio):
