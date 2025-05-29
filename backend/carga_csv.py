@@ -1,5 +1,6 @@
 import csv
 import io
+import os
 from backend.modelos.lugar import Lugar
 from backend.modelos.calificacion import Calificacion 
 
@@ -49,3 +50,32 @@ def cargar_calificaciones_csv(archivo, arbol):
             lugar = arbol.buscar(id_lugar)
             if lugar:
                 lugar.agregar_calificacion(float(puntaje), comentario)
+
+
+#Guardar datos en CSV
+def guardar_lugar_en_csv(lugar, ruta_csv):
+
+    campos = ['Id', 'Departamento', 'Municipio', 'Nombre', 'Tipo', 'Dirección',
+                'Latitud', 'Longitud', 'Calificación en Google', 'tiempo']
+
+    archivo_existe = os.path.isfile(ruta_csv)
+
+    with open(ruta_csv, mode='a', newline='', encoding='utf-8') as archivo:
+        writer = csv.DictWriter(archivo, fieldnames=campos)
+
+        # Escribir encabezado si el archivo no existía
+        if not archivo_existe:
+            writer.writeheader()
+
+        writer.writerow({
+            'Id': lugar.id,
+            'Departamento': lugar.departamento,
+            'Municipio': lugar.municipio,
+            'Nombre': lugar.nombre,
+            'Tipo': lugar.tipo,
+            'Dirección': lugar.direccion,
+            'Latitud': lugar.latitud,
+            'Longitud': lugar.longitud,
+            'Calificación en Google': lugar.calificacion,
+            'tiempo': lugar.tiempo_estadia if lugar.tiempo_estadia is not None else ''
+        })
