@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function cargarLugaresDesdeAPI() {
+
     fetch('/api/lugares')
         .then(res => {
             if (!res.ok) throw new Error('Error en la respuesta de la API');
@@ -27,7 +28,7 @@ function cargarLugaresDesdeAPI() {
                 return;
             }
 
-            // Crear título clickeable para filtrar lugares y navegar a página filtro
+            // Crear título clickeable, recibe filtroParametros para armar URL solo con lo que quieres
             const crearTituloClickeable = (titulo, lugaresTipo, filtroParametros = {}) => {
                 const h2 = document.createElement('h2');
                 h2.classList.add('carrusel-titulo');
@@ -61,7 +62,7 @@ function cargarLugaresDesdeAPI() {
                 return h2;
             };
 
-            // Crear carrusel con lugares y flechas para scroll horizontal
+            // Crear carrusel con flechas
             const crearSeccionCarruselConTitulo = (titulo, lugares, limite = 7, filtroParametros = {}) => {
                 const contenedor = document.createElement('div');
                 contenedor.classList.add('carrusel-contenedor');
@@ -82,6 +83,7 @@ function cargarLugaresDesdeAPI() {
                         <p>Calificación: ${lugar.calificacion}</p>
                     `;
 
+                    // Agregar listener para redirigir a detalle al click
                     item.addEventListener('click', () => {
                         window.location.href = `/lugares/detalle?nombre=${encodeURIComponent(lugar.nombre)}`;
                     });
@@ -89,7 +91,7 @@ function cargarLugaresDesdeAPI() {
                     carrusel.appendChild(item);
                 });
 
-                // Agregar flechas si hay más de 5 lugares
+                // Solo agregar flechas si hay más de 5 lugares
                 if (lugares.length > 5) {
                     const btnIzq = document.createElement('button');
                     btnIzq.classList.add('flecha', 'izquierda');
@@ -111,13 +113,14 @@ function cargarLugaresDesdeAPI() {
                     contenedor.appendChild(carrusel);
                     contenedor.appendChild(btnDer);
                 } else {
+                    // Si no hay más de 5, solo se muestra el carrusel sin flechas
                     contenedor.appendChild(carrusel);
                 }
 
                 return contenedor;
             };
 
-            // Filtrar lugares según función y agregar carrusel al contenedor principal
+            // Función para filtrar y agregar carrusel, recibe filtroFn y filtroParametros para la URL
             const filtrarYLlenarCarrusel = (titulo, filtroFn, filtroParametros = {}) => {
                 const lugaresFiltrados = data.lugares.filter(filtroFn)
                     .sort((a, b) => b.calificacion - a.calificacion);
@@ -126,7 +129,7 @@ function cargarLugaresDesdeAPI() {
                 }
             };
 
-            // Aplicar filtros para diferentes categorías y agregarlos
+            // FILTROS
             filtrarYLlenarCarrusel(
                 "Restaurantes populares en la Capital",
                 l => l.tipo === 'Comida' && l.departamento.toLowerCase() === 'guatemala',

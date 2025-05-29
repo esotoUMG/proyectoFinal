@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}Hospedajes filtrados - Travel Map{% endblock %}
+{% block title %}Hospedaje filtrados - Travel Map{% endblock %}
 
 {% block contenido %}
   <section class="contenido">
-    <h2 class="contenido-titulo"> {{ tipo|title }}</h2>
+    <h2 class="contenido-titulo">{{ tipo|title }}</h2>
     <div class="lista-lugares">
       {% if hospedajes %}
       <div class="grid-lugares">
         {% for lugar in hospedajes %}
-          <div class="lugar-card">
+          <div class="lugar-card" data-nombre="{{ lugar.nombre }}">
             <h3>{{ lugar.nombre }}</h3>
             <p>Dirección: {{ lugar.direccion }}</p>
             <p>Ubicación: {{ lugar.municipio }} {{ lugar.departamento }}</p>
@@ -18,7 +18,7 @@
         {% endfor %}
       </div>
       {% else %}
-        <p>No se encontraron lugares para este filtro.</p>
+        <p>No se encontraron hospedajes para este filtro.</p>
       {% endif %}
     </div>
   </section>
@@ -26,4 +26,5 @@
 
 {% block scripts %}
   <script src="{{ js_path }}"></script>
+  <script src="{{ detalle }}"></script>
 {% endblock %}
