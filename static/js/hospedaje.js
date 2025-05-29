@@ -5,8 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function cargarHospedajesDesdeAPI() {
-    console.log("Cargando hospedajes...");
-
     fetch('/api/hospedajes')
         .then(res => {
             if (!res.ok) throw new Error('Error en la respuesta de la API');
@@ -19,37 +17,40 @@ function cargarHospedajesDesdeAPI() {
                 return;
             }
 
-            contenedor.innerHTML = ""; // Limpiar contenido anterior
+            contenedor.innerHTML = "";
 
             if (!data.hospedajes || data.hospedajes.length === 0) {
                 contenedor.innerHTML = "<p>No hay hospedajes disponibles.</p>";
                 return;
             }
 
-            // Función para crear título clickeable para filtros
             const crearTituloClickeable = (titulo, itemsTipo, filtroParametros = {}) => {
                 const h2 = document.createElement('h2');
                 h2.classList.add('carrusel-titulo');
                 h2.textContent = titulo;
-
+            
                 if (itemsTipo.length > 7) {
                     h2.classList.add('clickeable');
                     h2.title = "Ver todos";
                     h2.style.cursor = "pointer";
                     h2.addEventListener('click', () => {
                         const params = new URLSearchParams();
+            
+                        // tipo es obligatorio si quieres filtrar
                         if (filtroParametros.tipo) params.append('tipo', filtroParametros.tipo);
+            
                         if (filtroParametros.departamento) params.append('departamento', filtroParametros.departamento);
-
-                        const url = `/hospedajes/filtro?${params.toString()}`;
+            
+                        const queryString = params.toString();
+                        const url = queryString ? `/hospedajes/filtro?${queryString}` : `/hospedajes/filtro`;
                         window.location.href = url;
                     });
                 }
-
+            
                 return h2;
             };
+            
 
-            // Función para crear carrusel con flechas
             const crearCarrusel = (hospedajesArray, titulo, filtroParametros = {}) => {
                 const seccion = document.createElement('div');
                 seccion.classList.add('carrusel-contenedor');
@@ -72,6 +73,11 @@ function cargarHospedajesDesdeAPI() {
                         <p>Ubicación: ${hospedaje.municipio} ${hospedaje.departamento}</p>
                         <p>Calificación: ${hospedaje.calificacion}</p>
                     `;
+
+                    item.addEventListener('click', () => {
+                        window.location.href = `/hospedajes/detalle?nombre=${encodeURIComponent(hospedaje.nombre)}`;
+                    });
+
                     carrusel.appendChild(item);
                 });
 
@@ -102,7 +108,6 @@ function cargarHospedajesDesdeAPI() {
                 return seccion;
             };
 
-            // Función para filtrar y agregar carrusel con filtro y título
             const filtrarYLlenarCarrusel = (titulo, filtroFn, filtroParametros = {}) => {
                 const hospedajesFiltrados = data.hospedajes.filter(filtroFn);
                 if (hospedajesFiltrados.length) {
@@ -110,18 +115,19 @@ function cargarHospedajesDesdeAPI() {
                 }
             };
 
-            // FILTROS para hospadesajes
+            // FILTROS
             filtrarYLlenarCarrusel(
                 "Hospedajes en Guatemala",
                 h => h.departamento.toLowerCase() === 'guatemala',
-                { tipo: 'hotel', departamento: 'Guatemala' }
+                { departamento: 'Guatemala' }  // Solo departamento, no tipo
             );
 
             filtrarYLlenarCarrusel(
                 "Todos los hospedajes",
                 _ => true,
-                { tipo: 'hotel' }
+                {}  // Sin parámetros
             );
+
         })
         .catch(error => {
             console.error("Error al cargar hospedajes:", error);

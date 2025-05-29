@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, request, jsonify, Response
+from flask import Flask, render_template, url_for, request, jsonify, Response, redirect
 import json
 from backend import arbolB
 from backend.arbolB import BTree
@@ -220,7 +220,7 @@ def render_hospedaje_detalle(nombre):
     css_path = url_for('static', filename='css/app.css')
     js_path = url_for('static', filename='js/scripts.js')
     mapa = url_for('static', filename='js/mapa.js')
-    hospedajejs = url_for('static', filename='js/hospedaje.js')
+    jsH = url_for('static', filename='js/hospedaje.js')
     detalle = url_for('static', filename='js/detalle_hospedaje.js')
 
     return render_template(
@@ -228,7 +228,7 @@ def render_hospedaje_detalle(nombre):
         hospedaje=hospedaje,
         css_path=css_path,
         js_path=js_path,
-        hospedajejs=hospedajejs,
+        jsH=jsH,
         detalle=detalle,
         mapa=mapa
     )
@@ -251,34 +251,32 @@ def hospedaje_detalle_filtro():
         return f"Error interno del servidor: {e}", 500
 
 
-@app.route('/hospedajes/filtro')  # PAGINA PARA MOSTRAR LOS HOSPEDAJES SEGUN EL FILTRO SELECCIONADO
+@app.route('/hospedajes/filtro')  # Página para mostrar hospedajes según filtro
 def hospedajes_filtro():
     try:
         tipo = request.args.get('tipo')
         departamento = request.args.get('departamento')
 
-        if not tipo:
-            return "Falta el parámetro 'tipo'", 400
+        if not tipo or tipo.strip() == "":
+            return redirect(url_for('hospedajes_filtro', tipo='hotel'))
 
         tipo = tipo.strip().lower()
         departamento = departamento.strip().lower() if departamento else None
 
         if departamento and departamento != 'todo':
-            # Filtra por tipo y departamento
             hospedajes_filtrados = [
-                lugar for lugar in arbol_lugares.obtener_lugares()
+                lugar for lugar in arbol_lugares.obtener_hospedajes()
                 if lugar.tipo.strip().lower() == tipo and lugar.departamento.strip().lower() == departamento
             ]
         else:
-            # Solo filtra por tipo (todos los departamentos)
             hospedajes_filtrados = [
-                lugar for lugar in arbol_lugares.obtener_lugares()
+                lugar for lugar in arbol_lugares.obtener_hospedajes()
                 if lugar.tipo.strip().lower() == tipo
             ]
 
         css_path = url_for('static', filename='css/app.css')
         js_path = url_for('static', filename='js/scripts.js')
-        hospedajejs = url_for('static', filename='js/hospedaje.js')
+        jsH = url_for('static', filename='js/hospedaje.js')
         detalle = url_for('static', filename='js/detalle_hospedaje.js')
 
         return render_template(
@@ -288,12 +286,13 @@ def hospedajes_filtro():
             departamento=departamento if departamento else "Todos",
             css_path=css_path,
             js_path=js_path,
-            hospedajejs=hospedajejs,
+            jsH=jsH,
             detalle=detalle
         )
     
     except Exception as e:
         return f"Error interno del servidor: {e}", 500
+
 
 
 # API PARA RECOMENDACIONES DE HOSPEDAJES
@@ -357,6 +356,29 @@ def api_lugar():
     }
     return jsonify({"lugar": lugar_dict})
 
+
+#API PARA SOLAMENTE OBTENER UN LUGAR EN ESPECIFICO
+@app.route('/api/hospedaje', methods=['GET'])
+def api_hospedaje():
+    nombre = request.args.get('nombre')
+    if not nombre:
+        return jsonify({"error": "Falta el parámetro 'nombre'"}), 400
+
+    lugar = arbol_hospedaje.buscar_por_nombre(nombre)
+    if not lugar:
+        return jsonify({"error": "Lugar no encontrado"}), 404
+
+    lugar_dict = {
+        "nombre": lugar.nombre,
+        "direccion": lugar.direccion,
+        "municipio": lugar.municipio,
+        "departamento": lugar.departamento,
+        "tipo": lugar.tipo,
+        "calificacion": getattr(lugar, "calificacion", "N/A"),
+        "latitud": getattr(lugar, "latitud", None),
+        "longitud": getattr(lugar, "longitud", None)
+    }
+    return jsonify({"lugar": lugar_dict})
 
 @app.route('/api/recomendaciones')
 def api_recomendaciones():
