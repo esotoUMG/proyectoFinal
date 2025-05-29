@@ -28,28 +28,34 @@ function cargarHospedajesDesdeAPI() {
                 const h2 = document.createElement('h2');
                 h2.classList.add('carrusel-titulo');
                 h2.textContent = titulo;
-            
+
                 if (itemsTipo.length > 7) {
                     h2.classList.add('clickeable');
                     h2.title = "Ver todos";
                     h2.style.cursor = "pointer";
                     h2.addEventListener('click', () => {
                         const params = new URLSearchParams();
-            
-                        // tipo es obligatorio si quieres filtrar
-                        if (filtroParametros.tipo) params.append('tipo', filtroParametros.tipo);
-            
-                        if (filtroParametros.departamento) params.append('departamento', filtroParametros.departamento);
-            
-                        const queryString = params.toString();
-                        const url = queryString ? `/hospedajes/filtro?${queryString}` : `/hospedajes/filtro`;
+
+                        // tipo es obligatorio para el backend
+                        if (filtroParametros.tipo) {
+                            params.append('tipo', filtroParametros.tipo.toLowerCase());
+                        } else {
+                            // Por defecto usaremos 'hotel' como tipo general
+                            params.append('tipo', 'hotel');
+                        }
+
+                        if (filtroParametros.departamento) {
+                            params.append('departamento', filtroParametros.departamento.toLowerCase());
+                        }
+
+                        const url = `/hospedajes/filtro?${params.toString()}`;
+                        console.log("Redirigiendo a:", url);  // para debug
                         window.location.href = url;
                     });
                 }
-            
+
                 return h2;
             };
-            
 
             const crearCarrusel = (hospedajesArray, titulo, filtroParametros = {}) => {
                 const seccion = document.createElement('div');
@@ -118,14 +124,14 @@ function cargarHospedajesDesdeAPI() {
             // FILTROS
             filtrarYLlenarCarrusel(
                 "Hospedajes en Guatemala",
-                h => h.departamento.toLowerCase() === 'guatemala',
-                { departamento: 'Guatemala' }  // Solo departamento, no tipo
+                h => h.departamento.toLowerCase() === 'guatemala' && h.tipo.toLowerCase() === 'hotel',
+                { tipo: 'hotel', departamento: 'Guatemala' }
             );
 
             filtrarYLlenarCarrusel(
                 "Todos los hospedajes",
-                _ => true,
-                {}  // Sin parámetros
+                h => h.tipo.toLowerCase() === 'hotel',  // también filtramos por tipo aquí
+                { tipo: 'hotel' }
             );
 
         })
