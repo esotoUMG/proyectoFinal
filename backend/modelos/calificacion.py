@@ -1,4 +1,3 @@
-
 #CLASE CALIFICACION: Representar una calificación individual de un lugar.
 class Calificacion:
     def __init__(self, id_lugar, puntaje, comentario=None):
