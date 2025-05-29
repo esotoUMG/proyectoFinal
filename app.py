@@ -155,8 +155,10 @@ def lugar_detalle():
 
         css_path = url_for('static', filename='css/app.css')
         js_path = url_for('static', filename='js/scripts.js')
+        mapa = url_for('static', filename='js/mapa.js')
         lugarjs = url_for('static', filename='js/lugar.js')
         detalle = url_for('static', filename='js/detalle_lugar.js')
+
 
         return render_template(
             'lugardetalle.html',
@@ -164,7 +166,8 @@ def lugar_detalle():
             css_path=css_path,
             js_path=js_path,
             lugarjs=lugarjs,
-            detalle = detalle
+            detalle = detalle,
+            mapa = mapa
         )
     
     except Exception as e:

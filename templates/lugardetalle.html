@@ -3,7 +3,7 @@
 {% block title %}Detalle del Lugar - Travel Map{% endblock %}
 
 {% block contenido %}
-<section>
+<section style="display: flex; height: 100vh;">
   <!-- Lado Izquierdo: Información -->
   <div class="info-lugar" style="width: 50%; padding: 2rem; overflow-y: auto;">
     <div id="info-detallada">
@@ -20,7 +20,7 @@
   </div>
 
   <!-- Lado Derecho: Mapa -->
-  <div id="contenedor__mapa" style="width: 50%; height: 100vh;"></div>
+  <div id="contenedor__mapa" style="width: 50%; height: 100%;"></div>
 </section>
 {% endblock %}
 
@@ -29,14 +29,9 @@
   <!-- Leaflet JS -->
   <script
     src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
-    integrity="sha512-nQM+6PpQm4oKU7pIT08z7zHZv7nVZs7N0My9dhzZCvZTb3WwS6lNc0QtpU6j+6p+LR0YKhF9lyV5Q+ci9NHPGA=="
-    crossorigin=""
   ></script>
-
   <!-- Scripts personalizados -->
-  <script src="{{ js_path }}"></script>
   <script src="{{ lugarjs }}"></script>
   <script src="{{ detalle }}"></script>
-  <script src="{{ detalle }}"></script>
-
+  <script src="{{ mapa }}"></script>
 {% endblock %}

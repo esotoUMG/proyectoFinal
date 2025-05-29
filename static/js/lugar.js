@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function cargarLugaresDesdeAPI() {
-    console.log("Cargando lugares...");
 
     fetch('/api/lugares')
         .then(res => {
@@ -17,7 +16,6 @@ function cargarLugaresDesdeAPI() {
             const seccionCompletaContenedor = document.getElementById('seccion-completa');
 
             if (!mainContenedor || !seccionCompletaContenedor) {
-                console.warn("No se encontró alguno de los contenedores");
                 return;
             }
 

@@ -70,11 +70,11 @@ function mostrarRecomendaciones(recomendaciones) {
     }
 
     const lista = document.createElement('div');
-    lista.classList.add('grid-recomendaciones');
+    lista.classList.add('recomendaciones-grid');
 
     recomendaciones.slice(0, 5).forEach(lugar => {
         const card = document.createElement('div');
-        card.classList.add('lugar-card');
+        card.classList.add('recomendaciones-card');
         card.innerHTML = `
             <h4>${lugar.nombre}</h4>
             <p>${lugar.direccion}</p>
