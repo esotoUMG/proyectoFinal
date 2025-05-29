@@ -684,6 +684,11 @@ header.fixed #filtros-form button:hover {
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
   padding: 2rem;
   flex-shrink: 0;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+.lugar-card:hover {
+  transform: scale(1.05);
 }
 
 /* --------------------------------------- */
@@ -716,11 +721,6 @@ header.fixed #filtros-form button:hover {
   right: 0;
 }
 
-@media (max-width: 600px) {
-  .flecha {
-    display: none;
-  }
-}
 /* --------------------------------------- */
 /* Grid completo (para /lugares/filtrar/) */
 /* --------------------------------------- */
@@ -739,6 +739,11 @@ header.fixed #filtros-form button:hover {
   width: 30rem;
   height: 20rem;
   margin: 1rem 0;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+.grid-lugares .lugar-card:hover {
+  transform: scale(1.05);
 }
 
 .contenido-titulo {

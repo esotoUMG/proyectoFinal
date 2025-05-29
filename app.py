@@ -29,6 +29,8 @@ try:
 except Exception as e:
     print(f"Error al cargar datos: {e}")
 
+
+#API LUGARES
 @app.route('/api/lugares', methods=['GET'])
 def obtener_lugares():
     try:
@@ -52,7 +54,7 @@ def obtener_lugares():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
+#API HOSPEDAJES
 @app.route('/api/hospedajes', methods=['GET'])
 def obtener_hospedajes():
     try:
@@ -71,20 +73,20 @@ def obtener_hospedajes():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
-@app.route('/')
+#PAGINAS WEB
+@app.route('/') #PAGINA PRINCIPAL
 def home():
     css_path = url_for('static', filename='css/app.css')
     js_path = url_for('static', filename='js/scripts.js')
     return render_template('index.html', css_path=css_path, js_path=js_path, ocultar=False)
 
-@app.route('/cargar')
+@app.route('/cargar')#PAGINA PARA AGREGAR REGISTROS A CSV
 def cargar():
     css_path = url_for('static', filename='css/app.css')
     js_path = url_for('static', filename='js/scripts.js')
     return render_template('cargar.html', css_path=css_path, js_path=js_path, ocultar=True)
 
-@app.route('/lugares')
+@app.route('/lugares') #PAGINA PARA MOSTRAR LOS LUGARES
 def lugares():
     css_path = url_for('static', filename='css/app.css')
     js_path = url_for('static', filename='js/scripts.js')
@@ -101,7 +103,7 @@ def lugares():
         ocultar=False
     )
 
-@app.route('/lugares/filtro')
+@app.route('/lugares/filtro') #PAGINA PARA MOSTRAR LOS LUGARES SEGUN EL FILTRO SELECCIONADO
 def lugares_filtrados():
     tipo = request.args.get('tipo')
     departamento = request.args.get('departamento')
@@ -140,7 +142,37 @@ def lugares_filtrados():
     )
 
 
-@app.route('/hospedajes')
+@app.route('/lugares/detalle')  # Mostrar el lugar con más detalles
+def lugar_detalle():
+    try:
+        nombre = request.args.get('nombre')
+        if not nombre:
+            return "Falta el nombre del lugar", 400
+
+        lugar = arbol_lugares.buscar_por_nombre(nombre)
+        if not lugar:
+            return "Lugar no encontrado", 404
+
+        css_path = url_for('static', filename='css/app.css')
+        js_path = url_for('static', filename='js/scripts.js')
+        lugarjs = url_for('static', filename='js/lugar.js')
+        detalle = url_for('static', filename='js/detalle_lugar.js')
+
+        return render_template(
+            'lugardetalle.html',
+            lugar=lugar,
+            css_path=css_path,
+            js_path=js_path,
+            lugarjs=lugarjs,
+            detalle = detalle
+        )
+    
+    except Exception as e:
+        return f"Error interno del servidor: {e}", 500
+
+
+
+@app.route('/hospedajes') #PAGINA PARA MOSTRAR LOS HOSPEDAJES
 def hospedajes():
     css_path = url_for('static', filename='css/app.css')
     js_path = url_for('static', filename='js/scripts.js')
@@ -157,7 +189,7 @@ def hospedajes():
         ocultar=False
     )
 
-@app.route('/hospedajes/filtro')
+@app.route('/hospedajes/filtro') #PAGINA PARA MOSTRAR LOS HOSPEDAJES SEGUN EL FILTRO SELECCIONADO
 def hospedajes_filtrados():
     tipo = request.args.get('tipo')
     departamento = request.args.get('departamento')
@@ -201,7 +233,65 @@ def hospedajes_filtrados():
         js_path=js_path,
         hospedajesjs=hospedajesjs
     )
+#API PARA SOLAMENTE OBTENER UN LUGAR EN ESPECIFICO
+@app.route('/api/lugar', methods=['GET'])
+def api_lugar():
+    nombre = request.args.get('nombre')
+    if not nombre:
+        return jsonify({"error": "Falta el parámetro 'nombre'"}), 400
 
+    lugar = arbol_lugares.buscar_por_nombre(nombre)
+    if not lugar:
+        return jsonify({"error": "Lugar no encontrado"}), 404
+
+    lugar_dict = {
+        "nombre": lugar.nombre,
+        "direccion": lugar.direccion,
+        "municipio": lugar.municipio,
+        "departamento": lugar.departamento,
+        "tipo": lugar.tipo,
+        "calificacion": getattr(lugar, "calificacion", "N/A")
+    }
+    return jsonify({"lugar": lugar_dict})
+
+
+
+@app.route('/api/recomendaciones')
+def api_recomendaciones():
+    nombre = request.args.get('nombre')
+    if not nombre:
+        return {"error": "Falta el parámetro 'nombre'"}, 400
+    
+    lugar = arbol_lugares.buscar_por_nombre(nombre)
+    if not lugar:
+        return {"error": "Lugar no encontrado"}, 404
+    
+    departamento = lugar.departamento.strip().lower()
+    
+    # Obtener lugares en el mismo departamento, excepto el actual
+    recomendaciones = [
+        l for l in arbol_lugares.obtener_lugares()
+        if l.departamento.strip().lower() == departamento and l.nombre != lugar.nombre
+    ]
+    
+    # Opcional: ordenar recomendaciones por calificación descendente (si tienes atributo calificacion numérica)
+    recomendaciones.sort(key=lambda x: getattr(x, 'calificacion', 0), reverse=True)
+    
+    # Tomar máximo 5 recomendaciones
+    recomendaciones = recomendaciones[:5]
+    
+    # Formatear para JSON: devolver solo los campos que usas en JS
+    lista_recomendaciones = []
+    for r in recomendaciones:
+        lista_recomendaciones.append({
+            "nombre": r.nombre,
+            "direccion": r.direccion,
+            "municipio": r.municipio,
+            "departamento": r.departamento,
+            "calificacion": getattr(r, "calificacion", "N/A")
+        })
+    
+    return {"recomendaciones": lista_recomendaciones}
 
 
 @app.route('/api/cargar-calificaciones', methods=['POST'])

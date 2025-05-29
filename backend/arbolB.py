@@ -192,3 +192,10 @@ class BTree:
             for i in range(nodo.hijos.longitud()):
                 self._recorrer(nodo.hijos.obtener(i), lista)
 
+    def buscar_por_nombre(self, nombre):
+        for lugar in self.obtener_lugares():
+            if lugar.nombre.strip().lower() == nombre.strip().lower():
+                return lugar
+        return None
+
+

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle del Lugar - Travel Map{% endblock %}
+
+{% block contenido %}
+<section>
+  <!-- Lado Izquierdo: Información -->
+  <div class="info-lugar" style="width: 50%; padding: 2rem; overflow-y: auto;">
+    <div id="info-detallada">
+      <h2>Detalle del lugar</h2>
+      <!-- Aquí se cargará info detallada vía JS -->
+    </div>
+
+    <hr style="margin: 2rem 0;">
+
+    <div id="recomendaciones-cercanas">
+      <h3>Recomendaciones cercanas</h3>
+      <!-- Aquí se cargarán recomendaciones vía JS -->
+    </div>
+  </div>
+
+  <!-- Lado Derecho: Mapa -->
+  <div id="contenedor__mapa" style="width: 50%; height: 100vh;"></div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <!-- Leaflet JS -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+    integrity="sha512-nQM+6PpQm4oKU7pIT08z7zHZv7nVZs7N0My9dhzZCvZTb3WwS6lNc0QtpU6j+6p+LR0YKhF9lyV5Q+ci9NHPGA=="
+    crossorigin=""
+  ></script>
+
+  <!-- Scripts personalizados -->
+  <script src="{{ js_path }}"></script>
+  <script src="{{ lugarjs }}"></script>
+  <script src="{{ detalle }}"></script>
+  <script src="{{ detalle }}"></script>
+
+{% endblock %}

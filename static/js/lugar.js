@@ -66,17 +66,17 @@ function cargarLugaresDesdeAPI() {
 
             // Crear carrusel con flechas
             const crearSeccionCarruselConTitulo = (titulo, lugares, limite = 7, filtroParametros = {}) => {
-                const contenedor = document.createElement('div');
+                const contenedor = document.createElement('DIV');
                 contenedor.classList.add('carrusel-contenedor');
             
                 const tituloElem = crearTituloClickeable(titulo, lugares, filtroParametros);
                 contenedor.appendChild(tituloElem);
             
-                const carrusel = document.createElement('div');
+                const carrusel = document.createElement('DIV');
                 carrusel.classList.add('carrusel');
             
                 lugares.slice(0, limite).forEach(lugar => {
-                    const item = document.createElement('div');
+                    const item = document.createElement('DIV');
                     item.classList.add('lugar-card');
                     item.innerHTML = `
                         <h3>${lugar.nombre}</h3>
@@ -84,6 +84,10 @@ function cargarLugaresDesdeAPI() {
                         <p>Ubicación: ${lugar.municipio} ${lugar.departamento}</p>
                         <p>Calificación: ${lugar.calificacion}</p>
                     `;
+
+                    item.addEventListener('click', () =>{
+                        window.location.href = `/lugares/detalle?nombre=${encodeURIComponent(lugar.nombre)}`
+                    })
                     carrusel.appendChild(item);
                 });
             
