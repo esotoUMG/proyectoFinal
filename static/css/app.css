@@ -877,4 +877,59 @@ footer h2 span {
   color: #5dc1b9;
   transform: scale(1.05);
   box-shadow: 1px 1px 10px #e6e6e6;
+}
+
+/*FORMULARIO CARGAR DATOS Y MAPA*/
+.cargar {
+  margin: 4rem 8rem;
+}
+.cargar h2 {
+  font-size: 3rem;
+}
+
+.formulario-mapa-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  margin-top: 1.5rem;
+}
+
+.formulario {
+  margin: 0 10rem 0 3rem;
+  background-color: #e6e6e6;
+  padding: 2rem;
+  border-radius: 2rem;
+}
+.formulario input, .formulario select {
+  font-size: 1.2rem;
+  display: block;
+}
+.formulario input, .formulario select {
+  font-family: "DM Sans", sans-serif;
+  width: 100%;
+  border: 1px solid #5dc1b9;
+  border-radius: 0.7rem;
+  padding: 0.3rem 1rem;
+}
+.formulario label, .formulario button {
+  font-family: "Raleway", sans-serif;
+  font-weight: 800;
+}
+.formulario label {
+  text-transform: uppercase;
+  font-size: 1.3rem;
+}
+.formulario button {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 2rem;
+  background-color: #5dc1b9;
+  color: #ffffff;
+  font-size: 2rem;
+  border: none;
+  transition: 0.4s ease;
+  cursor: pointer;
+}
+.formulario button:hover {
+  background-color: #74d0c9;
 }/*# sourceMappingURL=app.css.map */

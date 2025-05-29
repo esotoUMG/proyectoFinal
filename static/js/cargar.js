@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
           !document.getElementById('municipio').value.trim() ||
           !formulario.tipo.value.trim()
         ) {
-          mensajeDiv.textContent = '❌ Por favor completa todos los campos obligatorios.';
+          mensajeDiv.textContent = 'Por favor completa todos los campos obligatorios.';
           mensajeDiv.style.color = 'red';
           return;
         }
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
           })
           .then(respuesta => {
             if (respuesta.mensaje) {
-              mensajeDiv.textContent = '✅ ' + respuesta.mensaje;
+              mensajeDiv.textContent = '' + respuesta.mensaje;
               mensajeDiv.style.color = 'green';
               formulario.reset();
               if (typeof marcador !== 'undefined' && marcador && typeof mapa !== 'undefined' && mapa) {
@@ -104,16 +104,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 initMap();
               }
             } else if (respuesta.error) {
-              mensajeDiv.textContent = '❌ ' + respuesta.error;
-              mensajeDiv.style.color = 'red';
+              mensajeDiv.textContent = '' + respuesta.error;
+              mensajeDiv.style.color = 'white';
+              mensajeDiv.style.backgroundColor = '#FF746C'
             } else {
-              mensajeDiv.textContent = '❌ Error desconocido al registrar el lugar.';
+              mensajeDiv.textContent = 'Error desconocido al registrar el lugar.';
               mensajeDiv.style.color = 'red';
             }
           })
           .catch(err => {
             console.error('Error en fetch:', err);
-            mensajeDiv.textContent = '❌ Ocurrió un error inesperado: ' + err.message;
+            mensajeDiv.textContent = 'Ocurrió un error inesperado: ' + err.message;
             mensajeDiv.style.color = 'red';
           });
               fetch('/api/registrar-lugar', {
@@ -132,8 +133,15 @@ document.addEventListener('DOMContentLoaded', () => {
           })
           .then(respuesta => {
             if (respuesta.mensaje) {
-              mensajeDiv.textContent = '✅ ' + respuesta.mensaje;
-              mensajeDiv.style.color = 'green';
+              mensajeDiv.textContent = '' + respuesta.mensaje;
+              mensajeDiv.style.color = 'white';
+              mensajeDiv.style.backgroundColor = '#C6E5B1'
+              mensajeDiv.style.width = '100%'
+              mensajeDiv.style.borderRadius = '1rem'
+              mensajeDiv.style.padding = '1rem'
+              mensajeDiv.style.fontFamily = 'Arial'
+              mensajeDiv.style.fontSize = '1rem'
+              mensajeDiv.style.textAlign = 'center'
               formulario.reset();
               if (typeof marcador !== 'undefined' && marcador && typeof mapa !== 'undefined' && mapa) {
                 marcador.setMap(null);
