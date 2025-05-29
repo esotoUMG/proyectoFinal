@@ -209,7 +209,7 @@ def hospedajes():
     )
 
 #HOSPEDAJES
-def render_lugar_detalle(nombre):
+def render_hospedaje_detalle(nombre):
     if not nombre:
         return "Falta el nombre del hospedaje", 400
 
@@ -237,7 +237,7 @@ def render_lugar_detalle(nombre):
 def hospedaje_detalle():
     try:
         nombre = request.args.get('nombre')
-        return render_lugar_detalle(nombre)
+        return render_hospedaje_detalle(nombre)
     except Exception as e:
         return f"Error interno del servidor: {e}", 500
 
@@ -246,7 +246,52 @@ def hospedaje_detalle():
 def hospedaje_detalle_filtro():
     try:
         nombre = request.args.get('nombre')
-        return render_lugar_detalle(nombre)
+        return render_hospedaje_detalle(nombre)
+    except Exception as e:
+        return f"Error interno del servidor: {e}", 500
+
+
+@app.route('/hospedajes/filtro')  # PAGINA PARA MOSTRAR LOS HOSPEDAJES SEGUN EL FILTRO SELECCIONADO
+def hospedajes_filtro():
+    try:
+        tipo = request.args.get('tipo')
+        departamento = request.args.get('departamento')
+
+        if not tipo:
+            return "Falta el parámetro 'tipo'", 400
+
+        tipo = tipo.strip().lower()
+        departamento = departamento.strip().lower() if departamento else None
+
+        if departamento and departamento != 'todo':
+            # Filtra por tipo y departamento
+            hospedajes_filtrados = [
+                lugar for lugar in arbol_lugares.obtener_lugares()
+                if lugar.tipo.strip().lower() == tipo and lugar.departamento.strip().lower() == departamento
+            ]
+        else:
+            # Solo filtra por tipo (todos los departamentos)
+            hospedajes_filtrados = [
+                lugar for lugar in arbol_lugares.obtener_lugares()
+                if lugar.tipo.strip().lower() == tipo
+            ]
+
+        css_path = url_for('static', filename='css/app.css')
+        js_path = url_for('static', filename='js/scripts.js')
+        hospedajejs = url_for('static', filename='js/hospedaje.js')
+        detalle = url_for('static', filename='js/detalle_hospedaje.js')
+
+        return render_template(
+            'hospedajes_filtro.html',
+            hospedajes=hospedajes_filtrados,
+            tipo=tipo,
+            departamento=departamento if departamento else "Todos",
+            css_path=css_path,
+            js_path=js_path,
+            hospedajejs=hospedajejs,
+            detalle=detalle
+        )
+    
     except Exception as e:
         return f"Error interno del servidor: {e}", 500
 
