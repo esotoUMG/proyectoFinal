@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function cargarLugaresDesdeAPI() {
-
     fetch('/api/lugares')
         .then(res => {
             if (!res.ok) throw new Error('Error en la respuesta de la API');
@@ -16,6 +15,7 @@ function cargarLugaresDesdeAPI() {
             const seccionCompletaContenedor = document.getElementById('seccion-completa');
 
             if (!mainContenedor || !seccionCompletaContenedor) {
+                console.error("No se encontró alguno de los contenedores esperados");
                 return;
             }
 
@@ -27,7 +27,7 @@ function cargarLugaresDesdeAPI() {
                 return;
             }
 
-            // Crear título clickeable, recibe filtroParametros para armar URL solo con lo que quieres
+            // Crear título clickeable para filtrar lugares y navegar a página filtro
             const crearTituloClickeable = (titulo, lugaresTipo, filtroParametros = {}) => {
                 const h2 = document.createElement('h2');
                 h2.classList.add('carrusel-titulo');
@@ -55,26 +55,25 @@ function cargarLugaresDesdeAPI() {
 
                         const queryString = params.toString();
                         const url = queryString ? `/lugares/filtro?${queryString}` : `/lugares/filtro`;
-                        console.log("URL a redirigir:", url);
                         window.location.href = url;
                     });
                 }
                 return h2;
             };
 
-            // Crear carrusel con flechas
+            // Crear carrusel con lugares y flechas para scroll horizontal
             const crearSeccionCarruselConTitulo = (titulo, lugares, limite = 7, filtroParametros = {}) => {
-                const contenedor = document.createElement('DIV');
+                const contenedor = document.createElement('div');
                 contenedor.classList.add('carrusel-contenedor');
-            
+
                 const tituloElem = crearTituloClickeable(titulo, lugares, filtroParametros);
                 contenedor.appendChild(tituloElem);
-            
-                const carrusel = document.createElement('DIV');
+
+                const carrusel = document.createElement('div');
                 carrusel.classList.add('carrusel');
-            
+
                 lugares.slice(0, limite).forEach(lugar => {
-                    const item = document.createElement('DIV');
+                    const item = document.createElement('div');
                     item.classList.add('lugar-card');
                     item.innerHTML = `
                         <h3>${lugar.nombre}</h3>
@@ -83,13 +82,14 @@ function cargarLugaresDesdeAPI() {
                         <p>Calificación: ${lugar.calificacion}</p>
                     `;
 
-                    item.addEventListener('click', () =>{
-                        window.location.href = `/lugares/detalle?nombre=${encodeURIComponent(lugar.nombre)}`
-                    })
+                    item.addEventListener('click', () => {
+                        window.location.href = `/lugares/detalle?nombre=${encodeURIComponent(lugar.nombre)}`;
+                    });
+
                     carrusel.appendChild(item);
                 });
-            
-                // Solo agregar flechas si hay más de 5 lugares
+
+                // Agregar flechas si hay más de 5 lugares
                 if (lugares.length > 5) {
                     const btnIzq = document.createElement('button');
                     btnIzq.classList.add('flecha', 'izquierda');
@@ -98,7 +98,7 @@ function cargarLugaresDesdeAPI() {
                     btnIzq.addEventListener('click', () => {
                         carrusel.scrollBy({ left: -250, behavior: 'smooth' });
                     });
-            
+
                     const btnDer = document.createElement('button');
                     btnDer.classList.add('flecha', 'derecha');
                     btnDer.setAttribute('aria-label', 'Siguiente');
@@ -106,20 +106,18 @@ function cargarLugaresDesdeAPI() {
                     btnDer.addEventListener('click', () => {
                         carrusel.scrollBy({ left: 250, behavior: 'smooth' });
                     });
-            
+
                     contenedor.appendChild(btnIzq);
                     contenedor.appendChild(carrusel);
                     contenedor.appendChild(btnDer);
                 } else {
-                    // Si no hay más de 5, solo se muestra el carrusel sin flechas
                     contenedor.appendChild(carrusel);
                 }
-            
+
                 return contenedor;
             };
-            
 
-            // Función para filtrar y agregar carrusel, recibe filtroFn y filtroParametros para la URL
+            // Filtrar lugares según función y agregar carrusel al contenedor principal
             const filtrarYLlenarCarrusel = (titulo, filtroFn, filtroParametros = {}) => {
                 const lugaresFiltrados = data.lugares.filter(filtroFn)
                     .sort((a, b) => b.calificacion - a.calificacion);
@@ -128,7 +126,7 @@ function cargarLugaresDesdeAPI() {
                 }
             };
 
-            //FILTROS
+            // Aplicar filtros para diferentes categorías y agregarlos
             filtrarYLlenarCarrusel(
                 "Restaurantes populares en la Capital",
                 l => l.tipo === 'Comida' && l.departamento.toLowerCase() === 'guatemala',
@@ -158,7 +156,6 @@ function cargarLugaresDesdeAPI() {
                 l => l.tipo === 'Turismo' && l.calificacion >= 4.8 && l.calificacion <= 5,
                 { tipo: 'Turismo', calificacion_min: 4.8, calificacion_max: 5 }
             );
-            
 
         })
         .catch(error => {

@@ -9,7 +9,7 @@
       {% if lugares %}
       <div class="grid-lugares">
         {% for lugar in lugares %}
-          <div class="lugar-card">
+          <div class="lugar-card" data-nombre="{{ lugar.nombre }}">
             <h3>{{ lugar.nombre }}</h3>
             <p>Dirección: {{ lugar.direccion }}</p>
             <p>Ubicación: {{ lugar.municipio }} {{ lugar.departamento }}</p>
@@ -17,14 +17,14 @@
           </div>
         {% endfor %}
       </div>
-    {% else %}
-      <p>No se encontraron lugares para este filtro.</p>
-    {% endif %}
-    
+      {% else %}
+        <p>No se encontraron lugares para este filtro.</p>
+      {% endif %}
     </div>
   </section>
 {% endblock %}
 
 {% block scripts %}
   <script src="{{ js_path }}"></script>
+  <script src="{{ detalle }}"></script>
 {% endblock %}

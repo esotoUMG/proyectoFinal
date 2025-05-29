@@ -2,19 +2,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const nombre = urlParams.get('nombre');  // Obtener nombre de la URL
 
-    if (!nombre) {
-        console.error("No se proporcionó un nombre en la URL");
-        return;
+    // Si estamos en página detalle (tiene ?nombre=...), carga el detalle y recomendaciones
+    if (nombre) {
+        cargarDetalleYRecomendaciones(nombre);
     }
 
-    // Llamar API lugar
+    // Agrega listeners a las tarjetas principales si existen (lista de lugares)
+    agregarListenerTarjetasPrincipales();
+});
+
+function cargarDetalleYRecomendaciones(nombre) {
     fetch(`/api/lugar?nombre=${encodeURIComponent(nombre)}`)
         .then(res => {
             if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
             return res.json();
         })
         .then(data => {
-            console.log("Detalle lugar recibido:", data);
             if (data.lugar) {
                 mostrarInfoLugar(data.lugar);
             } else {
@@ -23,14 +26,12 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(err => console.error("Error al obtener lugar:", err));
 
-    // Llamar API recomendaciones
     fetch(`/api/recomendaciones?nombre=${encodeURIComponent(nombre)}`)
         .then(res => {
             if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
             return res.json();
         })
         .then(data => {
-            console.log("Recomendaciones recibidas:", data);
             if (data.recomendaciones) {
                 mostrarRecomendaciones(data.recomendaciones);
             } else {
@@ -38,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         })
         .catch(err => console.error("Error al obtener recomendaciones:", err));
-});
+}
 
 function mostrarInfoLugar(lugar) {
     const contenedor = document.getElementById('info-detallada');
@@ -46,6 +47,7 @@ function mostrarInfoLugar(lugar) {
         console.error("No se encontró el contenedor info-detallada");
         return;
     }
+
     contenedor.innerHTML = `
         <h2>${lugar.nombre}</h2>
         <p><strong>Dirección:</strong> ${lugar.direccion}</p>
@@ -53,7 +55,15 @@ function mostrarInfoLugar(lugar) {
         <p><strong>Tipo:</strong> ${lugar.tipo}</p>
         <p><strong>Calificación:</strong> ${lugar.calificacion}</p>
     `;
+
+    // Llama manualmente a initMap para volver a inicializar el mapa
+    if (typeof initMap === "function") {
+        initMap();
+    } else {
+        console.error("initMap no está definida");
+    }
 }
+
 
 function mostrarRecomendaciones(recomendaciones) {
     const contenedor = document.getElementById('recomendaciones-cercanas');
@@ -83,12 +93,49 @@ function mostrarRecomendaciones(recomendaciones) {
         `;
 
         card.addEventListener('click', () => {
-            const nombreEncoded = encodeURIComponent(lugar.nombre);
-            window.location.href = `/lugares/detalle?nombre=${nombreEncoded}`;
+            redirigirADetalleConFiltros(lugar.nombre);
         });
 
         lista.appendChild(card);
     });
 
     contenedor.appendChild(lista);
+}
+
+function agregarListenerTarjetasPrincipales() {
+    // Selecciona todas las tarjetas de la lista principal (asegúrate que tengan la clase lugar-card)
+    const tarjetas = document.querySelectorAll('.lugar-card');
+    if (!tarjetas.length) return;
+
+    tarjetas.forEach(card => {
+        card.addEventListener('click', () => {
+            const nombreLugar = card.getAttribute('data-nombre');
+            if (!nombreLugar) {
+                console.error("La tarjeta no tiene atributo data-nombre");
+                return;
+            }
+            redirigirADetalleConFiltros(nombreLugar);
+        });
+    });
+}
+
+function redirigirADetalleConFiltros(nombreLugar) {
+    const nombreEncoded = encodeURIComponent(nombreLugar);
+    const path = window.location.pathname;
+    const queryString = window.location.search; // Ejemplo: "?tipo=Comida&departamento=Guatemala"
+
+    let urlDetalle;
+    if (path.startsWith('/lugares/filtro')) {
+        // Quita el '?' inicial para concatenar
+        const filtros = queryString.length > 0 ? queryString.substring(1) : "";
+        // Usa ruta detalle estándar (cambia si tienes ruta especial)
+        urlDetalle = `/lugares/detalle?nombre=${nombreEncoded}`;
+        if (filtros) {
+            urlDetalle += `&${filtros}`;
+        }
+    } else {
+        urlDetalle = `/lugares/detalle?nombre=${nombreEncoded}`;
+    }
+
+    window.location.href = urlDetalle;
 }

@@ -27,11 +27,13 @@
 {% block scripts %}
   {{ super() }}
   <!-- Leaflet JS -->
-  <script
-    src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
-  ></script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBPe0eVEKRRzjfZod6BLf7TQxRNxz51xTc&callback=initMap&libraries=places&loading=async"
+        async
+    ></script>
+
   <!-- Scripts personalizados -->
-  <script src="{{ lugarjs }}"></script>
-  <script src="{{ detalle }}"></script>
-  <script src="{{ mapa }}"></script>
+    <script src="{{ lugarjs }}"></script>
+    <script src="{{ detalle }}"></script>
+    <script src="{{ mapa }}"></script>
 {% endblock %}
