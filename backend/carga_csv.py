@@ -53,7 +53,7 @@ def cargar_calificaciones_csv(archivo, arbol):
 
 
 #Guardar datos en CSV
-def guardar_lugar_en_csv(lugar, ruta_csv):
+def guardar_lugar_en_csv(lugar_nuevo, ruta_csv):
 
     campos = ['Id', 'Departamento', 'Municipio', 'Nombre', 'Tipo', 'Dirección',
                 'Latitud', 'Longitud', 'Calificación en Google', 'tiempo']
@@ -68,14 +68,14 @@ def guardar_lugar_en_csv(lugar, ruta_csv):
             writer.writeheader()
 
         writer.writerow({
-            'Id': lugar.id,
-            'Departamento': lugar.departamento,
-            'Municipio': lugar.municipio,
-            'Nombre': lugar.nombre,
-            'Tipo': lugar.tipo,
-            'Dirección': lugar.direccion,
-            'Latitud': lugar.latitud,
-            'Longitud': lugar.longitud,
-            'Calificación en Google': lugar.calificacion,
-            'tiempo': lugar.tiempo_estadia if lugar.tiempo_estadia is not None else ''
+            'Id': lugar_nuevo.id,
+            'Departamento': lugar_nuevo.departamento,
+            'Municipio': lugar_nuevo.municipio,
+            'Nombre': lugar_nuevo.nombre,
+            'Tipo': lugar_nuevo.tipo,
+            'Dirección': lugar_nuevo.direccion,
+            'Latitud': lugar_nuevo.latitud,
+            'Longitud': lugar_nuevo.longitud,
+            'Calificación en Google': lugar_nuevo.calificacion,
+            'tiempo': lugar_nuevo.tiempo_estadia if lugar_nuevo.tiempo_estadia is not None else ''
         })
