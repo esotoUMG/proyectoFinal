@@ -496,7 +496,6 @@ header #filtros-form {
   width: 100%;
   max-width: 900px;
   display: flex;
-  gap: 0;
   justify-content: center;
   background: white;
   border-radius: 9999px;
@@ -504,6 +503,7 @@ header #filtros-form {
   overflow: hidden;
   padding: 0.6rem 0.8rem;
   transition: margin 0.5s cubic-bezier(0.4, 0, 0.2, 1), border-radius 0.5s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  gap: 0;
 }
 header #filtros-form .input-busqueda {
   flex: 1 1 250px;
@@ -517,6 +517,29 @@ header #filtros-form .input-busqueda input {
   border-radius: 9999px 0 0 9999px;
   outline: none;
   box-sizing: border-box;
+  background-color: transparent;
+  color: #000000;
+}
+header #filtros-form .input-busqueda input::placeholder {
+  color: #888;
+}
+header #filtros-form .input-presupuesto {
+  flex: 0 0 200px;
+  position: relative;
+  border-left: 1px solid #ddd;
+}
+header #filtros-form .input-presupuesto input {
+  width: 100%;
+  font-size: 1.6em;
+  padding: 1.3rem 2rem;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  box-sizing: border-box;
+  color: #000000;
+}
+header #filtros-form .input-presupuesto input::placeholder {
+  color: #888;
 }
 header #filtros-form select {
   flex: 0 0 150px;
@@ -528,6 +551,11 @@ header #filtros-form select {
   border-left: 1px solid #ddd;
   cursor: pointer;
   box-sizing: border-box;
+  color: #000000;
+  transition: background-color 0.3s ease;
+}
+header #filtros-form select:hover, header #filtros-form select:focus {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 header #filtros-form button {
   flex: 0 0 50px;
@@ -607,13 +635,36 @@ header.fixed #filtros-form {
   gap: 0.5rem;
   z-index: 1001;
 }
+header.fixed #filtros-form .input-busqueda {
+  flex: 1 1 400px;
+}
 header.fixed #filtros-form .input-busqueda input {
   font-size: 1.3rem;
   padding: 0.6rem 1.2rem 0.6rem 2rem;
   border: none;
   outline: none;
   width: 100%;
+  background: transparent;
   transition: font-size 0.7s ease;
+}
+header.fixed #filtros-form .input-busqueda input::placeholder {
+  color: #888;
+}
+header.fixed #filtros-form .input-presupuesto {
+  flex: 0 0 250px;
+  border-left: 1px solid #ddd;
+}
+header.fixed #filtros-form .input-presupuesto input {
+  width: 100%;
+  padding: 1.3rem 1.5rem;
+  font-size: 1.3rem;
+  border: none;
+  outline: none;
+  background: transparent;
+  box-sizing: border-box;
+}
+header.fixed #filtros-form .input-presupuesto input::placeholder {
+  color: #888;
 }
 header.fixed #filtros-form select {
   flex: 0 0 100px;
@@ -623,6 +674,8 @@ header.fixed #filtros-form select {
   background: transparent;
   outline: none;
   transition: font-size 0.7s ease;
+  color: #000000;
+  cursor: pointer;
 }
 header.fixed #filtros-form button {
   flex: 0 0 36px;

@@ -336,52 +336,43 @@ def lugar_detalle_filtro():
         return f"Error interno del servidor: {e}", 500
 
 
-@app.route('/lugares/filtro')  # PAGINA PARA MOSTRAR LOS LUGARES SEGUN EL FILTRO
+@app.route('/lugares/filtro')
 def lugares_filtro():
     try:
-        tipo = request.args.get('tipo', '').strip().lower()
-        departamento = request.args.get('departamento', '').strip().lower()
+        busqueda = request.args.get('busqueda', '').strip().lower()
+        presupuesto_str = request.args.get('presupuesto', '').strip()
 
-        tipos_validos = ['turismo', 'comida', 'entretenimiento']
+        presupuesto = None
+        if presupuesto_str != '':
+            try:
+                presupuesto = float(presupuesto_str)
+            except ValueError:
+                presupuesto = None  # O puedes manejar el error mostrando mensaje
 
-        if tipo not in tipos_validos:
-            # Redirigir a un tipo válido por defecto, por ejemplo "turismo"
-            return redirect(url_for('lugares_filtro', tipo='turismo'))
+        lugares = arbol_lugares.obtener_lugares()
 
-        if departamento == 'todo' or departamento == '':
-            departamento = None
-
-        if departamento:
-            lugares_filtrados = [
-                lugar for lugar in arbol_lugares.obtener_lugares()
-                if lugar.tipo.strip().lower() == tipo and lugar.departamento.strip().lower() == departamento
-            ]
-        else:
-            lugares_filtrados = [
-                lugar for lugar in arbol_lugares.obtener_lugares()
-                if lugar.tipo.strip().lower() == tipo
+        if busqueda:
+            lugares = [
+                lugar for lugar in lugares
+                if busqueda in lugar.departamento.strip().lower()
+                or busqueda in lugar.nombre.strip().lower()
+                or busqueda in lugar.municipio.strip().lower()
             ]
 
-        css_path = url_for('static', filename='css/app.css')
-        js_path = url_for('static', filename='js/scripts.js')
-        lugarjs = url_for('static', filename='js/lugar.js')
-        detalle = url_for('static', filename='js/detalle_lugar.js')
+        if presupuesto is not None:
+            lugares = [
+                lugar for lugar in lugares
+                if lugar.precio <= presupuesto
+            ]
 
         return render_template(
             'lugares_filtro.html',
-            lugares=lugares_filtrados,
-            tipo=tipo,
-            departamento=departamento if departamento else "Todos",
-            css_path=css_path,
-            js_path=js_path,
-            lugarjs=lugarjs,
-            detalle=detalle,
-            ocultar = False
+            lugares=lugares,
+            busqueda=busqueda,
+            presupuesto=presupuesto,
         )
-
     except Exception as e:
         return f"Error interno del servidor: {e}", 500
-
 
 
 #HOSPEDAJES
