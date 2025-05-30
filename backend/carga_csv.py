@@ -2,11 +2,6 @@ import csv, io, signal, sys, os
 from backend.modelos.lugar import Lugar
 from backend.modelos.calificacion import Calificacion 
 
-import csv
-import io
-import os
-from backend.modelos.lugar import Lugar
-from backend.modelos.calificacion import Calificacion 
 
 def safe_float(valor, default=0.0):
     try:
@@ -118,17 +113,20 @@ def cargar_calificaciones_csv(archivo, arbol):
                 # Ignorar filas con datos inválidos
                 continue
 
-def guardar_calificacion_en_csv(ruta_csv, id_lugar, puntaje, comentario):
-    archivo_existe = os.path.isfile(ruta_csv)
+def guardar_calificaciones_en_csv(calificaciones, archivo='./data/calificaciones.csv'):
+    """
+    Guarda una lista de calificaciones en un archivo CSV.
+    calificaciones: lista de diccionarios con claves 'dest_idx', 'rating', 'comment'
+    """
+    file_exists = os.path.exists(archivo)
 
-    with open(ruta_csv, mode='a', newline='', encoding='utf-8') as archivo:
-        escritor = csv.writer(archivo)
-
-        if not archivo_existe:
-            escritor.writerow(['Id', 'Puntaje', 'Comentario'])
-
-        escritor.writerow([id_lugar, puntaje, comentario])
-
+    with open(archivo, 'a', newline='', encoding='utf-8') as csvfile:
+        fieldnames = ['dest_idx', 'rating', 'comment']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        if not file_exists:
+            writer.writeheader()
+        for cal in calificaciones:
+            writer.writerow(cal)
 
         
 def actualizar_calificacion_promedio_csv(ruta_csv_lugares, arbol):

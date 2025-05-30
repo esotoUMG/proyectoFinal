@@ -1,58 +1,74 @@
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
-    const nombre = urlParams.get('nombre');  // Obtener nombre de la URL
+    const nombre = urlParams.get('nombre');
+    const idx = urlParams.get('idx');
 
     if (nombre) {
-        cargarDetalleYRecomendaciones(nombre);
+        cargarDetalle(nombre);
+    } else if (idx !== null && idx !== '') {
+        fetch(`/lugares/detalle/${idx}`)
+            .then(res => res.ok ? res.json() : Promise.reject(res.status))
+            .then(data => {
+                if (data.lugar) {
+                    mostrarInfoLugar(data.lugar);
+                    cargarRecomendaciones(data.lugar.nombre);
+                } else {
+                    mostrarMensajeGrafo("No se encontró el lugar", "error");
+                }
+            })
+            .catch(err => {
+                console.error("Error al obtener detalle:", err);
+                mostrarMensajeGrafo("Error al obtener datos", "error");
+            });
+    } else {
+        mostrarMensajeGrafo("No se especificó un lugar. Por favor, seleccione uno.", "advertencia");
+        const contenedor = document.getElementById('info-detallada');
+        if (contenedor) contenedor.innerHTML = '<p>No se ha especificado ningún lugar para mostrar.</p>';
     }
-
-    agregarListenerTarjetasPrincipales();
 });
 
-function cargarDetalleYRecomendaciones(nombre) {
-    const urlParams = new URLSearchParams(window.location.search);
-    const presupuesto = urlParams.get('presupuesto') || 10000;
-    const tiempoMaxDiario = urlParams.get('tiempo_max_diario') || 8;
-
-    // Cargar info del lugar principal
+function cargarDetalle(nombre) {
     fetch(`/api/lugar?nombre=${encodeURIComponent(nombre)}`)
-        .then(res => {
-            if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
-            return res.json();
-        })
+        .then(res => res.ok ? res.json() : Promise.reject(res.status))
         .then(data => {
             if (data.lugar) {
                 mostrarInfoLugar(data.lugar);
+                cargarRecomendaciones(data.lugar.nombre);
             } else {
-                console.error("No se encontró el lugar en la respuesta");
+                mostrarMensajeGrafo("Lugar no encontrado", "error");
             }
         })
-        .catch(err => console.error("Error al obtener lugar:", err));
+        .catch(err => {
+            console.error("Error al obtener lugar:", err);
+            mostrarMensajeGrafo("Error al obtener lugar", "error");
+        });
+}
 
-    // Cargar recomendaciones con filtros presupuesto y tiempo máximo
+function cargarRecomendaciones(nombre) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const presupuesto = urlParams.get('presupuesto') || '10000';
+    const tiempoMaxDiario = urlParams.get('tiempo_max_diario') || '8';
+
     fetch(`/api/recomendaciones?nombre=${encodeURIComponent(nombre)}&presupuesto=${presupuesto}&tiempo_max_diario=${tiempoMaxDiario}`)
-        .then(res => {
-            if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
-            return res.json();
-        })
+        .then(res => res.ok ? res.json() : Promise.reject(res.status))
         .then(data => {
             if (data.recomendaciones) {
                 mostrarRecomendaciones(data.recomendaciones, nombre);
             } else {
-                console.error("No se encontraron recomendaciones en la respuesta");
+                mostrarMensajeGrafo("Sin recomendaciones disponibles", "advertencia");
             }
         })
-        .catch(err => console.error("Error al obtener recomendaciones:", err));
+        .catch(err => {
+            console.error("Error al obtener recomendaciones:", err);
+            mostrarMensajeGrafo("Error al obtener recomendaciones", "error");
+        });
 }
 
 function mostrarInfoLugar(lugar) {
     const contenedor = document.getElementById('info-detallada');
-    if (!contenedor) {
-        console.error("No se encontró el contenedor info-detallada");
-        return;
-    }
+    if (!contenedor) return;
 
-    const precio = Number(lugar.precio) === 0 ? 'Gratis' : ` Q ${Number(lugar.precio).toFixed(2)}`;
+    const precio = Number(lugar.precio) === 0 ? 'Gratis' : `Q ${Number(lugar.precio).toFixed(2)}`;
     const calificacion = Number(lugar.calificacion) || 0;
     const estrellas = generarEstrellasHTML(calificacion);
 
@@ -61,43 +77,19 @@ function mostrarInfoLugar(lugar) {
         <p>${lugar.direccion}</p>
         <p>${lugar.municipio}, ${lugar.departamento}</p>
         <p>${lugar.tipo}</p>
-        <p>
-            <span class="calificacion-valor">${calificacion.toFixed(1)}</span>
-            <span class="estrellas">${estrellas}</span>
-        </p>
+        <p><span class="calificacion-valor">${calificacion.toFixed(1)}</span>
+        <span class="estrellas">${estrellas}</span></p>
         <p>${precio}</p>
     `;
 
     if (typeof initMap === "function") {
         initMap();
-    } else {
-        console.error("initMap no está definida");
     }
-}
-
-function generarEstrellasHTML(calificacion) {
-    const maxEstrellas = 5;
-    let estrellas = '';
-
-    for (let i = 1; i <= maxEstrellas; i++) {
-        if (calificacion >= i) {
-            estrellas += '<span class="estrella llena">&#9733;</span>';
-        } else if (calificacion >= i - 0.5) {
-            estrellas += '<span class="estrella media">&#9733;</span>';
-        } else {
-            estrellas += '<span class="estrella vacia">&#9734;</span>';
-        }
-    }
-
-    return estrellas;
 }
 
 function mostrarRecomendaciones(recomendaciones, nodoPrincipal) {
     const contenedor = document.getElementById('recomendaciones-cercanas');
-    if (!contenedor) {
-        console.error("No se encontró el contenedor recomendaciones-cercanas");
-        return;
-    }
+    if (!contenedor) return;
 
     contenedor.innerHTML = `<h3>Recomendaciones cercanas</h3>`;
 
@@ -109,12 +101,15 @@ function mostrarRecomendaciones(recomendaciones, nodoPrincipal) {
     const lista = document.createElement('div');
     lista.classList.add('recomendaciones-grid');
 
+    const nombresUnicos = new Set();
     recomendaciones.slice(0, 5).forEach(lugar => {
+        if (nombresUnicos.has(lugar.nombre)) return;
+        nombresUnicos.add(lugar.nombre);
+
         const calificacion = Number(lugar.calificacion) || 0;
         const precio = Number(lugar.precio) || 0;
         const tiempoEstadia = Number(lugar.tiempo_estadia) || 0;
         const tiempoTraslado = Number(lugar.tiempo_traslado) || 0;
-        const tiempoTotal = tiempoEstadia + tiempoTraslado;
         const tiempoTrasladoStr = lugar.tiempo_traslado_str || formatoHorasMinutos(tiempoTraslado);
         const estrellas = generarEstrellasHTML(calificacion);
 
@@ -130,28 +125,35 @@ function mostrarRecomendaciones(recomendaciones, nodoPrincipal) {
                 Calificación: <span class="calificacion-valor">${calificacion.toFixed(1)}</span>
                 <span class="estrellas">${estrellas}</span>
             </p>
-            <p>Precio: ${precio === 0 ? 'Gratis' : ` Q ${precio.toFixed(2)}`}</p>
+            <p>Precio: ${precio === 0 ? 'Gratis' : `Q ${precio.toFixed(2)}`}</p>
             <p>Tiempo de estadía: ${tiempoEstadia.toFixed(1)} hrs</p>
             <p>Tiempo aproximado de traslado: ${tiempoTrasladoStr}</p>
-            <p><strong>Tiempo total aproximado:</strong> ${formatoHorasMinutos(tiempoTotal)}</p>
+            <p><strong>Tiempo total aproximado:</strong> ${formatoHorasMinutos(tiempoEstadia + tiempoTraslado)}</p>
         `;
 
-        card.addEventListener('click', () => {
-            const nombreLugar = card.getAttribute('data-nombre');
-            if (typeof window.seleccionarLugarRecomendado === 'function') {
-                window.seleccionarLugarRecomendado(nombreLugar);
-            }
-        });
-
+        card.addEventListener('click', () => redirigirADetalleConFiltros(lugar.nombre));
         lista.appendChild(card);
     });
 
     contenedor.appendChild(lista);
 
-    // Construir y enviar grafo automáticamente
     const grafo = construirGrafoDesdeRecomendaciones(nodoPrincipal, recomendaciones.slice(0, 5));
     const idGrafo = Date.now();
     enviarGrafoAlBackend(grafo, idGrafo);
+}
+
+function generarEstrellasHTML(calificacion) {
+    let estrellas = '';
+    for (let i = 1; i <= 5; i++) {
+        if (calificacion >= i) {
+            estrellas += '<span class="estrella llena">&#9733;</span>';
+        } else if (calificacion >= i - 0.5) {
+            estrellas += '<span class="estrella media">&#9733;</span>';
+        } else {
+            estrellas += '<span class="estrella vacia">&#9734;</span>';
+        }
+    }
+    return estrellas;
 }
 
 function formatoHorasMinutos(horas) {
@@ -163,89 +165,44 @@ function formatoHorasMinutos(horas) {
     return `${m} mins`;
 }
 
-function agregarListenerTarjetasPrincipales() {
-    const tarjetas = document.querySelectorAll('.recomendaciones-card');
-    if (!tarjetas.length) return;
-
-    tarjetas.forEach(card => {
-        card.addEventListener('click', () => {
-            const nombreLugar = card.getAttribute('data-nombre');
-            if (!nombreLugar) {
-                console.error("La tarjeta no tiene atributo data-nombre");
-                return;
-            }
-            redirigirADetalleConFiltros(nombreLugar);
-        });
-    });
-}
-
 function redirigirADetalleConFiltros(nombreLugar) {
     const path = window.location.pathname;
     const urlParams = new URLSearchParams(window.location.search);
 
-    const inputPresupuesto = document.getElementById('inputPresupuesto');
-    const presupuestoActual = inputPresupuesto ? inputPresupuesto.value : '10000';
+    const presupuesto = document.getElementById('inputPresupuesto')?.value || '10000';
+    const tiempoMax = document.getElementById('inputTiempoMaxDiario')?.value || '8';
+    const star = urlParams.get('star') || '';
 
-    const inputTiempoMax = document.getElementById('inputTiempoMaxDiario');
-    const tiempoMaxActual = inputTiempoMax ? inputTiempoMax.value : '8';
-
-    const parametros = new URLSearchParams();
-
+    const nuevosParams = new URLSearchParams();
     for (const [key, value] of urlParams.entries()) {
-        if (key !== 'nombre' && key !== 'presupuesto' && key !== 'tiempo_max_diario') {
-            parametros.append(key, value);
+        if (!['nombre', 'presupuesto', 'tiempo_max_diario'].includes(key)) {
+            nuevosParams.append(key, value);
         }
     }
 
-    parametros.set('nombre', nombreLugar);
-    parametros.set('presupuesto', presupuestoActual || '10000');
-    parametros.set('tiempo_max_diario', tiempoMaxActual || '8');
+    nuevosParams.set('nombre', nombreLugar);
+    nuevosParams.set('presupuesto', presupuesto);
+    nuevosParams.set('tiempo_max_diario', tiempoMax);
+    if (star) nuevosParams.set('star', star);
 
-    let urlDetalle;
-    if (path.startsWith('/lugares/filtro')) {
-        urlDetalle = `/lugares/filtro/detalle?${parametros.toString()}`;
-    } else {
-        urlDetalle = `/lugares/detalle?${parametros.toString()}`;
-    }
+    const url = path.startsWith('/lugares/filtro')
+        ? `/lugares/filtro/detalle?${nuevosParams}`
+        : `/lugares/detalle?${nuevosParams}`;
 
-    console.log("Redirigiendo a:", urlDetalle);
-    window.location.href = urlDetalle;
-}
-
-function formatearTiempoMinutos(minutos) {
-    if (minutos < 60) {
-        return `${minutos.toFixed(1)} min`;
-    } else {
-        const horas = Math.floor(minutos / 60);
-        const minsRestantes = Math.round(minutos % 60);
-        if (minsRestantes === 0) {
-            return `${horas} hr${horas > 1 ? 's' : ''}`;
-        } else {
-            return `${horas} hr${horas > 1 ? 's' : ''} ${minsRestantes} min`;
-        }
-    }
+    window.location.href = url;
 }
 
 function construirGrafoDesdeRecomendaciones(nodoPrincipal, recomendaciones) {
     const nodos = [nodoPrincipal];
+    const aristas = [];
+
     recomendaciones.forEach(r => {
         if (r.nombre && r.nombre !== nodoPrincipal) {
             nodos.push(r.nombre);
+            const tiempoMin = (Number(r.tiempo_traslado) || 0) * 60;
+            aristas.push({ origen: nodoPrincipal, destino: r.nombre, peso: tiempoMin });
         }
     });
-
-    const aristas = recomendaciones
-        .filter(r => r.nombre && r.nombre !== nodoPrincipal)
-        .map(r => {
-            const tiempoTrasladoHoras = Number(r.tiempo_traslado) || 0;
-            const tiempoTrasladoMinutos = tiempoTrasladoHoras * 60;
-            const pesoFormateado = tiempoTrasladoMinutos > 0 ? formatearTiempoMinutos(tiempoTrasladoMinutos) : '1 min';
-            return {
-                origen: nodoPrincipal,
-                destino: r.nombre,
-                peso: pesoFormateado
-            };
-        });
 
     return { nodos, aristas };
 }
@@ -257,55 +214,33 @@ function mostrarMensajeGrafo(texto, tipo = 'exito') {
     contenedor.style.display = 'block';
     contenedor.textContent = texto;
 
-    if (tipo === 'exito') {
-        contenedor.style.backgroundColor = '#d4edda';
-        contenedor.style.color = '#155724';
-        contenedor.style.border = '1px solid #c3e6cb';
-    } else if (tipo === 'error') {
-        contenedor.style.backgroundColor = '#f8d7da';
-        contenedor.style.color = '#721c24';
-        contenedor.style.border = '1px solid #f5c6cb';
-    } else {
-        contenedor.style.backgroundColor = '#fff3cd';
-        contenedor.style.color = '#856404';
-        contenedor.style.border = '1px solid #ffeeba';
-    }
+    const estilos = {
+        exito: ['#d4edda', '#155724', '#c3e6cb'],
+        error: ['#f8d7da', '#721c24', '#f5c6cb'],
+        advertencia: ['#fff3cd', '#856404', '#ffeeba']
+    };
 
-    // Opcional: ocultar el mensaje después de 4 segundos
-    setTimeout(() => {
-        contenedor.style.display = 'none';
-    }, 4000);
+    const [bg, color, border] = estilos[tipo] || estilos.exito;
+    contenedor.style.backgroundColor = bg;
+    contenedor.style.color = color;
+    contenedor.style.border = `1px solid ${border}`;
+
+    setTimeout(() => { contenedor.style.display = 'none'; }, 4000);
 }
 
 function enviarGrafoAlBackend(grafo, idGrafo) {
-    // Convertir los pesos a números (por ejemplo, 2.3 en lugar de '2.3 min')
-    const aristasConvertidas = grafo.aristas.map(a => {
-        const pesoNumerico = parseFloat(a.peso); // ignora " min"
-        return {
-            origen: a.origen,
-            destino: a.destino,
-            peso: isNaN(pesoNumerico) ? 1 : pesoNumerico // valor por defecto 1 si falla
-        };
-    });
+    const aristasConvertidas = grafo.aristas.map(a => ({
+        origen: a.origen,
+        destino: a.destino,
+        peso: Number(a.peso) || 1
+    }));
 
     fetch('/api/generar_grafo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            id: idGrafo,
-            nodos: grafo.nodos,
-            aristas: aristasConvertidas
-        })
+        body: JSON.stringify({ id: idGrafo, nodos: grafo.nodos, aristas: aristasConvertidas })
     })
-    .then(response => {
-        if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
-        return response.json();
-    })
-    .then(data => {
-        console.log('Grafo guardado:', data.rutaArchivo);
-    })    
-    .catch(err => {
-        console.error('Error fetch:', err);
-    });
+    .then(res => res.ok ? res.json() : Promise.reject(res.status))
+    .then(data => console.log('Grafo guardado:', data.rutaArchivo))
+    .catch(err => console.error('Error al enviar grafo:', err));
 }
-

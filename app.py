@@ -1,10 +1,12 @@
 from flask import Flask, render_template, url_for, jsonify, redirect, request
 import  os, csv, re, asyncio, aiohttp, math
 from backend.arbolB import BTree
-from backend.carga_csv import cargar_lugares_csv, guardar_lugar_en_csv, guardar_calificacion_en_csv
+from backend.carga_csv import cargar_lugares_csv, guardar_lugar_en_csv, guardar_calificaciones_en_csv
 from backend.modelos.utilidadesGrafo import UtilidadesGrafo
 from backend.modelos.GrafoPonderado import generar_grafo_ponderado  
 from backend.modelos.lugar import Lugar
+from backend.modelos.calificaciones import load_data
+
 
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True  # Recarga automática de plantillas
@@ -28,7 +30,6 @@ try:
 
     print(f"Lugares cargados: {len(arbol_lugares.obtener_lugares())}")
     print(f"Hospedajes cargados: {len(arbol_hospedaje.obtener_lugares())}")
-
 except Exception as e:
     print(f"Error al cargar datos: {e}")
 
@@ -48,6 +49,54 @@ def obtener_siguiente_id(path='data/datos.csv'):
     return id_max + 1
 
 #API's PARA LUGARES
+
+@app.route('/lugares/detalle/<int:idx>')
+def lugar_por_idx(idx):
+    lugar = arbol_lugares.obtener_por_idx(idx) 
+    if lugar:
+        return jsonify({"lugar": lugar.to_dict()})
+    return jsonify({"error": "Lugar no encontrado"}), 404
+@app.route('/submit_rating', methods=['POST'])
+def submit_rating():
+    RATINGS_CSV = './data/calificaciones.csv'
+    data = load_data()  # Tu función que carga los lugares
+
+    selected_row = request.form.get('selected_row')
+    rating_str = request.form.get('rating')
+    comment = request.form.get('comment', '').strip()
+
+    if selected_row is None or rating_str is None or comment == '':
+        return jsonify({"error": "Seleccione un destino, calificación y deje un comentario."}), 400
+
+    try:
+        idx = int(selected_row)
+        rating_new = float(rating_str)
+    except ValueError:
+        return jsonify({"error": "Índice o calificación inválida."}), 400
+
+    if idx < 0 or idx >= len(data):
+        return jsonify({"error": "Destino seleccionado inválido."}), 400
+
+    nombre_lugar = data[idx].nombre  # Obtener el nombre del lugar a partir del índice
+
+    # Guardar la calificación
+    file_exists = os.path.exists(RATINGS_CSV)
+    with open(RATINGS_CSV, 'a', newline='', encoding='utf-8') as csvfile:
+        fieldnames = ['dest_idx', 'rating', 'comment']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+        if not file_exists:
+            writer.writeheader()
+
+        writer.writerow({
+            'dest_idx': selected_row,
+            'rating': rating_new,
+            'comment': comment
+        })
+
+    # Redirigir al detalle del lugar con su nombre y una estrella temporal como referencia
+    return redirect(url_for('detalle_lugar', nombre=nombre_lugar, star=int(rating_new)))
+
 
 #API PARA SOLAMENTE OBTENER UN LUGAR EN ESPECIFICO
 @app.route('/api/lugar', methods=['GET'])
@@ -122,6 +171,7 @@ def registrar_lugar():
             tiempo=tiempo,
             precio=precio
         )
+
     except (KeyError, ValueError) as e:
         return jsonify({'error': 'Datos inválidos o faltantes', 'detalle': str(e)}), 400
 
@@ -503,7 +553,6 @@ def render_lugar_detalle(nombre):
 def lugar_detalle():
     try:
         nombre = request.args.get('nombre')
-        presupuesto = request.args.get('presupuesto')
         return render_lugar_detalle(nombre)
     except Exception as e:
         return f"Error interno del servidor: {e}", 500
@@ -715,13 +764,8 @@ def api_recomendaciones_hospedajes():
     
     return {"recomendaciones": lista_recomendaciones}
 
-@app.route('/detalle/<int:idx>')
-def detalle(idx):
-    return render_template(
-        'detalle.html',
-        detalle=url_for('static', filename='js/detalle.js'),
-        mapa=url_for('static', filename='js/mapa.js')
-    )
+
+
 
 # @app.route('/api/cargar-calificaciones', methods=['POST'])
 # def cargar_calificaciones():
