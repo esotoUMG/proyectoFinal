@@ -75,45 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
           latitud: latitud,
           longitud: longitud
         };
-  
-        fetch('/api/registrar-lugar', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(datos)
-        })
-          .then(async res => {
-            if (!res.ok) {
-              const errorData = await res.json().catch(() => ({}));
-              throw new Error(errorData.error || 'Error en la respuesta del servidor');
-            }
-            return res.json();
-          })
-          .then(respuesta => {
-            if (respuesta.mensaje) {
-              mensajeDiv.textContent = '✅ ' + respuesta.mensaje;
-              mensajeDiv.style.color = 'green';
-              formulario.reset();
-              if (typeof marcador !== 'undefined' && marcador && typeof mapa !== 'undefined' && mapa) {
-                marcador.setMap(null);
-                marcador = null;
-                initMap();
-              }
-            } else if (respuesta.error) {
-              mensajeDiv.textContent = '❌ ' + respuesta.error;
-              mensajeDiv.style.color = 'red';
-            } else {
-              mensajeDiv.textContent = '❌ Error desconocido al registrar el lugar.';
-              mensajeDiv.style.color = 'red';
-            }
-          })
-          .catch(err => {
-            console.error('Error en fetch:', err);
-            mensajeDiv.textContent = '❌ Ocurrió un error inesperado: ' + err.message;
-            mensajeDiv.style.color = 'red';
-          });
-              fetch('/api/registrar-hospedaje', {
+      fetch('/api/registrar-hospedaje', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

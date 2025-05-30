@@ -35,7 +35,7 @@
 34,Quiché,Santa Cruz del Quiché,Lagunas de Ixcán,Turismo,Santa Cruz del Quiché,15.0081,-90.4165,4.7,50,4
 35,Chimaltenango,Parramos,Volcán de Fuego,Turismo,Volcán de Fuego,14.4733,-90.883,4.7,135,4
 36,Izabal,Morales,Playa Blanca,Turismo,Morales,15.761,-88.5187,4.5,25,3
-37,Retalhuleu,Retalhuleu,Xetulul,Entretenimiento,Xetulul,14.5,-91.478,4.4,100,5
+37,Retalhuleu,Retalhuleu,Xetulul,Entretenimiento,Xetulul,14.5,-91.478,4.00,100,5
 38,Santa Rosa,Cuilapa,Parque Natural Montañas de Cuilapa,Turismo,Cuilapa,14.1311,-90.0431,4.6,20,3
 39,Baja Verapaz,Cobán,Biotopo del Quetzal,Turismo,Cobán,15.5333,-90.4278,4.7,75,6
 40,Guatemala,Ciudad de Guatemala,Zoológico La Aurora,Entretenimiento,"2a Calle 15-05, Zona 13",14.6343,-90.5196,4.6,50,4
@@ -89,3 +89,4 @@
 88,Guatemala,Ciudad de Guatemala,Tikal Futura Hotel,Hotel,"Calzada Roosevelt 22-43, Zona 11",14.61,-90.513,3.9,425,0
 89,Guatemala,Ciudad de Guatemala,Wyndham Garden Guatemala City,Hotel,"1a Avenida 12-46, Zona 10",14.61,-90.513,3.8,460,0
 90,Guatemala,Ciudad de Guatemala,Hotel Biltmore,Hotel,"15 Calle 0-31, Zona 10",14.61,-90.513,4.6,510,0
+91,Sacatepéquez,San Lucas,Cerro Alux,turismo,kilómetro 26.5 de la Carretera Nacional 1,14.601935139733321,-90.64447987860687,5.00,25.0,2.0

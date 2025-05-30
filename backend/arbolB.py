@@ -198,3 +198,41 @@ class BTree:
         return None
 
 
+class CalificacionNodo:
+    def __init__(self, id_lugar):
+        self.id_lugar = id_lugar
+        self.calificaciones = Lista()  # lista enlazada personalizada
+
+    @property
+    def id(self):
+        return self.id_lugar
+
+    def agregar(self, calificacion):
+        self.calificaciones.insertar(calificacion)
+
+    def promedio(self):
+        total = 0
+        n = self.calificaciones.longitud()
+        if n == 0:
+            return 0
+        actual = self.calificaciones.primero
+        while actual:
+            total += actual.dato.puntaje
+            actual = actual.siguiente
+        return total / n
+
+    def to_dict(self):
+        return {
+            "id_lugar": self.id_lugar,
+            "promedio": self.promedio(),
+            "calificaciones": [c.to_dict() for c in self.calificaciones.recorrer()]
+        }
+    
+
+    # Para que el BTree pueda ordenar y comparar nodos correctamente:
+    def __lt__(self, other):
+        return self.id < other.id
+
+    def __eq__(self, other):
+        return self.id == other.id
+
