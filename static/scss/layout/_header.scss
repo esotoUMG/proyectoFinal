@@ -58,8 +58,7 @@ header {
   .opciones {
     display: flex;
     gap: 3rem;
-    padding-top: 1rem;
-
+    margin-top: 1rem;
     a {
       position: relative;
       padding-bottom: 0.5rem;
@@ -183,7 +182,7 @@ header.fixed {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 3.2rem 0;              // padding original sin cambios
+  padding: 3.6rem 0;              // padding original sin cambios
   background: white;
   z-index: 1000;
   max-width: 100%;
@@ -200,12 +199,14 @@ header.fixed {
     justify-content: space-between;
 
     a {
-      font-size: 3rem;
+      font-size: 1.8rem;
       transition: font-size 0.7s ease;
+      margin: 0;
     }
   }
 
   .logo {
+    margin-top: 1rem;
     a {
       font-size: 2.8rem;
       transform: scale(0.9);
@@ -214,8 +215,9 @@ header.fixed {
   }
 
   .anfitrion {
+    margin-top: 1rem;
     a {
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       transition: font-size 0.7s ease;
     }
   }

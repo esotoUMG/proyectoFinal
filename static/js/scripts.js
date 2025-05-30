@@ -3,7 +3,7 @@ function toggleSearchbar(href) {
     const filtrosForm = document.getElementById('filtros-form');
     if (!filtrosForm) return;
 
-    if (href === '/cargar') {
+    if (href === '/cargar' ) {
         filtrosForm.style.display = 'none';
     } else {
         filtrosForm.style.display = '';

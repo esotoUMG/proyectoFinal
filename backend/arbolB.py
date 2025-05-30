@@ -1,5 +1,4 @@
 import math
-from backend.modelos.lugar import Lugar  # Importar clase Lugar desde su módulo
 
 # Clase NodoLista: Nodo individual de una lista enlazada
 class NodoLista:

@@ -59,3 +59,116 @@
         transition: .4s ease;
     }
 }
+#comentarios-seccion {
+  margin: 2rem 5rem 0 5rem;
+  background-color: v.$grisClaro;
+  border-radius: 2rem;
+  padding: 3rem 4rem;
+  text-align: center;
+
+  h3 {
+    font-family: v.$contenido2;
+    font-size: 2rem;
+    font-weight: 600;
+    padding-bottom: 2rem;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+
+    textarea {
+      font-family: v.$subtitulo;
+      font-size: 1.4rem;
+      padding: 1rem;
+      border-radius: 1rem;
+      border: 1px solid v.$gris_;
+      resize: vertical;
+      min-height: 80px;
+      max-height: 150px;
+    }
+
+    .rating-input {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      font-family: v.$subtitulo;
+      font-size: 1.4rem;
+      color: v.$negro;
+
+      label {
+        font-weight: 600;
+      }
+
+      .stars {
+        display: flex;
+        direction: rtl; /* para que la estrella 5 quede a la izquierda */
+
+        input[type="radio"] {
+          display: none;
+        }
+
+        label {
+          font-size: 2.5rem;
+          color: v.$gris_;
+          cursor: pointer;
+          transition: color 0.3s ease;
+
+          &:hover,
+          &:hover ~ label {
+            color: gold;
+          }
+        }
+
+        input[type="radio"]:checked ~ label {
+          color: gold;
+        }
+      }
+    }
+
+    button {
+      align-self: flex-end;
+      background-color: v.$negro;
+      color: white;
+      font-family: v.$contenido;
+      font-size: 1.4rem;
+      padding: 0.8rem 2rem;
+      border-radius: 2rem;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: darken(v.$negro, 10%);
+      }
+    }
+  }
+
+  #lista-comentarios {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: left;
+
+    .comentario-card {
+      background-color: white;
+      border-radius: 1.5rem;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+
+      p {
+        font-family: v.$subtitulo;
+        font-size: 1.2rem;
+        margin: 0 0 0.5rem 0;
+      }
+
+      .estrellas {
+        font-size: 1.6rem;
+        color: gold;
+      }
+    }
+  }
+}

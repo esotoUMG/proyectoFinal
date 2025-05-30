@@ -1,4 +1,3 @@
-from .calificacion import Calificacion
 
 # CLASE LUGAR: Representar un lugar turístico o de hospedaje.
 class Lugar:

@@ -447,7 +447,7 @@ header a {
 header .opciones {
   display: flex;
   gap: 3rem;
-  padding-top: 1rem;
+  margin-top: 1rem;
 }
 header .opciones a {
   position: relative;
@@ -555,7 +555,7 @@ header.fixed {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 3.2rem 0;
+  padding: 3.6rem 0;
   background: white;
   z-index: 1000;
   max-width: 100%;
@@ -572,16 +572,23 @@ header.fixed .header-top {
   justify-content: space-between;
 }
 header.fixed .header-top a {
-  font-size: 3rem;
+  font-size: 1.8rem;
   transition: font-size 0.7s ease;
+  margin: 0;
+}
+header.fixed .logo {
+  margin-top: 1rem;
 }
 header.fixed .logo a {
   font-size: 2.8rem;
   transform: scale(0.9);
   transition: font-size 0.7s ease, transform 0.7s ease;
 }
+header.fixed .anfitrion {
+  margin-top: 1rem;
+}
 header.fixed .anfitrion a {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   transition: font-size 0.7s ease;
 }
 header.fixed #filtros-form {
@@ -852,6 +859,103 @@ footer h2 span {
   border-radius: 2rem;
   padding: 1rem;
   transition: 0.4s ease;
+}
+
+#comentarios-seccion {
+  margin: 2rem 5rem 0 5rem;
+  background-color: #f0f0f0;
+  border-radius: 2rem;
+  padding: 3rem 4rem;
+  text-align: center;
+}
+#comentarios-seccion h3 {
+  font-family: "DM Sans", sans-serif;
+  font-size: 2rem;
+  font-weight: 600;
+  padding-bottom: 2rem;
+}
+#comentarios-seccion form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+#comentarios-seccion form textarea {
+  font-family: "Raleway", sans-serif;
+  font-size: 1.4rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 1px solid #e6e6e6;
+  resize: vertical;
+  min-height: 80px;
+  max-height: 150px;
+}
+#comentarios-seccion form .rating-input {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  font-family: "Raleway", sans-serif;
+  font-size: 1.4rem;
+  color: #000000;
+}
+#comentarios-seccion form .rating-input label {
+  font-weight: 600;
+}
+#comentarios-seccion form .rating-input .stars {
+  display: flex;
+  direction: rtl; /* para que la estrella 5 quede a la izquierda */
+}
+#comentarios-seccion form .rating-input .stars input[type=radio] {
+  display: none;
+}
+#comentarios-seccion form .rating-input .stars label {
+  font-size: 2.5rem;
+  color: #e6e6e6;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+#comentarios-seccion form .rating-input .stars label:hover, #comentarios-seccion form .rating-input .stars label:hover ~ label {
+  color: gold;
+}
+#comentarios-seccion form .rating-input .stars input[type=radio]:checked ~ label {
+  color: gold;
+}
+#comentarios-seccion form button {
+  align-self: flex-end;
+  background-color: #000000;
+  color: white;
+  font-family: "Cal Sans", sans-serif;
+  font-size: 1.4rem;
+  padding: 0.8rem 2rem;
+  border-radius: 2rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+#comentarios-seccion form button:hover {
+  background-color: black;
+}
+#comentarios-seccion #lista-comentarios {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  text-align: left;
+}
+#comentarios-seccion #lista-comentarios .comentario-card {
+  background-color: white;
+  border-radius: 1.5rem;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+#comentarios-seccion #lista-comentarios .comentario-card p {
+  font-family: "Raleway", sans-serif;
+  font-size: 1.2rem;
+  margin: 0 0 0.5rem 0;
+}
+#comentarios-seccion #lista-comentarios .comentario-card .estrellas {
+  font-size: 1.6rem;
+  color: gold;
 }
 
 .cargar {

@@ -11,11 +11,35 @@
       <!-- Aquí se cargará info detallada vía JS -->
     </div>
 
-
     <div id="recomendaciones-cercanas">
       <h3>Recomendaciones cercanas</h3>
       <!-- Aquí se cargarán recomendaciones vía JS -->
     </div>    
+    
+    <div id="comentarios-seccion">
+      <h3>Comentarios y Calificaciones</h3>
+    
+      <form id="form-comentario">
+        <textarea id="input-comentario" placeholder="Escribe tu comentario aquí..." required></textarea>
+
+        <div class="rating-input">
+          <label>Calificación:</label>
+          <div class="stars">
+            <input type="radio" name="star" id="star5" value="5" required><label for="star5">&#9733;</label>
+            <input type="radio" name="star" id="star4" value="4"><label for="star4">&#9733;</label>
+            <input type="radio" name="star" id="star3" value="3"><label for="star3">&#9733;</label>
+            <input type="radio" name="star" id="star2" value="2"><label for="star2">&#9733;</label>
+            <input type="radio" name="star" id="star1" value="1"><label for="star1">&#9733;</label>
+          </div>
+        </div>
+
+        <button type="submit">Agregar comentario</button>
+      </form>
+    
+      <div id="lista-comentarios">
+        <!-- Comentarios aquí -->
+      </div>
+    </div>
   </div>
 
   <!-- Lado Derecho: Mapa -->
