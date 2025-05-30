@@ -69,8 +69,6 @@ def guardar_lugar_en_csv(lugar_nuevo, ruta_csv):
         })
 
 
-
-
 # Función para cargar calificaciones desde archivo CSV
 def cargar_calificaciones_csv(archivo, arbol):
     """
@@ -94,6 +92,8 @@ def cargar_calificaciones_csv(archivo, arbol):
                 # Ignorar filas con datos inválidos
                 continue
 
+
+# Función para guardar una nueva calificación en el archivo CSV
 def guardar_calificacion_en_csv(ruta_csv, id_lugar, puntaje, comentario):
     archivo_existe = os.path.isfile(ruta_csv)
 
@@ -106,7 +106,7 @@ def guardar_calificacion_en_csv(ruta_csv, id_lugar, puntaje, comentario):
         escritor.writerow([id_lugar, puntaje, comentario])
 
 
-        
+# Función para actualizar las calificaciones promedio de cada lugar en el CSV de lugares
 def actualizar_calificacion_promedio_csv(ruta_csv_lugares, arbol):
     """
     Lee el CSV original de lugares, actualiza la columna de calificación
@@ -114,19 +114,20 @@ def actualizar_calificacion_promedio_csv(ruta_csv_lugares, arbol):
     """
     filas_actualizadas = []
 
-    with open(s_lugares, mode='r', encoding='utf-8') as archivo:
+    with open(ruta_csv_lugares, mode='r', encoding='utf-8') as archivo:
         lector = csv.DictReader(archivo)
         campos = lector.fieldnames
 
         for fila in lector:
-            id_lugar = int(fila['Id'])
-            lugar = arbol.buscar(id_lugar)
-            if lugar:
-                # Actualizar solo la calificación promedio en la fila
-                fila['Calificación en Google'] = f"{lugar.calificacion:.2f}"
+            try:
+                id_lugar = int(fila['Id'])
+                lugar = arbol.buscar(id_lugar)
+                if lugar:
+                    fila['Calificación en Google'] = f"{lugar.calificacion:.2f}"
+            except ValueError:
+                pass
             filas_actualizadas.append(fila)
 
-    # Sobrescribir archivo con las filas actualizadas
     with open(ruta_csv_lugares, mode='w', newline='', encoding='utf-8') as archivo:
         escritor = csv.DictWriter(archivo, fieldnames=campos)
         escritor.writeheader()

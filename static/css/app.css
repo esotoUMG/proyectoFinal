@@ -790,6 +790,16 @@ footer h2 span {
   color: #5dc1b9;
 }
 
+.contenido-detalle {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+}
+
+.info-lugar {
+  margin: 2rem 2rem;
+}
+
 #info-detallada {
   border-bottom: 1px solid #e6e6e6;
   padding: 2rem 1.5rem;

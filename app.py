@@ -1,7 +1,7 @@
 from flask import Flask, render_template, url_for, request, jsonify, Response, redirect
 import json, os, csv
 from backend.arbolB import BTree
-from backend.carga_csv import cargar_lugares_csv, cargar_calificaciones_csv, guardar_lugar_en_csv
+from backend.carga_csv import cargar_lugares_csv, cargar_calificaciones_csv, guardar_lugar_en_csv, guardar_calificacion_en_csv
 from backend.modelos.utilidadesGrafo import UtilidadesGrafo
 from backend.modelos.GrafoPonderado import GrafoPonderado  # Importar clase GrafoPonderado para el manejo de rutas
 from backend.modelos.lugar import Lugar
@@ -207,7 +207,8 @@ def render_lugar_detalle(nombre):
         js_path=js_path,
         lugarjs=lugarjs,
         detalle=detalle,
-        mapa=mapa
+        mapa=mapa,
+        ocultar = True
     )
 
 
@@ -268,7 +269,8 @@ def lugares_filtro():
             css_path=css_path,
             js_path=js_path,
             jsH=jsH,
-            detalle=detalle
+            detalle=detalle,
+            ocultar = True
         )
 
     except Exception as e:
@@ -333,7 +335,8 @@ def render_hospedaje_detalle(nombre):
         js_path=js_path,
         jsH=jsH,
         detalle=detalle,
-        mapa=mapa
+        mapa=mapa,
+        ocultar = True
     )
 
 @app.route('/hospedajes/detalle')
@@ -387,7 +390,8 @@ def hospedajes_filtro():
         css_path = url_for('static', filename='css/app.css')
         js_path = url_for('static', filename='js/scripts.js')
         jsH = url_for('static', filename='js/hospedaje.js')
-        detalle = url_for('static', filename='js/detalle_hospedaje.js')
+        detalle = url_for('static', filename='js/detalle_hospedaje.js',
+        ocultar = True)
 
         return render_template(
             'hospedajes_filtro.html',
@@ -564,6 +568,7 @@ def obtener_rutas():
 #     <h2>Visualización del Grafo Ponderado</h2>
 #     <img src="{image_path}" alt="Grafo Ponderado">
 #     """)
+
 
 if __name__ == "__main__":
     app.run(debug=True)

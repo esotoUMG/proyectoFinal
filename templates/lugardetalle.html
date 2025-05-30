@@ -3,9 +3,9 @@
 {% block title %}Detalle del Lugar - Travel Map{% endblock %}
 
 {% block contenido %}
-<section style="display: flex; height: 100vh;">
+<section class="contenido-detalle">
   <!-- Lado Izquierdo: Información -->
-  <div class="info-lugar" style="width: 50%; padding: 2rem; overflow-y: auto;">
+  <div class="info-lugar">
     <div id="info-detallada">
       <h2>Detalle del lugar</h2>
       <!-- Aquí se cargará info detallada vía JS -->
@@ -15,11 +15,11 @@
     <div id="recomendaciones-cercanas">
       <h3>Recomendaciones cercanas</h3>
       <!-- Aquí se cargarán recomendaciones vía JS -->
-    </div>
+    </div>    
   </div>
 
   <!-- Lado Derecho: Mapa -->
-  <div id="contenedor__mapa" style="width: 50%; height: 100%;"></div>
+  <div id="contenedor__mapa"></div>
 </section>
 {% endblock %}
 
@@ -32,7 +32,6 @@
     ></script>
 
   <!-- Scripts personalizados -->
-    <script src="{{ lugarjs }}"></script>
     <script src="{{ detalle }}"></script>
     <script src="{{ mapa }}"></script>
 {% endblock %}
