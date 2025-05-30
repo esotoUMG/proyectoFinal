@@ -3,12 +3,25 @@
 {% block title %}Travel Map{% endblock %}
 
 {% block contenido %}
-  <section>
-    <h2>¿De qué deseas convertirte en anfitrión?</h2>
+<section class="cargar">
+  <h2>¿De qué deseas convertirte en anfitrión?</h2>
 
-    <div style="display: flex; gap: 1rem;">
-      <div>Lugar</div>
-      <div>Hospedaje</div>
+  <div class="opciones">
+    <div class="opciones-grid" id="opcion-lugar">
+      <i class="fa-solid fa-location-dot"></i>
+      <h1>Lugar</h1>
     </div>
-  </section>
+    <div class="opciones-grid" id="opcion-hospedaje">
+      <i class="fa-solid fa-hotel"></i>
+      <h1>Hospedaje</h1>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+  <script>
+    const urlCargarLugar = "{{ url_for('cargar_lugar') }}";
+    const urlCargarHospedaje = "{{ url_for('cargar_hospedaje') }}";
+  </script>
+  <script src="{{ cargar }}"></script>
 {% endblock %}

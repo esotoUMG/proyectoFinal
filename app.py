@@ -1,10 +1,10 @@
-from flask import Flask, render_template, url_for, request, jsonify, Response
-import json
-from backend import arbolB
+from flask import Flask, render_template, url_for, request, jsonify, Response, redirect
+import json, os, csv
 from backend.arbolB import BTree
-from backend.carga_csv import cargar_lugares_csv, cargar_calificaciones_csv
+from backend.carga_csv import cargar_lugares_csv, cargar_calificaciones_csv, guardar_lugar_en_csv, guardar_calificacion_en_csv
 from backend.modelos.utilidadesGrafo import UtilidadesGrafo
 from backend.modelos.GrafoPonderado import GrafoPonderado  # Importar clase GrafoPonderado para el manejo de rutas
+from backend.modelos.lugar import Lugar
 
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True  # Recarga automática de plantillas
@@ -46,7 +46,9 @@ def obtener_lugares():
                 "municipio": lugar.municipio,
                 "departamento": lugar.departamento,
                 "calificacion": lugar.calificacion,
-                "direccion": lugar.direccion
+                "direccion": lugar.direccion,
+                "precio" : lugar.precio,
+                "tiempo" : lugar.tiempo
             })
 
         return jsonify({"lugares": lugares})
@@ -54,24 +56,6 @@ def obtener_lugares():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-#API HOSPEDAJES
-@app.route('/api/hospedajes', methods=['GET'])
-def obtener_hospedajes():
-    try:
-        hospedajes = [{
-            "id": hospedaje.id,
-            "nombre": hospedaje.nombre,
-            "tipo": hospedaje.tipo,
-            "latitud": hospedaje.latitud,
-            "longitud": hospedaje.longitud,
-            "municipio": hospedaje.municipio,
-            "departamento": hospedaje.departamento,
-            "calificacion": hospedaje.calificacion,
-            "direccion": hospedaje.direccion
-        } for hospedaje in arbol_hospedaje.obtener_lugares()]
-        return jsonify({"hospedajes": hospedajes})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
 #PAGINAS WEB
 @app.route('/') #PAGINA PRINCIPAL
@@ -84,7 +68,106 @@ def home():
 def cargar():
     css_path = url_for('static', filename='css/app.css')
     js_path = url_for('static', filename='js/scripts.js')
-    return render_template('cargar.html', css_path=css_path, js_path=js_path, ocultar=True)
+    cargar = url_for('static', filename='js/cargar.js')
+
+    tipo = request.args.get('tipo')
+    if tipo == 'hospedaje':
+        return redirect(url_for('cargar_hospedaje'))
+    elif tipo == 'lugar':
+        return redirect(url_for('cargar_lugar'))
+    else:
+        return render_template('cargar.html', css_path=css_path, js_path=js_path, cargar=cargar, ocultar=True)
+
+@app.route('/cargar/lugar')
+def cargar_lugar():
+    css_path = url_for('static', filename='css/app.css')
+    js_path = url_for('static', filename='js/scripts.js')
+    cargar = url_for('static', filename='js/cargar.js')
+
+    return render_template('cargar_lugar.html', css_path=css_path, js_path=js_path, cargar=cargar, ocultar=True)
+
+
+def obtener_siguiente_id(path='data/datos.csv'):
+    id_max = 0
+    if os.path.exists(path):
+        with open(path, newline='') as archivo:
+            reader = csv.reader(archivo)
+            for fila in reader:
+                try:
+                    id_actual = int(fila[0])
+                    id_max = max(id_max, id_actual)
+                except:
+                    continue
+    return id_max + 1
+
+@app.route('/api/registrar-lugar', methods=['POST'])
+def registrar_lugar():
+    datos = request.get_json()
+
+    try:
+        tiempo = float(datos.get('tiempo_estadia', 0) or 0)
+        precio = float(datos.get('precio', 0) or 0)
+
+        nuevo_lugar = Lugar(
+            id=obtener_siguiente_id(),
+            departamento=datos['departamento'],
+            municipio=datos['municipio'],
+            nombre=datos['nombre'],
+            tipo=datos['tipo'],
+            direccion=datos['direccion'],
+            latitud=float(datos['latitud']),
+            longitud=float(datos['longitud']),
+            calificacion=0.0,
+            tiempo=tiempo,
+            precio=precio
+        )
+    except (KeyError, ValueError) as e:
+        return jsonify({'error': 'Datos inválidos o faltantes', 'detalle': str(e)}), 400
+
+    guardar_lugar_en_csv(nuevo_lugar, 'data/datos.csv')
+
+    arbol_lugares.insertar(nuevo_lugar)
+
+    return jsonify({'mensaje': 'Lugar registrado con éxito', 'id': nuevo_lugar.id}), 201
+
+@app.route('/api/registrar-hospedaje', methods=['POST'])
+def registrar_hospedaje():
+    datos = request.get_json()
+
+    try:
+        tiempo = float(datos.get('tiempo_estadia', 0) or 0)
+        precio = float(datos.get('precio', 0) or 0)
+
+        nuevo_lugar = Lugar(
+            id=obtener_siguiente_id(),
+            departamento=datos['departamento'],
+            municipio=datos['municipio'],
+            nombre=datos['nombre'],
+            tipo=datos['tipo'],
+            direccion=datos['direccion'],
+            latitud=float(datos['latitud']),
+            longitud=float(datos['longitud']),
+            calificacion=0.0,
+            tiempo=tiempo,
+            precio=precio
+        )
+    except (KeyError, ValueError) as e:
+        return jsonify({'error': 'Datos inválidos o faltantes', 'detalle': str(e)}), 400
+
+    guardar_lugar_en_csv(nuevo_lugar, 'data/datos.csv')
+
+    arbol_hospedaje.insertar(nuevo_lugar)
+
+    return jsonify({'mensaje': 'Lugar registrado con éxito', 'id': nuevo_lugar.id}), 201
+
+@app.route('/cargar/hospedaje')
+def cargar_hospedaje():
+    css_path = url_for('static', filename='css/app.css')
+    js_path = url_for('static', filename='js/scripts.js')
+    cargar = url_for('static', filename='js/cargar.js')
+
+    return render_template('cargar_hospedaje.html', css_path=css_path, js_path=js_path, cargar=cargar, ocultar=True)
+
 
 @app.route('/lugares') #PAGINA PARA MOSTRAR LOS LUGARES
 def lugares():
@@ -102,51 +185,6 @@ def lugares():
         lugaresjs=lugaresjs,
         ocultar=False
     )
-
-@app.route('/lugares/filtro')  # PAGINA PARA MOSTRAR LOS LUGARES SEGUN EL FILTRO SELECCIONADO
-def lugares_filtrados():
-    try:
-        tipo = request.args.get('tipo')
-        departamento = request.args.get('departamento')
-
-        if not tipo:
-            return "Falta el parámetro 'tipo'", 400
-
-        tipo = tipo.strip().lower()
-        departamento = departamento.strip().lower() if departamento else None
-
-        if departamento and departamento != 'todo':
-            # Filtra por tipo y departamento
-            lugares_filtrados = [
-                lugar for lugar in arbol_lugares.obtener_lugares()
-                if lugar.tipo.strip().lower() == tipo and lugar.departamento.strip().lower() == departamento
-            ]
-        else:
-            # Solo filtra por tipo (todos los departamentos)
-            lugares_filtrados = [
-                lugar for lugar in arbol_lugares.obtener_lugares()
-                if lugar.tipo.strip().lower() == tipo
-            ]
-
-        css_path = url_for('static', filename='css/app.css')
-        js_path = url_for('static', filename='js/scripts.js')
-        lugaresjs = url_for('static', filename='js/lugar.js')
-        detalle = url_for('static', filename='js/detalle_lugar.js')
-
-        return render_template(
-            'lugares_filtro.html',
-            lugares=lugares_filtrados,
-            tipo=tipo,
-            departamento=departamento if departamento else "Todos",
-            css_path=css_path,
-            js_path=js_path,
-            lugaresjs=lugaresjs,
-            detalle=detalle
-        )
-    
-    except Exception as e:
-        return f"Error interno del servidor: {e}", 500
-
 
 def render_lugar_detalle(nombre):
     if not nombre:
@@ -169,7 +207,8 @@ def render_lugar_detalle(nombre):
         js_path=js_path,
         lugarjs=lugarjs,
         detalle=detalle,
-        mapa=mapa
+        mapa=mapa,
+        ocultar = True
     )
 
 
@@ -190,6 +229,72 @@ def lugar_detalle_filtro():
     except Exception as e:
         return f"Error interno del servidor: {e}", 500
 
+
+@app.route('/lugares/filtro')  # Página para mostrar hospedajes según filtro
+def lugares_filtro():
+    try:
+        tipo = request.args.get('tipo', '').strip().lower()
+        departamento = request.args.get('departamento', '').strip().lower()
+
+        tipos_validos = ['turismo', 'comida', 'entretenimiento']
+
+        if tipo not in tipos_validos:
+            # Redirigir a un tipo válido por defecto, por ejemplo "turismo"
+            return redirect(url_for('lugares_filtro', tipo='turismo'))
+
+        if departamento == 'todo' or departamento == '':
+            departamento = None
+
+        if departamento:
+            lugares_filtrados = [
+                lugar for lugar in arbol_lugares.obtener_lugares()
+                if lugar.tipo.strip().lower() == tipo and lugar.departamento.strip().lower() == departamento
+            ]
+        else:
+            lugares_filtrados = [
+                lugar for lugar in arbol_lugares.obtener_lugares()
+                if lugar.tipo.strip().lower() == tipo
+            ]
+
+        css_path = url_for('static', filename='css/app.css')
+        js_path = url_for('static', filename='js/scripts.js')
+        jsH = url_for('static', filename='js/hospedaje.js')
+        detalle = url_for('static', filename='js/detalle_hospedaje.js')
+
+        return render_template(
+            'hospedajes_filtro.html',
+            hospedajes=lugares_filtrados,
+            tipo=tipo,
+            departamento=departamento if departamento else "Todos",
+            css_path=css_path,
+            js_path=js_path,
+            jsH=jsH,
+            detalle=detalle,
+            ocultar = True
+        )
+
+    except Exception as e:
+        return f"Error interno del servidor: {e}", 500
+
+#API HOSPEDAJES
+@app.route('/api/hospedajes', methods=['GET'])
+def obtener_hospedajes():
+    try:
+        hospedajes = [{
+            "id": hospedaje.id,
+            "nombre": hospedaje.nombre,
+            "tipo": hospedaje.tipo,
+            "latitud": hospedaje.latitud,
+            "longitud": hospedaje.longitud,
+            "municipio": hospedaje.municipio,
+            "departamento": hospedaje.departamento,
+            "calificacion": hospedaje.calificacion,
+            "direccion": hospedaje.direccion,
+            "precio" : hospedaje.precio
+        } for hospedaje in arbol_hospedaje.obtener_lugares()]
+        return jsonify({"hospedajes": hospedajes})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/hospedajes') #PAGINA PARA MOSTRAR LOS HOSPEDAJES
 def hospedajes():
@@ -220,7 +325,7 @@ def render_hospedaje_detalle(nombre):
     css_path = url_for('static', filename='css/app.css')
     js_path = url_for('static', filename='js/scripts.js')
     mapa = url_for('static', filename='js/mapa.js')
-    hospedajejs = url_for('static', filename='js/hospedaje.js')
+    jsH = url_for('static', filename='js/hospedaje.js')
     detalle = url_for('static', filename='js/detalle_hospedaje.js')
 
     return render_template(
@@ -228,9 +333,10 @@ def render_hospedaje_detalle(nombre):
         hospedaje=hospedaje,
         css_path=css_path,
         js_path=js_path,
-        hospedajejs=hospedajejs,
+        jsH=jsH,
         detalle=detalle,
-        mapa=mapa
+        mapa=mapa,
+        ocultar = True
     )
 
 @app.route('/hospedajes/detalle')
@@ -250,36 +356,42 @@ def hospedaje_detalle_filtro():
     except Exception as e:
         return f"Error interno del servidor: {e}", 500
 
-
-@app.route('/hospedajes/filtro')  # PAGINA PARA MOSTRAR LOS HOSPEDAJES SEGUN EL FILTRO SELECCIONADO
+@app.route('/hospedajes/filtro')
 def hospedajes_filtro():
     try:
         tipo = request.args.get('tipo')
         departamento = request.args.get('departamento')
 
-        if not tipo:
-            return "Falta el parámetro 'tipo'", 400
+        if not tipo or tipo.strip() == "":
+            return redirect(url_for('hospedajes_filtro', tipo='hotel'))
 
         tipo = tipo.strip().lower()
         departamento = departamento.strip().lower() if departamento else None
 
-        if departamento and departamento != 'todo':
-            # Filtra por tipo y departamento
+        tipos_validos = ['hotel', 'hostal', 'apartamento']  # ejemplo, ajusta según tus tipos
+
+        if tipo not in tipos_validos:
+            return redirect(url_for('hospedajes_filtro', tipo='hotel'))
+
+        if departamento == 'todo':
+            departamento = None
+
+        if departamento:
             hospedajes_filtrados = [
-                lugar for lugar in arbol_lugares.obtener_lugares()
+                lugar for lugar in arbol_hospedaje.obtener_lugares()
                 if lugar.tipo.strip().lower() == tipo and lugar.departamento.strip().lower() == departamento
             ]
         else:
-            # Solo filtra por tipo (todos los departamentos)
             hospedajes_filtrados = [
-                lugar for lugar in arbol_lugares.obtener_lugares()
+                lugar for lugar in arbol_hospedaje.obtener_lugares()
                 if lugar.tipo.strip().lower() == tipo
             ]
 
         css_path = url_for('static', filename='css/app.css')
         js_path = url_for('static', filename='js/scripts.js')
-        hospedajejs = url_for('static', filename='js/hospedaje.js')
-        detalle = url_for('static', filename='js/detalle_hospedaje.js')
+        jsH = url_for('static', filename='js/hospedaje.js')
+        detalle = url_for('static', filename='js/detalle_hospedaje.js',
+        ocultar = True)
 
         return render_template(
             'hospedajes_filtro.html',
@@ -288,7 +400,7 @@ def hospedajes_filtro():
             departamento=departamento if departamento else "Todos",
             css_path=css_path,
             js_path=js_path,
-            hospedajejs=hospedajejs,
+            jsH=jsH,
             detalle=detalle
         )
     
@@ -326,7 +438,8 @@ def api_recomendaciones_hospedajes():
             "departamento": r.departamento,
             "latitud": getattr(r, "latitud", None),
             "longitud": getattr(r, "longitud", None),
-            "calificacion": getattr(r, "calificacion", "N/A")
+            "calificacion": getattr(r, "calificacion", "N/A"),
+            "precio" :getattr (r, "precio", None)
         })
     
     return {"recomendaciones": lista_recomendaciones}
@@ -353,10 +466,36 @@ def api_lugar():
         "tipo": lugar.tipo,
         "calificacion": getattr(lugar, "calificacion", "N/A"),
         "latitud": getattr(lugar, "latitud", None),
-        "longitud": getattr(lugar, "longitud", None)
+        "longitud": getattr(lugar, "longitud", None),
+        "precio" :getattr(lugar, "precio", None),
+        "tiempo" :getattr(lugar, "tiempo", None)
     }
     return jsonify({"lugar": lugar_dict})
 
+
+#API PARA SOLAMENTE OBTENER UN LUGAR EN ESPECIFICO
+@app.route('/api/hospedaje', methods=['GET'])
+def api_hospedaje():
+    nombre = request.args.get('nombre')
+    if not nombre:
+        return jsonify({"error": "Falta el parámetro 'nombre'"}), 400
+
+    lugar = arbol_hospedaje.buscar_por_nombre(nombre)
+    if not lugar:
+        return jsonify({"error": "Lugar no encontrado"}), 404
+
+    lugar_dict = {
+        "nombre": lugar.nombre,
+        "direccion": lugar.direccion,
+        "municipio": lugar.municipio,
+        "departamento": lugar.departamento,
+        "tipo": lugar.tipo,
+        "calificacion": getattr(lugar, "calificacion", "N/A"),
+        "latitud": getattr(lugar, "latitud", None),
+        "longitud": getattr(lugar, "longitud", None),
+        "precio" : getattr(lugar, "precio", None),
+    }
+    return jsonify({"lugar": lugar_dict})
 
 @app.route('/api/recomendaciones')
 def api_recomendaciones():
@@ -392,7 +531,9 @@ def api_recomendaciones():
             "departamento": r.departamento,
             "latitud": getattr(r, "latitud", None),   
             "longitud": getattr(r, "longitud", None) ,
-            "calificacion": getattr(r, "calificacion", "N/A")
+            "calificacion": getattr(r, "calificacion", "N/A"),
+            "precio": getattr(r, "precio", None),
+            "tiempo" :getattr(lugar, "tiempo", None)
         })
     
     return {"recomendaciones": lista_recomendaciones}
@@ -427,6 +568,7 @@ def obtener_rutas():
 #     <h2>Visualización del Grafo Ponderado</h2>
 #     <img src="{image_path}" alt="Grafo Ponderado">
 #     """)
+
 
 if __name__ == "__main__":
     app.run(debug=True)

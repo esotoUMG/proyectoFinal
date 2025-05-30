@@ -66,31 +66,43 @@ function cargarLugaresDesdeAPI() {
             const crearSeccionCarruselConTitulo = (titulo, lugares, limite = 7, filtroParametros = {}) => {
                 const contenedor = document.createElement('div');
                 contenedor.classList.add('carrusel-contenedor');
-
+            
                 const tituloElem = crearTituloClickeable(titulo, lugares, filtroParametros);
                 contenedor.appendChild(tituloElem);
-
+            
                 const carrusel = document.createElement('div');
                 carrusel.classList.add('carrusel');
-
+            
                 lugares.slice(0, limite).forEach(lugar => {
                     const item = document.createElement('div');
                     item.classList.add('lugar-card');
+            
+                    // Precio con validación
+                    const precioTexto = lugar.precio === 0 ? 'Gratis' : `Desde Q ${lugar.precio}`;
+            
+                    // Crear estrellas para la calificación
+                    const calificacion = lugar.calificacion;
+                    const estrellasHTML = crearEstrellas(calificacion);
+            
                     item.innerHTML = `
                         <h3>${lugar.nombre}</h3>
-                        <p>Dirección: ${lugar.direccion}</p>
-                        <p>Ubicación: ${lugar.municipio} ${lugar.departamento}</p>
-                        <p>Calificación: ${lugar.calificacion}</p>
+                        <p>${lugar.direccion}</p>
+                        <p>${lugar.municipio} ${lugar.departamento}</p>
+                        <p>
+                            <span class="calificacion-valor">${calificacion.toFixed(1)}</span>
+                            <span class="estrellas">${estrellasHTML}</span>
+                        </p>
+                        <p>${precioTexto}</p>
                     `;
-
+            
                     // Agregar listener para redirigir a detalle al click
                     item.addEventListener('click', () => {
                         window.location.href = `/lugares/detalle?nombre=${encodeURIComponent(lugar.nombre)}`;
                     });
-
+            
                     carrusel.appendChild(item);
                 });
-
+            
                 // Solo agregar flechas si hay más de 5 lugares
                 if (lugares.length > 5) {
                     const btnIzq = document.createElement('button');
@@ -100,7 +112,7 @@ function cargarLugaresDesdeAPI() {
                     btnIzq.addEventListener('click', () => {
                         carrusel.scrollBy({ left: -250, behavior: 'smooth' });
                     });
-
+            
                     const btnDer = document.createElement('button');
                     btnDer.classList.add('flecha', 'derecha');
                     btnDer.setAttribute('aria-label', 'Siguiente');
@@ -108,7 +120,7 @@ function cargarLugaresDesdeAPI() {
                     btnDer.addEventListener('click', () => {
                         carrusel.scrollBy({ left: 250, behavior: 'smooth' });
                     });
-
+            
                     contenedor.appendChild(btnIzq);
                     contenedor.appendChild(carrusel);
                     contenedor.appendChild(btnDer);
@@ -116,10 +128,31 @@ function cargarLugaresDesdeAPI() {
                     // Si no hay más de 5, solo se muestra el carrusel sin flechas
                     contenedor.appendChild(carrusel);
                 }
-
+            
                 return contenedor;
             };
-
+            
+            // Función para crear estrellas llenas, medias o vacías según la calificación
+            const crearEstrellas = (calificacion) => {
+                const maxEstrellas = 5;
+                let estrellas = '';
+            
+                for (let i = 1; i <= maxEstrellas; i++) {
+                    if (calificacion >= i) {
+                        // estrella llena
+                        estrellas += '<span class="estrella llena">&#9733;</span>';
+                    } else if (calificacion >= i - 0.5) {
+                        // estrella media
+                        estrellas += '<span class="estrella media">&#9733;</span>';
+                    } else {
+                        // estrella vacía
+                        estrellas += '<span class="estrella vacia">&#9734;</span>';
+                    }
+                }
+            
+                return estrellas;
+            };
+            
             // Función para filtrar y agregar carrusel, recibe filtroFn y filtroParametros para la URL
             const filtrarYLlenarCarrusel = (titulo, filtroFn, filtroParametros = {}) => {
                 const lugaresFiltrados = data.lugares.filter(filtroFn)
