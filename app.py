@@ -180,6 +180,32 @@ def lugares():
         ocultar=False
     )
 
+def render_lugar_detalle(nombre):
+    if not nombre:
+        return "Falta el nombre del lugar", 400
+
+    lugar = arbol_lugares.buscar_por_nombre(nombre)
+    if not lugar:
+        return "Lugar no encontrado", 404
+
+    css_path = url_for('static', filename='css/app.css')
+    js_path = url_for('static', filename='js/scripts.js')
+    mapa = url_for('static', filename='js/mapa.js')
+    lugarjs = url_for('static', filename='js/lugar.js')
+    detalle = url_for('static', filename='js/detalle_lugar.js')
+
+    return render_template(
+        'lugardetalle.html',
+        lugar=lugar,
+        css_path=css_path,
+        js_path=js_path,
+        lugarjs=lugarjs,
+        detalle=detalle,
+        mapa=mapa,
+        ocultar = True
+    )
+
+
 @app.route('/lugares/detalle')#PAGINA PARA MOSTRAR UN LUGAR CON TODOS SUS DETALLES
 def lugar_detalle():
     try:
@@ -226,12 +252,12 @@ def lugares_filtro():
 
         css_path = url_for('static', filename='css/app.css')
         js_path = url_for('static', filename='js/scripts.js')
-        jsH = url_for('static', filename='js/lugares.js')
+        jsH = url_for('static', filename='js/lugar.js')
         detalle = url_for('static', filename='js/detalle_lugar.js')
 
         return render_template(
             'lugares_filtro.html',
-            hospedajes=lugares_filtrados,
+            lugares=lugares_filtrados,
             tipo=tipo,
             departamento=departamento if departamento else "Todos",
             css_path=css_path,
@@ -251,35 +277,6 @@ def cargar_hospedaje():
     cargar = url_for('static', filename='js/cargar.js')
 
     return render_template('cargar_hospedaje.html', css_path=css_path, js_path=js_path, cargar=cargar, ocultar=True)
-
-
-
-def render_lugar_detalle(nombre):
-    if not nombre:
-        return "Falta el nombre del lugar", 400
-
-    lugar = arbol_lugares.buscar_por_nombre(nombre)
-    if not lugar:
-        return "Lugar no encontrado", 404
-
-    css_path = url_for('static', filename='css/app.css')
-    js_path = url_for('static', filename='js/scripts.js')
-    mapa = url_for('static', filename='js/mapa.js')
-    lugarjs = url_for('static', filename='js/lugar.js')
-    detalle = url_for('static', filename='js/detalle_lugar.js')
-
-    return render_template(
-        'lugardetalle.html',
-        lugar=lugar,
-        css_path=css_path,
-        js_path=js_path,
-        lugarjs=lugarjs,
-        detalle=detalle,
-        mapa=mapa,
-        ocultar = True
-    )
-
-
 
 
 #API HOSPEDAJES

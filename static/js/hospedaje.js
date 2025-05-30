@@ -67,7 +67,7 @@ function cargarHospedajesDesdeAPI() {
                 const carrusel = document.createElement('div');
                 carrusel.classList.add('carrusel');
 
-                const hospedajesAMostrar = hospedajesArray.slice(0, 7);
+                const hospedajesAMostrar = hospedajesArray.slice(0, 10);
 
                 hospedajesAMostrar.forEach(hospedaje => {
                     const item = document.createElement('div');

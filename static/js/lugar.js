@@ -63,7 +63,7 @@ function cargarLugaresDesdeAPI() {
             };
 
             // Crear carrusel con flechas
-            const crearSeccionCarruselConTitulo = (titulo, lugares, limite = 7, filtroParametros = {}) => {
+            const crearSeccionCarruselConTitulo = (titulo, lugares, limite = 10, filtroParametros = {}) => {
                 const contenedor = document.createElement('div');
                 contenedor.classList.add('carrusel-contenedor');
             
