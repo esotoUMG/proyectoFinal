@@ -4,24 +4,52 @@ import os
 from backend.modelos.lugar import Lugar
 from backend.modelos.calificacion import Calificacion 
 
+import csv
+import io
+import os
+from backend.modelos.lugar import Lugar
+from backend.modelos.calificacion import Calificacion 
+
+def safe_float(valor, default=0.0):
+    try:
+        return float(valor)
+    except (ValueError, TypeError):
+        return default
+
+def safe_int(valor, default=0):
+    try:
+        return int(valor)
+    except (ValueError, TypeError):
+        return default
+
 # Función para cargar lugares desde archivo CSV
 def cargar_lugares_csv(archivo, arbol_lugares, arbol_hospedaje):
     decoded = archivo.read().decode('utf-8-sig').splitlines()
     reader = csv.DictReader(decoded)
 
     for fila in reader:
+        id_lugar = fila['ï»¿Id'] if 'ï»¿Id' in fila else fila.get('Id')
+        # Si esperas que id sea entero, conviértelo seguro
+        id_lugar = safe_int(id_lugar)
+
+        latitud = safe_float(fila['Latitud'])
+        longitud = safe_float(fila['Longitud'])
+        calificacion = safe_float(fila['Calificación en Google'])
+        precio = safe_float(fila.get('Precio', '0'))
+        tiempo = safe_float(fila.get('Tiempo estadia', '0'))
+
         lugar = Lugar(
-            id=fila['ï»¿Id'] if 'ï»¿Id' in fila else fila.get('Id'),  
+            id=id_lugar,
             departamento=fila['Departamento'],
             municipio=fila['Municipio'],
             nombre=fila['Nombre'],
             tipo=fila['Tipo'],
             direccion=fila['Dirección'],
-            latitud=fila['Latitud'],
-            longitud=fila['Longitud'],
-            calificacion=fila['Calificación en Google'],
-            precio = fila.get ('Precio'),
-            tiempo=fila.get('Tiempo estadia')
+            latitud=latitud,
+            longitud=longitud,
+            calificacion=calificacion,
+            precio=precio,
+            tiempo=tiempo
         )
 
         tipo = lugar.tipo.strip().lower()

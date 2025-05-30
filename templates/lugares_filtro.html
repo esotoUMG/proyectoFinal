@@ -9,7 +9,7 @@
       {% if lugares %}
       <div class="grid-lugares">
         {% for lugar in lugares %}
-        <a href="{{ url_for('lugar_detalle') }}?nombre={{ lugar.nombre }}" class="lugar-link">
+        <a href="{{ url_for('lugar_detalle') }}?nombre={{ lugar.nombre | urlencode }}&presupuesto={{ presupuesto }}" class="lugar-link" style="text-decoration: none; color: black;">
           <div class="lugar-card" data-nombre="{{ lugar.nombre }}">
             <h3>{{ lugar.nombre }}</h3>
             <p>{{ lugar.direccion }}</p>

@@ -987,7 +987,7 @@ footer h2 span {
   transition: background-color 0.3s ease;
 }
 #comentarios-seccion form button:hover {
-  background-color: black;
+  background-color: rgb(25.5, 25.5, 25.5);
 }
 #comentarios-seccion #lista-comentarios {
   display: flex;
@@ -1009,6 +1009,10 @@ footer h2 span {
 #comentarios-seccion #lista-comentarios .comentario-card .estrellas {
   font-size: 1.6rem;
   color: gold;
+}
+
+.recomendaciones {
+  font-family: "DM Sans", sans-serif;
 }
 
 .cargar {

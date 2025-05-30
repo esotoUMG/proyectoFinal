@@ -1,13 +1,16 @@
-from flask import Flask, render_template, url_for, request, jsonify, Response, redirect
-import json, os, csv
+from flask import Flask, render_template, url_for, jsonify, Response, redirect, request
+import json, os, csv, requests, re, asyncio, aiohttp, math
 from backend.arbolB import BTree
 from backend.carga_csv import cargar_lugares_csv, cargar_calificaciones_csv, guardar_lugar_en_csv, guardar_calificacion_en_csv
 from backend.modelos.utilidadesGrafo import UtilidadesGrafo
-from backend.modelos.GrafoPonderado import GrafoPonderado  # Importar clase GrafoPonderado para el manejo de rutas
+from backend.modelos.GrafoPonderado import generar_grafo_ponderado  # Importar clase GrafoPonderado para el manejo de rutas
 from backend.modelos.lugar import Lugar
 
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True  # Recarga automática de plantillas
+API_KEY = os.getenv("AIzaSyBPe0eVEKRRzjfZod6BLf7TQxRNxz51xTc")
+cache_tiempos_traslado = {}
+
 
 #Diccionario para crear arboles segun el tipo de actividad
 arbol_lugares = BTree(grado=5)     # Para turismo, comida, entretenimiento
@@ -203,50 +206,228 @@ def api_hospedaje():
     }
     return jsonify({"lugar": lugar_dict})
 
-#API mostrar recomendaciones
+#API RECOMENDACIONES LUGARES
+
+def extraer_precio(valor):
+    if isinstance(valor, (int, float)):
+        return float(valor)
+    if not isinstance(valor, str):
+        return 0.0
+    valor = valor.strip().lower()
+    if "gratis" in valor:
+        return 0.0
+    numeros = re.findall(r'\d+\.?\d*', valor)
+    return float(numeros[0]) if numeros else 0.0
+
+def haversine(lat1, lon1, lat2, lon2):
+    R = 6371.0  # km
+    lat1_rad = math.radians(lat1)
+    lon1_rad = math.radians(lon1)
+    lat2_rad = math.radians(lat2)
+    lon2_rad = math.radians(lon2)
+
+    dlat = lat2_rad - lat1_rad
+    dlon = lon2_rad - lon1_rad
+
+    a = math.sin(dlat/2)**2 + math.cos(lat1_rad)*math.cos(lat2_rad)*math.sin(dlon/2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+    distancia = R * c
+    return distancia
+
+def estimar_tiempo_traslado_simple(origen, destino, velocidad_kmh=40):
+    try:
+        lat1 = float(getattr(origen, "latitud"))
+        lon1 = float(getattr(origen, "longitud"))
+        lat2 = float(getattr(destino, "latitud"))
+        lon2 = float(getattr(destino, "longitud"))
+    except (TypeError, ValueError, AttributeError):
+        return 0.0
+
+    distancia_km = haversine(lat1, lon1, lat2, lon2)
+    tiempo_horas = distancia_km / velocidad_kmh
+    return max(tiempo_horas, 0.0)
+
+async def estimar_tiempo_traslado_async(session, origen, destino):
+    try:
+        lat1 = float(getattr(origen, "latitud", None))
+        lon1 = float(getattr(origen, "longitud", None))
+        lat2 = float(getattr(destino, "latitud", None))
+        lon2 = float(getattr(destino, "longitud", None))
+    except (TypeError, ValueError):
+        return 0.0
+
+    if None in (lat1, lon1, lat2, lon2):
+        return 0.0
+
+    key_cache = (lat1, lon1, lat2, lon2)
+    if key_cache in cache_tiempos_traslado:
+        return cache_tiempos_traslado[key_cache]
+
+    url = "https://maps.googleapis.com/maps/api/distancematrix/json"
+    params = {
+        "origins": f"{lat1},{lon1}",
+        "destinations": f"{lat2},{lon2}",
+        "key": API_KEY,
+        "units": "metric"
+    }
+
+    try:
+        async with session.get(url, params=params, timeout=10) as resp:
+            data = await resp.json()
+            if data.get('status') == 'OK':
+                elemento = data['rows'][0]['elements'][0]
+                if elemento.get('status') == 'OK':
+                    duracion_s = elemento['duration']['value']
+                    horas = duracion_s / 3600
+                    cache_tiempos_traslado[key_cache] = horas
+                    return max(horas, 0.0)
+    except Exception as e:
+        print(f"Error Google Maps API: {e}")
+    return 0.0
+
+def calcular_puntaje(lugar, precio, tiempo_total):
+    calificacion = float(getattr(lugar, 'calificacion', 0) or 0)
+    max_precio = 100
+    max_tiempo = 8
+    precio_norm = max(0, min(1, 1 - precio / max_precio))  
+    tiempo_norm = max(0, min(1, 1 - tiempo_total / max_tiempo))  
+    calif_norm = max(0, min(1, calificacion / 5))
+
+    peso_calif = 0.5
+    peso_precio = 0.25
+    peso_tiempo = 0.25
+
+    puntaje = calif_norm * peso_calif + precio_norm * peso_precio + tiempo_norm * peso_tiempo
+    return puntaje
+
+def formatear_tiempo(tiempo_horas):
+    if tiempo_horas < 1:
+        minutos = tiempo_horas * 60
+        return f"{minutos:.1f} mins"
+    else:
+        return f"{tiempo_horas:.2f} hrs"
+
 @app.route('/api/recomendaciones')
 def api_recomendaciones():
     nombre = request.args.get('nombre')
     if not nombre:
-        return {"error": "Falta el parámetro 'nombre'"}, 400
+        return jsonify({"error": "Falta el parámetro 'nombre'"}), 400
     
     lugar = arbol_lugares.buscar_por_nombre(nombre)
     if not lugar:
-        return {"error": "Lugar no encontrado"}, 404
-    
+        return jsonify({"error": "Lugar no encontrado"}), 404
+
+    try:
+        presupuesto = float(request.args.get('presupuesto', 1e10))
+    except ValueError:
+        presupuesto = 1e10
+
+    try:
+        tiempo_max_diario = float(request.args.get('tiempo_max_diario', 8))
+    except ValueError:
+        tiempo_max_diario = 8
+
     departamento = lugar.departamento.strip().lower()
-    
-    # Obtener lugares en el mismo departamento, excepto el actual
+
     recomendaciones = [
         l for l in arbol_lugares.obtener_lugares()
-        if l.departamento.strip().lower() == departamento and l.nombre != lugar.nombre
+        if (
+            l.departamento.strip().lower() == departamento and 
+            l.nombre != lugar.nombre and 
+            getattr(l, "latitud", None) is not None and
+            getattr(l, "longitud", None) is not None
+        )
     ]
-    
-    # Opcional: ordenar recomendaciones por calificación descendente (si tienes atributo calificacion numérica)
-    recomendaciones.sort(key=lambda x: getattr(x, 'calificacion', 0), reverse=True)
-    
-    # Tomar máximo 5 recomendaciones
-    recomendaciones = recomendaciones[:5]
-    
-    # Formatear para JSON: devolver solo los campos que usas en JS
+
+    usar_api_google = False  # Cambia a True para usar API Google Distance Matrix
+
+    async def filtrar_y_calcular():
+        if usar_api_google:
+            async with aiohttp.ClientSession() as session:
+                resultados = []
+                for l in recomendaciones:
+                    precio = extraer_precio(getattr(l, "precio", 0))
+                    try:
+                        tiempo_estadia = float(getattr(l, "tiempo", 0))
+                    except (ValueError, TypeError):
+                        tiempo_estadia = 0
+                    
+                    tiempo_traslado = await estimar_tiempo_traslado_async(session, lugar, l) or 0.0
+                    tiempo_total = tiempo_estadia + tiempo_traslado
+
+                    if precio <= presupuesto and tiempo_total <= tiempo_max_diario:
+                        puntaje = calcular_puntaje(l, precio, tiempo_total)
+                        resultados.append((l, precio, tiempo_estadia, tiempo_traslado, puntaje))
+
+                resultados.sort(key=lambda x: x[4], reverse=True)
+                return resultados[:5]
+        else:
+            resultados = []
+            for l in recomendaciones:
+                precio = extraer_precio(getattr(l, "precio", 0))
+                try:
+                    tiempo_estadia = float(getattr(l, "tiempo", 0))
+                except (ValueError, TypeError):
+                    tiempo_estadia = 0
+                
+                tiempo_traslado = estimar_tiempo_traslado_simple(lugar, l) or 0.0
+                tiempo_total = tiempo_estadia + tiempo_traslado
+
+                if precio <= presupuesto and tiempo_total <= tiempo_max_diario:
+                    puntaje = calcular_puntaje(l, precio, tiempo_total)
+                    resultados.append((l, precio, tiempo_estadia, tiempo_traslado, puntaje))
+
+            resultados.sort(key=lambda x: x[4], reverse=True)
+            return resultados[:5]
+
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    resultados_filtrados = loop.run_until_complete(filtrar_y_calcular())
+    loop.close()
+
     lista_recomendaciones = []
-    for r in recomendaciones:
+    for r, precio, t_estadia, t_traslado, puntaje in resultados_filtrados:
         lista_recomendaciones.append({
             "nombre": r.nombre,
             "direccion": r.direccion,
             "municipio": r.municipio,
             "departamento": r.departamento,
-            "latitud": getattr(r, "latitud", None),   
-            "longitud": getattr(r, "longitud", None) ,
-            "calificacion": getattr(r, "calificacion", "N/A"),
-            "precio": getattr(r, "precio", None),
-            "tiempo" :getattr(lugar, "tiempo", None)
+            "latitud": float(getattr(r, "latitud", 0) or 0),
+            "longitud": float(getattr(r, "longitud", 0) or 0),
+            "calificacion": float(getattr(r, "calificacion", 0) or 0),
+            "precio": precio,
+            "tiempo_estadia": t_estadia,
+            "tiempo_traslado": t_traslado,
+            "tiempo_traslado_str": formatear_tiempo(t_traslado),
+            "puntaje": puntaje
         })
     
-    return {"recomendaciones": lista_recomendaciones}
+    return jsonify({"recomendaciones": lista_recomendaciones})
 
+@app.route('/api/generar_grafo', methods=['POST'])
+def api_generar_grafo():
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'No se recibió data JSON'}), 400
 
+    nodos = data.get('nodos')
+    aristas = data.get('aristas')
+    id_grafo = data.get('id')
 
+    if nodos is None or aristas is None or id_grafo is None:
+        return jsonify({'error': 'Faltan campos nodos, aristas o id'}), 400
+
+    if not isinstance(nodos, list) or not isinstance(aristas, list):
+        return jsonify({'error': 'Los campos nodos y aristas deben ser listas'}), 400
+
+    try:
+        ruta = generar_grafo_ponderado(nodos, aristas, id_grafo)
+        return jsonify({'exito': True, 'mensaje': 'Grafo generado', 'rutaArchivo': ruta})
+    except Exception as e:
+        # Aquí podrías agregar logging.error(f"Error al generar grafo: {e}")
+        return jsonify({'exito': False, 'error': f'Error interno: {str(e)}'}), 500
+    
 #PAGINAS WEB
 @app.route('/') #PAGINA PRINCIPAL
 def home():
@@ -322,6 +503,7 @@ def render_lugar_detalle(nombre):
 def lugar_detalle():
     try:
         nombre = request.args.get('nombre')
+        presupuesto = request.args.get('presupuesto')
         return render_lugar_detalle(nombre)
     except Exception as e:
         return f"Error interno del servidor: {e}", 500
@@ -331,7 +513,8 @@ def lugar_detalle():
 def lugar_detalle_filtro():
     try:
         nombre = request.args.get('nombre')
-        return render_lugar_detalle(nombre)
+        presupuesto = request.args.get('presupuesto')
+        return render_lugar_detalle(nombre, presupuesto)
     except Exception as e:
         return f"Error interno del servidor: {e}", 500
 
@@ -446,53 +629,54 @@ def hospedaje_detalle_filtro():
 @app.route('/hospedajes/filtro')
 def hospedajes_filtro():
     try:
-        tipo = request.args.get('tipo')
-        departamento = request.args.get('departamento')
+        busqueda = request.args.get('busqueda', '').strip().lower()
+        presupuesto_str = request.args.get('presupuesto', '').strip()
 
-        if not tipo or tipo.strip() == "":
-            return redirect(url_for('hospedajes_filtro', tipo='hotel'))
+        presupuesto = None
+        if presupuesto_str != '':
+            try:
+                presupuesto = float(presupuesto_str)
+            except ValueError:
+                presupuesto = None  # Puedes manejar el error más adelante si quieres
 
-        tipo = tipo.strip().lower()
-        departamento = departamento.strip().lower() if departamento else None
+        hospedajes = arbol_hospedaje.obtener_lugares()
 
-        tipos_validos = ['hotel', 'hostal', 'apartamento']  # ejemplo, ajusta según tus tipos
-
-        if tipo not in tipos_validos:
-            return redirect(url_for('hospedajes_filtro', tipo='hotel'))
-
-        if departamento == 'todo':
-            departamento = None
-
-        if departamento:
-            hospedajes_filtrados = [
-                lugar for lugar in arbol_hospedaje.obtener_lugares()
-                if lugar.tipo.strip().lower() == tipo and lugar.departamento.strip().lower() == departamento
+        if busqueda:
+            hospedajes = [
+                h for h in hospedajes
+                if busqueda in h.departamento.strip().lower()
+                or busqueda in h.nombre.strip().lower()
+                or busqueda in h.municipio.strip().lower()
+                or busqueda in h.tipo.strip().lower()
             ]
-        else:
-            hospedajes_filtrados = [
-                lugar for lugar in arbol_hospedaje.obtener_lugares()
-                if lugar.tipo.strip().lower() == tipo
+
+        if presupuesto is not None:
+            hospedajes = [
+                h for h in hospedajes
+                if h.precio <= presupuesto
             ]
 
         css_path = url_for('static', filename='css/app.css')
         js_path = url_for('static', filename='js/scripts.js')
         jsH = url_for('static', filename='js/hospedaje.js')
-        detalle = url_for('static', filename='js/detalle_hospedaje.js',
-        ocultar = False)
+        detalle = url_for('static', filename='js/detalle_hospedaje.js')
+        ocultar = False
 
         return render_template(
             'hospedajes_filtro.html',
-            hospedajes=hospedajes_filtrados,
-            tipo=tipo,
-            departamento=departamento if departamento else "Todos",
+            hospedajes=hospedajes,
+            busqueda=busqueda,
+            presupuesto=presupuesto,
             css_path=css_path,
             js_path=js_path,
             jsH=jsH,
-            detalle=detalle
+            detalle=detalle,
+            ocultar=ocultar
         )
-    
+
     except Exception as e:
         return f"Error interno del servidor: {e}", 500
+
 
 
 # API PARA RECOMENDACIONES DE HOSPEDAJES

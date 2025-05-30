@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Hospedaje filtrados - Travel Map{% endblock %}
+{% block title %}Hospedajes filtrados - Travel Map{% endblock %}
 
 {% block contenido %}
   <section class="contenido">
@@ -9,13 +9,33 @@
       {% if hospedajes %}
       <div class="grid-lugares">
         {% for lugar in hospedajes %}
+        <a href="{{ url_for('hospedaje_detalle') }}?nombre={{ lugar.nombre }}" class="lugar-link" style="text-decoration: none; color: black;">
           <div class="lugar-card" data-nombre="{{ lugar.nombre }}">
             <h3>{{ lugar.nombre }}</h3>
             <p>{{ lugar.direccion }}</p>
             <p>{{ lugar.municipio }} {{ lugar.departamento }}</p>
-            <p>{{ lugar.calificacion }}</p>
-            <p>Desde Q {{ lugar.precio }}</p>
+            <p>
+              Calificación: 
+              {% for i in range(1, 6) %}
+                {% if lugar.calificacion >= i %}
+                  <i class="fa-solid fa-star" style="color: gold;"></i>
+                {% elif lugar.calificacion >= i - 0.5 %}
+                  <i class="fa-solid fa-star-half-stroke" style="color: gold;"></i>
+                {% else %}
+                  <i class="fa-regular fa-star" style="color: gold;"></i>
+                {% endif %}
+              {% endfor %}
+            </p>
+            <p>
+              Precio:
+              {% if lugar.precio == 0 %}
+                Gratis
+              {% else %}
+                Desde Q {{ lugar.precio }}
+              {% endif %}
+            </p>
           </div>
+        </a>        
         {% endfor %}
       </div>
       {% else %}
@@ -26,8 +46,7 @@
 {% endblock %}
 
 {% block scripts %}
+  <script src="{{ jsH }}"></script>
   <script src="{{ js_path }}"></script>
   <script src="{{ detalle }}"></script>
-
 {% endblock %}
-

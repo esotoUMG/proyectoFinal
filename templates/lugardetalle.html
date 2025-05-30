@@ -40,6 +40,7 @@
         <!-- Comentarios aquí -->
       </div>
     </div>
+    <div id="mensaje-grafo" style="display:none; padding:10px; margin:10px 0; border-radius:5px;"></div>
   </div>
 
   <!-- Lado Derecho: Mapa -->
@@ -49,11 +50,12 @@
 
 {% block scripts %}
   {{ super() }}
-  <!-- Leaflet JS -->
     <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBPe0eVEKRRzjfZod6BLf7TQxRNxz51xTc&callback=initMap&libraries=places&loading=async"
-        async
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBPe0eVEKRRzjfZod6BLf7TQxRNxz51xTc&callback=initMap&libraries=places"
+      async
+      defer
     ></script>
+
 
   <!-- Scripts personalizados -->
     <script src="{{ detalle }}"></script>

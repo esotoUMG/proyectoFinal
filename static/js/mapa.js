@@ -9,69 +9,52 @@ function initMap() {
 
   const mapa = new google.maps.Map(contenedorMapa, {
     center: defaultCoords,
-    zoom: 13
+    zoom: 9
   });
 
   let lugarPrincipalCoords = null;
+  let infoWindowPrincipal = null;  // Guardar el infowindow principal
   let directionsService = new google.maps.DirectionsService();
-  let directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true });
+  let directionsRenderer = new google.maps.DirectionsRenderer({
+    suppressMarkers: true
+  });
   directionsRenderer.setMap(mapa);
 
   let currentInfoWindow = null;
 
-  function createInfoWindowSinCerrar(content) {
-    const infowindow = new google.maps.InfoWindow({
-      content,
-    });
-    return infowindow;
-  }
+  // Marcadores recomendados (nombre -> marcador e infowindow)
+  const marcadoresRecomendados = new Map();
 
-  function addMarker(coords, titulo, onClick, mostrarInfoInmediata = false, esLugarPrincipal = false) {
+  function addMarker(coords, titulo, esLugarPrincipal = false) {
     const marker = new google.maps.Marker({
       position: coords,
       map: mapa,
       title: titulo
     });
 
-    const contentString = `<div><b>${titulo}</b></div>`;
+    const infowindow = new google.maps.InfoWindow({
+      content: `<div><b>${titulo}</b></div>`
+    });
 
-    let infowindow;
     if (esLugarPrincipal) {
-      infowindow = createInfoWindowSinCerrar(contentString);
-    } else {
-      infowindow = new google.maps.InfoWindow({
-        content: contentString
-      });
+      infowindow.open(mapa, marker);
+      currentInfoWindow = infowindow;
+      infoWindowPrincipal = infowindow; // Guardamos la infoWindow principal
     }
 
     marker.addListener("click", () => {
-      if (esLugarPrincipal) {
-        if (!infowindow.getMap()) {
-          infowindow.open(mapa, marker);
-        }
-        return;
+      // Solo cerramos currentInfoWindow si no es el infowindow principal
+      if (currentInfoWindow && currentInfoWindow !== infoWindowPrincipal) {
+        currentInfoWindow.close();
       }
-
-      if (currentInfoWindow === infowindow) {
-        infowindow.close();
-        currentInfoWindow = null;
-      } else {
-        if (currentInfoWindow) currentInfoWindow.close();
-        infowindow.open(mapa, marker);
-        currentInfoWindow = infowindow;
-        if (onClick) onClick(coords);
-      }
-    });
-
-    if (mostrarInfoInmediata && esLugarPrincipal) {
       infowindow.open(mapa, marker);
       currentInfoWindow = infowindow;
-    }
+    });
 
-    return marker;
+    return { marker, infowindow };
   }
 
-  function trazarRuta(destinoCoords) {
+  function trazarRuta(destinoCoords, destinoMarker, destinoInfoWindow) {
     if (!lugarPrincipalCoords) return;
 
     const request = {
@@ -83,15 +66,28 @@ function initMap() {
     directionsService.route(request, (result, status) => {
       if (status === 'OK') {
         directionsRenderer.setDirections(result);
+
+        // Cerramos la infoWindow actual solo si no es la principal
+        if (currentInfoWindow && currentInfoWindow !== infoWindowPrincipal) {
+          currentInfoWindow.close();
+        }
+
+        // Abrimos la infoWindow del destino
+        destinoInfoWindow.open(mapa, destinoMarker);
+        currentInfoWindow = destinoInfoWindow;
+
+        // Reabrir siempre la infoWindow principal para que nunca desaparezca
+        if (infoWindowPrincipal) {
+          infoWindowPrincipal.open(mapa);
+        }
+
       } else {
         console.error('Error al trazar ruta:', status);
       }
     });
   }
 
-  // Ya no solicitamos ni marcamos la ubicación del usuario aquí
-
-  // Lugar principal
+  // Cargar lugar principal
   fetch(`/api/lugar?nombre=${encodeURIComponent(nombreLugar)}`)
     .then(res => res.json())
     .then(data => {
@@ -103,75 +99,48 @@ function initMap() {
           mapa.setCenter(lugarPrincipalCoords);
           mapa.setZoom(15);
 
-          addMarker(
-            lugarPrincipalCoords,
-            data.lugar.nombre,
-            null,
-            true,
-            true
-          ).setAnimation(google.maps.Animation.DROP);
+          const { marker, infowindow } = addMarker(lugarPrincipalCoords, data.lugar.nombre, true);
+          // Guardar o exponer el lugar principal si necesitas
         }
       }
     });
 
-  // Recomendaciones lugar
-  fetch(`/api/recomendaciones?nombre=${encodeURIComponent(nombreLugar)}`)
-    .then(res => res.json())
-    .then(data => {
-      if (data.recomendaciones) {
-        data.recomendaciones.forEach(lugar => {
-          const lat = parseFloat(lugar.latitud);
-          const lng = parseFloat(lugar.longitud);
-          if (!isNaN(lat) && !isNaN(lng)) {
-            addMarker(
-              { lat, lng },
-              lugar.nombre,
-              (coords) => trazarRuta(coords)
-            );
-          }
-        });
-      }
-    });
-
-  // Hospedaje principal
-  fetch(`/api/hospedaje?nombre=${encodeURIComponent(nombreLugar)}`)
-    .then(res => res.json())
-    .then(data => {
-      if (data.lugar) {
-        const lat = parseFloat(data.lugar.latitud);
-        const lng = parseFloat(data.lugar.longitud);
+  // Cargar recomendaciones y crear marcadores, sin trazar rutas aún
+  Promise.all([
+    fetch(`/api/recomendaciones?nombre=${encodeURIComponent(nombreLugar)}`).then(res => res.json()),
+    fetch(`/api/recomendaciones_hospedajes?nombre=${encodeURIComponent(nombreLugar)}`).then(res => res.json())
+  ]).then(([recomendacionesLugares, recomendacionesHospedajes]) => {
+    if (recomendacionesLugares.recomendaciones) {
+      recomendacionesLugares.recomendaciones.forEach(lugar => {
+        const lat = parseFloat(lugar.latitud);
+        const lng = parseFloat(lugar.longitud);
         if (!isNaN(lat) && !isNaN(lng)) {
-          const hospedajePrincipalCoords = { lat, lng };
-          mapa.setCenter(hospedajePrincipalCoords);
-          mapa.setZoom(15);
-
-          addMarker(
-            hospedajePrincipalCoords,
-            data.lugar.nombre,
-            null,
-            true,
-            true
-          ).setAnimation(google.maps.Animation.DROP);
+          const coords = { lat, lng };
+          const { marker, infowindow } = addMarker(coords, lugar.nombre);
+          marcadoresRecomendados.set(lugar.nombre, { coords, marker, infowindow });
         }
-      }
-    });
+      });
+    }
+    if (recomendacionesHospedajes.recomendaciones) {
+      recomendacionesHospedajes.recomendaciones.forEach(hospedaje => {
+        const lat = parseFloat(hospedaje.latitud);
+        const lng = parseFloat(hospedaje.longitud);
+        if (!isNaN(lat) && !isNaN(lng)) {
+          const coords = { lat, lng };
+          const { marker, infowindow } = addMarker(coords, hospedaje.nombre);
+          marcadoresRecomendados.set(hospedaje.nombre, { coords, marker, infowindow });
+        }
+      });
+    }
+  });
 
-  // Recomendaciones hospedajes
-  fetch(`/api/recomendaciones_hospedajes?nombre=${encodeURIComponent(nombreLugar)}`)
-    .then(res => res.json())
-    .then(data => {
-      if (data.recomendaciones) {
-        data.recomendaciones.forEach(hospedaje => {
-          const lat = parseFloat(hospedaje.latitud);
-          const lng = parseFloat(hospedaje.longitud);
-          if (!isNaN(lat) && !isNaN(lng)) {
-            addMarker(
-              { lat, lng },
-              hospedaje.nombre,
-              (coords) => trazarRuta(coords)
-            );
-          }
-        });
-      }
-    });
+  // Función que el frontend (tarjetas) debe llamar para trazar ruta y mostrar infowindow
+  window.seleccionarLugarRecomendado = function(nombreLugarSeleccionado) {
+    const destino = marcadoresRecomendados.get(nombreLugarSeleccionado);
+    if (destino && lugarPrincipalCoords) {
+      trazarRuta(destino.coords, destino.marker, destino.infowindow);
+    } else {
+      console.warn('Lugar seleccionado no encontrado o lugar principal no cargado');
+    }
+  };
 }

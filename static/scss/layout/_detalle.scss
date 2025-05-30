@@ -1,4 +1,6 @@
 @use 'base/variables' as v;
+@use "sass:color";
+
 
 .contenido-detalle{
     display: grid;
@@ -142,7 +144,7 @@
       transition: background-color 0.3s ease;
 
       &:hover {
-        background-color: darken(v.$negro, 10%);
+        background-color: color.adjust(v.$negro, $lightness: 10%);
       }
     }
   }
@@ -171,4 +173,7 @@
       }
     }
   }
+}
+.recomendaciones{
+  font-family: v.$contenido2;
 }

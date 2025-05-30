@@ -1,64 +1,89 @@
-import heapq
-import graphviz
 from graphviz import Digraph
-# Grafo ponderado utilizando el algoritmo de Dijkstra
-class GrafoPonderado:
-    def __init__(self):
-        self.grafo = {}
-    def agregar_vertice(self, vertice):
-        if vertice not in self.grafo:
-            self.grafo[vertice] = []
-    def agregar_arista(self, vertice1, vertice2, peso):
-        self.grafo[vertice1].append((vertice2, peso))
-        self.grafo[vertice2].append((vertice1, peso)) # Grafo no dirigido
-    def dijkstra(self, inicio):
-        # Inicialización de distancias y cola de prioridad
-        distancias = {vertice: float('infinity') for vertice in self.grafo}
-        distancias[inicio] = 0
-        cola_prioridad = [(0, inicio)]  # (distancia, vertice)
-        while cola_prioridad:
-            distancia_actual, vertice_actual = heapq.heappop(cola_prioridad)
-            # Si la distancia actual es mayor que la registrada, se ignora
-            if distancia_actual > distancias[vertice_actual]:
-                continue
-            # Recorre los vecinos del vértice actual
-            for vecino, peso in self.grafo[vertice_actual]:
-                distancia = distancia_actual + peso
-                if distancia < distancias[vecino]:
-                    distancias[vecino] = distancia
-                    heapq.heappush(cola_prioridad, (distancia, vecino))
-        return distancias
-    
-    def graficar_grafo(self):
-        dot = Digraph(comment="Grafo de lugares turísticos")
+import os
+import math
 
-        # Agregar nodos
-        for vertice in self.grafo:
-            dot.node(vertice, vertice)  # Puedes cambiar el label si tienes nombres
+def generar_grafo_ponderado(nodos, aristas, id_grafo):
+    grafo = Digraph(comment='Grafo ponderado', engine='neato')
 
-        # Agregar aristas (evitando duplicados)
-        aristas_agregadas = set()
-        for vertice, vecinos in self.grafo.items():
-            for vecino, peso in vecinos:
-                # Evitar duplicar aristas en grafo no dirigido
-                arista = tuple(sorted((vertice, vecino)))
-                if arista not in aristas_agregadas:
-                    dot.edge(vertice, vecino, label=f"{peso:.2f} min")
-                    aristas_agregadas.add(arista)
+    if not nodos:
+        raise ValueError("Lista de nodos vacía")
 
-        # Guardar como archivo PNG
-        output_path = "static/grafo_ponderado"
-        dot.render(output_path, format="png", cleanup=True)
-        return f"/{output_path}.png"
-    
-def calcular_peso_total(lugar1, lugar2, tiempo_traslado):
-    # Peso calificación: menor si la calificación es más alta
-    peso_calificacion = 5 - ((lugar1.calificacion + lugar2.calificacion) / 2)
+    nodo_principal = nodos[0]
+    recomendaciones = nodos[1:]
 
-    # Peso total (ajusta los coeficientes según prioridad)
-    return (
-        (lugar1.precio + lugar2.precio) * 1.0 +
-        (lugar1.tiempo_estadia + lugar2.tiempo_estadia) * 1.5 +
-        tiempo_traslado * 2.0 +
-        peso_calificacion * 3.0
-    )
+    # Nodo principal en el centro
+    centro_x, centro_y = 50, 50
+    grafo.node(nodo_principal, shape='doublecircle', style='filled', fillcolor='lightblue', pos=f'{centro_x},{centro_y}!')
+
+    # Obtener pesos entre nodo_principal y recomendaciones
+    pesos = []
+    for nodo in recomendaciones:
+        peso_raw = next((a['peso'] for a in aristas if a['origen'] == nodo_principal and a['destino'] == nodo), 1)
+        try:
+            peso = float(str(peso_raw).split()[0])
+        except:
+            peso = 1
+        pesos.append(peso)
+
+    peso_min = min(pesos) if pesos else 1
+    peso_max = max(pesos) if pesos else 1
+
+    # Distancia radial: menor peso = más cerca del centro
+    def escalar_distancia(peso):
+        min_dist, max_dist = 5, 15
+        if peso_max == peso_min:
+            return (min_dist + max_dist) / 2
+        return min_dist + ((peso - peso_min) * (max_dist - min_dist) / (peso_max - peso_min))
+
+
+    # Nodo con menor peso
+    nodo_destacado = recomendaciones[pesos.index(peso_min)] if recomendaciones else None
+
+    # Posicionar nodos en círculo
+    n = len(recomendaciones)
+    for i, nodo in enumerate(recomendaciones):
+        peso = pesos[i]
+        distancia = escalar_distancia(peso)
+        angulo = 2 * math.pi * i / n
+
+        x = centro_x + distancia * math.cos(angulo)
+        y = centro_y + distancia * math.sin(angulo)
+
+        color = 'lightgreen' if nodo == nodo_destacado else 'white'
+        grafo.node(nodo, shape='circle', style='filled', fillcolor=color, pos=f'{x:.2f},{y:.2f}!')
+
+    # Aristas
+    pesos_aristas = []
+    for a in aristas:
+        try:
+            val = float(str(a.get('peso', '1')).split()[0])
+        except:
+            val = 1
+        pesos_aristas.append(val)
+
+    peso_min_arista = min(pesos_aristas) if pesos_aristas else 1
+    peso_max_arista = max(pesos_aristas) if pesos_aristas else 1
+
+    def escalar_penwidth(peso):
+        if peso_max_arista == peso_min_arista:
+            return 3
+        return 1 + 4 * (peso - peso_min_arista) / (peso_max_arista - peso_min_arista)
+
+    for arista in aristas:
+        origen = arista['origen']
+        destino = arista['destino']
+        peso_raw = arista.get('peso', 1)
+        try:
+            peso = float(str(peso_raw).split()[0])
+        except:
+            peso = 1
+        penwidth = escalar_penwidth(peso)
+        grafo.edge(origen, destino, label=str(peso_raw), penwidth=str(penwidth))
+
+    escritorio = os.path.join(os.path.expanduser('~'), 'Desktop')
+    nombre_archivo = f'grafoponderado{id_grafo}'
+    ruta_archivo = os.path.join(escritorio, nombre_archivo)
+
+    grafo.render(ruta_archivo, format='png', cleanup=True)
+
+    return ruta_archivo + '.png'
