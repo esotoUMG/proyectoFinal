@@ -252,7 +252,7 @@ def lugares_filtro():
 
         css_path = url_for('static', filename='css/app.css')
         js_path = url_for('static', filename='js/scripts.js')
-        jsH = url_for('static', filename='js/lugar.js')
+        lugarjs = url_for('static', filename='js/lugar.js')
         detalle = url_for('static', filename='js/detalle_lugar.js')
 
         return render_template(
@@ -262,9 +262,8 @@ def lugares_filtro():
             departamento=departamento if departamento else "Todos",
             css_path=css_path,
             js_path=js_path,
-            jsH=jsH,
+            lugarjs=lugarjs,
             detalle=detalle,
-            ocultar = True
         )
 
     except Exception as e:
