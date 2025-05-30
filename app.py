@@ -715,6 +715,13 @@ def api_recomendaciones_hospedajes():
     
     return {"recomendaciones": lista_recomendaciones}
 
+@app.route('/detalle/<int:idx>')
+def detalle(idx):
+    return render_template(
+        'detalle.html',
+        detalle=url_for('static', filename='js/detalle.js'),
+        mapa=url_for('static', filename='js/mapa.js')
+    )
 
 # @app.route('/api/cargar-calificaciones', methods=['POST'])
 # def cargar_calificaciones():
