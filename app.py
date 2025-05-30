@@ -30,7 +30,22 @@ except Exception as e:
     print(f"Error al cargar datos: {e}")
 
 
-#API LUGARES
+#FUNCION PARA SEGUIR LOS ID'S DEL ARCHIVO DATOS.CSV
+def obtener_siguiente_id(path='data/datos.csv'):
+    id_max = 0
+    if os.path.exists(path):
+        with open(path, newline='') as archivo:
+            reader = csv.reader(archivo)
+            for fila in reader:
+                try:
+                    id_actual = int(fila[0])
+                    id_max = max(id_max, id_actual)
+                except:
+                    continue
+    return id_max + 1
+
+#API's PARA LUGARES
+#API para cargar los lugares desde el CSV
 @app.route('/api/lugares', methods=['GET'])
 def obtener_lugares():
     try:
@@ -56,50 +71,7 @@ def obtener_lugares():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
-#PAGINAS WEB
-@app.route('/') #PAGINA PRINCIPAL
-def home():
-    css_path = url_for('static', filename='css/app.css')
-    js_path = url_for('static', filename='js/scripts.js')
-    return render_template('index.html', css_path=css_path, js_path=js_path, ocultar=False)
-
-@app.route('/cargar')#PAGINA PARA AGREGAR REGISTROS A CSV
-def cargar():
-    css_path = url_for('static', filename='css/app.css')
-    js_path = url_for('static', filename='js/scripts.js')
-    cargar = url_for('static', filename='js/cargar.js')
-
-    tipo = request.args.get('tipo')
-    if tipo == 'hospedaje':
-        return redirect(url_for('cargar_hospedaje'))
-    elif tipo == 'lugar':
-        return redirect(url_for('cargar_lugar'))
-    else:
-        return render_template('cargar.html', css_path=css_path, js_path=js_path, cargar=cargar, ocultar=True)
-
-@app.route('/cargar/lugar')
-def cargar_lugar():
-    css_path = url_for('static', filename='css/app.css')
-    js_path = url_for('static', filename='js/scripts.js')
-    cargar = url_for('static', filename='js/cargar.js')
-
-    return render_template('cargar_lugar.html', css_path=css_path, js_path=js_path, cargar=cargar, ocultar=True)
-
-
-def obtener_siguiente_id(path='data/datos.csv'):
-    id_max = 0
-    if os.path.exists(path):
-        with open(path, newline='') as archivo:
-            reader = csv.reader(archivo)
-            for fila in reader:
-                try:
-                    id_actual = int(fila[0])
-                    id_max = max(id_max, id_actual)
-                except:
-                    continue
-    return id_max + 1
-
+#API para registrar lugar en el archivo CSV
 @app.route('/api/registrar-lugar', methods=['POST'])
 def registrar_lugar():
     datos = request.get_json()
@@ -130,6 +102,8 @@ def registrar_lugar():
 
     return jsonify({'mensaje': 'Lugar registrado con éxito', 'id': nuevo_lugar.id}), 201
 
+
+#API's PARA HOSPEDAJES
 @app.route('/api/registrar-hospedaje', methods=['POST'])
 def registrar_hospedaje():
     datos = request.get_json()
@@ -160,14 +134,34 @@ def registrar_hospedaje():
 
     return jsonify({'mensaje': 'Lugar registrado con éxito', 'id': nuevo_lugar.id}), 201
 
-@app.route('/cargar/hospedaje')
-def cargar_hospedaje():
+#PAGINAS WEB
+@app.route('/') #PAGINA PRINCIPAL
+def home():
+    css_path = url_for('static', filename='css/app.css')
+    js_path = url_for('static', filename='js/scripts.js')
+    return render_template('index.html', css_path=css_path, js_path=js_path, ocultar=False)
+
+@app.route('/cargar')#PAGINA PARA AGREGAR REGISTROS A CSV
+def cargar():
     css_path = url_for('static', filename='css/app.css')
     js_path = url_for('static', filename='js/scripts.js')
     cargar = url_for('static', filename='js/cargar.js')
 
-    return render_template('cargar_hospedaje.html', css_path=css_path, js_path=js_path, cargar=cargar, ocultar=True)
+    tipo = request.args.get('tipo')
+    if tipo == 'hospedaje':
+        return redirect(url_for('cargar_hospedaje'))
+    elif tipo == 'lugar':
+        return redirect(url_for('cargar_lugar'))
+    else:
+        return render_template('cargar.html', css_path=css_path, js_path=js_path, cargar=cargar, ocultar=True)
 
+@app.route('/cargar/lugar')#PAGINA PARA AGREGAR LUGARES
+def cargar_lugar():
+    css_path = url_for('static', filename='css/app.css')
+    js_path = url_for('static', filename='js/scripts.js')
+    cargar = url_for('static', filename='js/cargar.js')
+
+    return render_template('cargar_lugar.html', css_path=css_path, js_path=js_path, cargar=cargar, ocultar=True)
 
 @app.route('/lugares') #PAGINA PARA MOSTRAR LOS LUGARES
 def lugares():
@@ -186,33 +180,7 @@ def lugares():
         ocultar=False
     )
 
-def render_lugar_detalle(nombre):
-    if not nombre:
-        return "Falta el nombre del lugar", 400
-
-    lugar = arbol_lugares.buscar_por_nombre(nombre)
-    if not lugar:
-        return "Lugar no encontrado", 404
-
-    css_path = url_for('static', filename='css/app.css')
-    js_path = url_for('static', filename='js/scripts.js')
-    mapa = url_for('static', filename='js/mapa.js')
-    lugarjs = url_for('static', filename='js/lugar.js')
-    detalle = url_for('static', filename='js/detalle_lugar.js')
-
-    return render_template(
-        'lugardetalle.html',
-        lugar=lugar,
-        css_path=css_path,
-        js_path=js_path,
-        lugarjs=lugarjs,
-        detalle=detalle,
-        mapa=mapa,
-        ocultar = True
-    )
-
-
-@app.route('/lugares/detalle')
+@app.route('/lugares/detalle')#PAGINA PARA MOSTRAR UN LUGAR CON TODOS SUS DETALLES
 def lugar_detalle():
     try:
         nombre = request.args.get('nombre')
@@ -221,7 +189,7 @@ def lugar_detalle():
         return f"Error interno del servidor: {e}", 500
 
 
-@app.route('/lugares/filtro/detalle')
+@app.route('/lugares/filtro/detalle')#PAGINA PARA MOSTRAR EL LUGAR CON DETALLES DESDE LA PAGINA FILTRO
 def lugar_detalle_filtro():
     try:
         nombre = request.args.get('nombre')
@@ -230,7 +198,7 @@ def lugar_detalle_filtro():
         return f"Error interno del servidor: {e}", 500
 
 
-@app.route('/lugares/filtro')  # Página para mostrar hospedajes según filtro
+@app.route('/lugares/filtro')  # PAGINA PARA MOSTRAR LOS LUGARES SEGUN EL FILTRO
 def lugares_filtro():
     try:
         tipo = request.args.get('tipo', '').strip().lower()
@@ -258,11 +226,11 @@ def lugares_filtro():
 
         css_path = url_for('static', filename='css/app.css')
         js_path = url_for('static', filename='js/scripts.js')
-        jsH = url_for('static', filename='js/hospedaje.js')
-        detalle = url_for('static', filename='js/detalle_hospedaje.js')
+        jsH = url_for('static', filename='js/lugares.js')
+        detalle = url_for('static', filename='js/detalle_lugar.js')
 
         return render_template(
-            'hospedajes_filtro.html',
+            'lugares_filtro.html',
             hospedajes=lugares_filtrados,
             tipo=tipo,
             departamento=departamento if departamento else "Todos",
@@ -275,6 +243,44 @@ def lugares_filtro():
 
     except Exception as e:
         return f"Error interno del servidor: {e}", 500
+
+@app.route('/cargar/hospedaje')#PAGINA PARA AGREGAR HOSPEDAJES
+def cargar_hospedaje():
+    css_path = url_for('static', filename='css/app.css')
+    js_path = url_for('static', filename='js/scripts.js')
+    cargar = url_for('static', filename='js/cargar.js')
+
+    return render_template('cargar_hospedaje.html', css_path=css_path, js_path=js_path, cargar=cargar, ocultar=True)
+
+
+
+def render_lugar_detalle(nombre):
+    if not nombre:
+        return "Falta el nombre del lugar", 400
+
+    lugar = arbol_lugares.buscar_por_nombre(nombre)
+    if not lugar:
+        return "Lugar no encontrado", 404
+
+    css_path = url_for('static', filename='css/app.css')
+    js_path = url_for('static', filename='js/scripts.js')
+    mapa = url_for('static', filename='js/mapa.js')
+    lugarjs = url_for('static', filename='js/lugar.js')
+    detalle = url_for('static', filename='js/detalle_lugar.js')
+
+    return render_template(
+        'lugardetalle.html',
+        lugar=lugar,
+        css_path=css_path,
+        js_path=js_path,
+        lugarjs=lugarjs,
+        detalle=detalle,
+        mapa=mapa,
+        ocultar = True
+    )
+
+
+
 
 #API HOSPEDAJES
 @app.route('/api/hospedajes', methods=['GET'])

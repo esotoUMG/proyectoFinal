@@ -94,10 +94,19 @@ function cargarLugaresDesdeAPI() {
                         </p>
                         <p>${precioTexto}</p>
                     `;
-            
-                    // Agregar listener para redirigir a detalle al click
+
+                    // CORRECCIÓN: detectar ruta y armar url de detalle según contexto
                     item.addEventListener('click', () => {
-                        window.location.href = `/lugares/detalle?nombre=${encodeURIComponent(lugar.nombre)}`;
+                        const path = window.location.pathname;
+                        let urlDetalle;
+
+                        if (path.startsWith('/lugares/filtro')) {
+                            urlDetalle = `/lugares/filtro/detalle?nombre=${encodeURIComponent(lugar.nombre)}`;
+                        } else {
+                            urlDetalle = `/lugares/detalle?nombre=${encodeURIComponent(lugar.nombre)}`;
+                        }
+
+                        window.location.href = urlDetalle;
                     });
             
                     carrusel.appendChild(item);

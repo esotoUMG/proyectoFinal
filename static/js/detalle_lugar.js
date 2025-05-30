@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cargarDetalleYRecomendaciones(nombre);
     }
 
-    // Agrega listeners a las tarjetas principales si existen (lista de lugares)
+    // Agrega listeners a las tarjetas principales y recomendaciones si existen
     agregarListenerTarjetasPrincipales();
 });
 
@@ -48,15 +48,15 @@ function mostrarInfoLugar(lugar) {
         return;
     }
 
-    const precio = lugar.precio === 0 ? 'Gratis' : `Desde Q ${lugar.precio}`
-    const calificacion = lugar.calificacion
-    const estrellas = generarEstrellasHTML(calificacion)
+    const precio = lugar.precio === 0 ? 'Gratis' : `Desde Q ${lugar.precio}`;
+    const calificacion = lugar.calificacion;
+    const estrellas = generarEstrellasHTML(calificacion);
 
     contenedor.innerHTML = `
         <h2>${lugar.nombre}</h2>
-        <p> ${lugar.direccion}</p>
-        <p> ${lugar.municipio}, ${lugar.departamento}</p>
-        <p> ${lugar.tipo}</p>
+        <p>${lugar.direccion}</p>
+        <p>${lugar.municipio}, ${lugar.departamento}</p>
+        <p>${lugar.tipo}</p>
         <p>
             <span class="calificacion-valor">${calificacion.toFixed(1)}</span>
             <span class="estrellas">${estrellas}</span>
@@ -72,27 +72,26 @@ function mostrarInfoLugar(lugar) {
     }
 }
 
-    // Función auxiliar para generar estrellas según la calificación
-    const generarEstrellasHTML = (calificacion) => {
+// Función auxiliar para generar estrellas según la calificación
+const generarEstrellasHTML = (calificacion) => {
+    const maxEstrellas = 5;
+    let estrellas = '';
 
-        const maxEstrellas = 5;
-        let estrellas = '';
-
-        for (let i = 1; i <= maxEstrellas; i++) {
-            if (calificacion >= i) {
-                // estrella llena
-                estrellas += '<span class="estrella llena">&#9733;</span>';
-            } else if (calificacion >= i - 0.5) {
-                // estrella media
-                estrellas += '<span class="estrella media">&#9733;</span>';
-            } else {
-                // estrella vacía
-                estrellas += '<span class="estrella vacia">&#9734;</span>';
-            }
+    for (let i = 1; i <= maxEstrellas; i++) {
+        if (calificacion >= i) {
+            // estrella llena
+            estrellas += '<span class="estrella llena">&#9733;</span>';
+        } else if (calificacion >= i - 0.5) {
+            // estrella media
+            estrellas += '<span class="estrella media">&#9733;</span>';
+        } else {
+            // estrella vacía
+            estrellas += '<span class="estrella vacia">&#9734;</span>';
         }
+    }
 
-        return estrellas;
-    };
+    return estrellas;
+};
 
 function mostrarRecomendaciones(recomendaciones) {
     const contenedor = document.getElementById('recomendaciones-cercanas');
@@ -113,8 +112,9 @@ function mostrarRecomendaciones(recomendaciones) {
 
     recomendaciones.slice(0, 5).forEach(lugar => {
         const card = document.createElement('div');
-        card.classList.add('recomendaciones-card'); 
-        
+        card.classList.add('recomendaciones-card');
+        card.setAttribute('data-nombre', lugar.nombre);  // Agregado para capturar el nombre en el click
+
         card.innerHTML = `
             <h4>${lugar.nombre}</h4>
             <p>${lugar.direccion}</p>
@@ -128,10 +128,9 @@ function mostrarRecomendaciones(recomendaciones) {
     contenedor.appendChild(lista);
 }
 
-
 function agregarListenerTarjetasPrincipales() {
-    // Selecciona todas las tarjetas de la lista principal (asegúrate que tengan la clase lugar-card)
-    const tarjetas = document.querySelectorAll('.recomendaciones-card');
+    // Agregar listeners a las tarjetas principales y a las recomendaciones
+    const tarjetas = document.querySelectorAll('.lugar-card, .recomendaciones-card');
     if (!tarjetas.length) return;
 
     tarjetas.forEach(card => {
@@ -147,22 +146,19 @@ function agregarListenerTarjetasPrincipales() {
 }
 
 function redirigirADetalleConFiltros(nombreLugar) {
+    console.log("Función llamada con lugar:", nombreLugar);
     const nombreEncoded = encodeURIComponent(nombreLugar);
     const path = window.location.pathname;
-    const queryString = window.location.search; // Ejemplo: "?tipo=Comida&departamento=Guatemala"
 
-    let urlDetalle;
     if (path.startsWith('/lugares/filtro')) {
-        // Quita el '?' inicial para concatenar
-        const filtros = queryString.length > 0 ? queryString.substring(1) : "";
-        // Usa ruta detalle estándar (cambia si tienes ruta especial)
-        urlDetalle = `/lugares/detalle?nombre=${nombreEncoded}`;
-        if (filtros) {
-            urlDetalle += `&${filtros}`;
-        }
-    } else {
-        urlDetalle = `/lugares/detalle?nombre=${nombreEncoded}`;
-    }
+        // Copiar TODOS los parámetros actuales de filtro (menos nombre)
+        const filtros = new URLSearchParams(window.location.search);
+        filtros.set('nombre', nombreLugar);  // Sobrescribir o agregar nombre
 
-    window.location.href = urlDetalle;
+        const urlDetalle = `/lugares/filtro/detalle?${filtros.toString()}`;
+        window.location.href = urlDetalle;
+    } else {
+        const urlDetalle = `/lugares/detalle?nombre=${nombreEncoded}`;
+        window.location.href = urlDetalle;
+    }
 }
