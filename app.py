@@ -1,9 +1,9 @@
-from flask import Flask, render_template, url_for, jsonify, Response, redirect, request
-import json, os, csv, requests, re, asyncio, aiohttp, math
+from flask import Flask, render_template, url_for, jsonify, redirect, request
+import  os, csv, re, asyncio, aiohttp, math
 from backend.arbolB import BTree
-from backend.carga_csv import cargar_lugares_csv, cargar_calificaciones_csv, guardar_lugar_en_csv, guardar_calificacion_en_csv
+from backend.carga_csv import cargar_lugares_csv, guardar_lugar_en_csv, guardar_calificacion_en_csv
 from backend.modelos.utilidadesGrafo import UtilidadesGrafo
-from backend.modelos.GrafoPonderado import generar_grafo_ponderado  # Importar clase GrafoPonderado para el manejo de rutas
+from backend.modelos.GrafoPonderado import generar_grafo_ponderado  
 from backend.modelos.lugar import Lugar
 
 app = Flask(__name__)

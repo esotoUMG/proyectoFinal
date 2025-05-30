@@ -135,32 +135,57 @@ document.addEventListener('DOMContentLoaded', () => {
             if (respuesta.mensaje) {
               mensajeDiv.textContent = '' + respuesta.mensaje;
               mensajeDiv.style.color = 'white';
-              mensajeDiv.style.backgroundColor = '#C6E5B1'
-              mensajeDiv.style.width = '100%'
-              mensajeDiv.style.borderRadius = '1rem'
-              mensajeDiv.style.padding = '1rem'
-              mensajeDiv.style.fontFamily = 'Arial'
-              mensajeDiv.style.fontSize = '1rem'
-              mensajeDiv.style.textAlign = 'center'
+              mensajeDiv.style.backgroundColor = '#C6E5B1';
+              mensajeDiv.style.width = '100%';
+              mensajeDiv.style.borderRadius = '1rem';
+              mensajeDiv.style.padding = '1rem';
+              mensajeDiv.style.fontFamily = 'Arial';
+              mensajeDiv.style.fontSize = '1rem';
+              mensajeDiv.style.textAlign = 'center';
+          
               formulario.reset();
+          
               if (typeof marcador !== 'undefined' && marcador && typeof mapa !== 'undefined' && mapa) {
                 marcador.setMap(null);
                 marcador = null;
                 initMap();
               }
+          
+              // Ocultar mensaje después de 4 segundos
+              setTimeout(() => {
+                mensajeDiv.textContent = '';
+                mensajeDiv.removeAttribute('style');
+              }, 4000);
+          
             } else if (respuesta.error) {
-              mensajeDiv.textContent = '❌ ' + respuesta.error;
+              mensajeDiv.textContent = '' + respuesta.error;
               mensajeDiv.style.color = 'red';
+          
+              setTimeout(() => {
+                mensajeDiv.textContent = '';
+                mensajeDiv.removeAttribute('style');
+              }, 4000);
+          
             } else {
-              mensajeDiv.textContent = '❌ Error desconocido al registrar el lugar.';
+              mensajeDiv.textContent = 'Error desconocido al registrar el lugar.';
               mensajeDiv.style.color = 'red';
+          
+              setTimeout(() => {
+                mensajeDiv.textContent = '';
+                mensajeDiv.removeAttribute('style');
+              }, 4000);
             }
           })
           .catch(err => {
             console.error('Error en fetch:', err);
-            mensajeDiv.textContent = '❌ Ocurrió un error inesperado: ' + err.message;
+            mensajeDiv.textContent = 'Ocurrió un error inesperado: ' + err.message;
             mensajeDiv.style.color = 'red';
-          });
+          
+            setTimeout(() => {
+              mensajeDiv.textContent = '';
+              mensajeDiv.removeAttribute('style');
+            }, 4000);
+          });          
       });
     }
   });

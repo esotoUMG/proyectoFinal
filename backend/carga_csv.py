@@ -1,6 +1,4 @@
-import csv
-import io
-import os
+import csv, io, signal, sys, os
 from backend.modelos.lugar import Lugar
 from backend.modelos.calificacion import Calificacion 
 
@@ -157,3 +155,64 @@ def actualizar_calificacion_promedio_csv(ruta_csv_lugares, arbol):
         escritor = csv.DictWriter(archivo, fieldnames=campos)
         escritor.writeheader()
         escritor.writerows(filas_actualizadas)
+
+#Funcion para exportar los documentos en formato CSV
+def exportar_recomendaciones_csv(nodos, aristas):
+    escritorio = os.path.join(os.path.expanduser('~'), 'Desktop')
+    ruta = os.path.join(escritorio, 'recomendaciones.csv')
+
+    with open(ruta, mode='w', newline='', encoding='utf-8') as archivo:
+        writer = csv.writer(archivo)
+        writer.writerow(['Nodo Principal', nodos[0]])
+        writer.writerow([])
+        writer.writerow(['Recomendación', 'Peso'])
+
+        for arista in aristas:
+            if arista['origen'] == nodos[0]:
+                writer.writerow([arista['destino'], arista['peso']])
+    
+    print(f"recomendaciones.csv guardado en: {ruta}")
+
+def exportar_datos_csv(lista_lugares):
+    escritorio = os.path.join(os.path.expanduser('~'), 'Desktop')
+    ruta = os.path.join(escritorio, 'datos.csv')
+
+    with open(ruta, mode='w', newline='', encoding='utf-8') as archivo:
+        writer = csv.writer(archivo)
+        writer.writerow(['Nombre', 'Descripción', 'Categoría', 'Precio', 'Tiempo Estadia', 'Latitud', 'Longitud'])  # Ajusta según campos reales
+
+        actual = lista_lugares.primero  # Asumiendo lista enlazada personalizada
+        while actual:
+            lugar = actual.valor
+            writer.writerow([
+                lugar.nombre,
+                lugar.descripcion,
+                lugar.categoria,
+                lugar.precio,
+                lugar.tiempo_estadia,
+                lugar.latitud,
+                lugar.longitud
+            ])
+            actual = actual.siguiente
+
+    print(f"datos.csv actualizado guardado en: {ruta}")
+
+nodos = []     
+aristas = []   
+lugares_arbol = None  
+
+def handler_exit(signum, frame):
+    print("Servidor cerrándose. Exportando datos...")
+
+    try:
+        exportar_recomendaciones_csv(nodos, aristas)
+        exportar_datos_csv(lugares_arbol)  # Este debe ser tu árbol u otra estructura de lugares
+        print("Datos exportados correctamente.")
+    except Exception as e:
+        print(f"Error al exportar: {e}")
+
+    sys.exit(0)
+
+# Registrar las señales de salida
+signal.signal(signal.SIGINT, handler_exit)   # Ctrl+C
+signal.signal(signal.SIGTERM, handler_exit)  # kill PID
