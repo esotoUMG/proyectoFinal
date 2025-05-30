@@ -55,16 +55,6 @@ def calculate_average(rating_list):
     avg = total / len(rating_list)
     return round(avg, 2)
 
-@app.route('/', methods=['GET'])
-def index():
-    data = load_data()
-    ratings = load_ratings()
-    ratings_summary = {
-        k: {'average': calculate_average(v), 'count': len(v)}
-        for k, v in ratings.items()
-    }
-
-    return render_template_string(TEMPLATE, data=data, ratings=ratings, ratings_summary=ratings_summary)
 
 @app.route('/submit_rating', methods=['POST'])
 def submit_rating():
@@ -129,10 +119,7 @@ def submit_rating():
     </html>
     """
 
-# HTML y JS incrustado como plantilla
-TEMPLATE = """ 
-<!-- AQUÍ PEGA EL HTML Y JS QUE TENGAS -->
-"""
+
 
 if __name__ == '__main__':
     app.run(debug=True)
