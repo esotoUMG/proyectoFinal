@@ -975,6 +975,7 @@ footer h2 span {
   color: gold;
 }
 #comentarios-seccion form button {
+  margin-top: 1rem;
   align-self: flex-end;
   background-color: #000000;
   color: white;
@@ -987,13 +988,16 @@ footer h2 span {
   transition: background-color 0.3s ease;
 }
 #comentarios-seccion form button:hover {
-  background-color: rgb(25.5, 25.5, 25.5);
+  background-color: #5dc1b9;
 }
 #comentarios-seccion #lista-comentarios {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
   text-align: left;
+  font-family: "Raleway", sans-serif;
+  font-size: 1.4rem;
+  padding: 2rem;
 }
 #comentarios-seccion #lista-comentarios .comentario-card {
   background-color: white;
@@ -1013,6 +1017,22 @@ footer h2 span {
 
 .recomendaciones {
   font-family: "DM Sans", sans-serif;
+}
+
+#btn-generar-grafo {
+  margin-top: 2rem;
+  background-color: #000000;
+  color: white;
+  font-family: "Cal Sans", sans-serif;
+  font-size: 1.4rem;
+  padding: 0.8rem 2rem;
+  border-radius: 2rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+#btn-generar-grafo:hover {
+  background-color: #5dc1b9;
 }
 
 .cargar {

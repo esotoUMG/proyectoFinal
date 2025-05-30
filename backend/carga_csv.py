@@ -1,4 +1,4 @@
-import csv, io, signal, sys, os
+import csv, signal, sys, os
 from backend.modelos.lugar import Lugar
 from backend.modelos.calificacion import Calificacion 
 
@@ -57,7 +57,7 @@ def cargar_lugares_csv(archivo, arbol_lugares, arbol_hospedaje):
 #Guardar datos en CSV
 def guardar_lugar_en_csv(lugar_nuevo, ruta_csv):
     campos = ['Id', 'Departamento', 'Municipio', 'Nombre', 'Tipo', 'Dirección',
-              'Latitud', 'Longitud', 'Calificación en Google', 'Tiempo estadia', 'Precio']
+              'Latitud', 'Longitud', 'Calificación en Google', 'Precio', 'Tiempo estadia']
 
     archivo_existe = os.path.isfile(ruta_csv)
 
@@ -89,122 +89,161 @@ def guardar_lugar_en_csv(lugar_nuevo, ruta_csv):
             'Precio': lugar_nuevo.precio
         })
 
+#FUNCIONES PARA LAS CALIFICACIONES
+def guardar_calificacion_csv(calificacion, archivo="./data/ratings.csv"):
+    os.makedirs(os.path.dirname(archivo), exist_ok=True)
 
-# Función para cargar calificaciones desde archivo CSV
-def cargar_calificaciones_csv(archivo, arbol):
-    """
-    Recibe un archivo CSV con calificaciones.
-    Busca el lugar en el Árbol y le agrega la calificación.
-    """
-    contenido = archivo.read().decode('utf-8')
-    lector = csv.DictReader(io.StringIO(contenido))
-
-    for fila in lector:
-        if "Id" in fila and "Puntaje" in fila:
-            try:
-                id_lugar = int(fila['Id'])
-                puntaje = float(fila['Puntaje'])
-                comentario = fila.get('Comentario', '')
-
-                lugar = arbol.buscar(id_lugar)
-                if lugar:
-                    lugar.agregar_calificacion(puntaje, comentario)
-            except ValueError:
-                # Ignorar filas con datos inválidos
-                continue
-
-def guardar_calificaciones_en_csv(calificaciones, archivo='./data/calificaciones.csv'):
-    """
-    Guarda una lista de calificaciones en un archivo CSV.
-    calificaciones: lista de diccionarios con claves 'dest_idx', 'rating', 'comment'
-    """
-    file_exists = os.path.exists(archivo)
-
-    with open(archivo, 'a', newline='', encoding='utf-8') as csvfile:
-        fieldnames = ['dest_idx', 'rating', 'comment']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        if not file_exists:
-            writer.writeheader()
-        for cal in calificaciones:
-            writer.writerow(cal)
+    with open(archivo, "a", encoding="utf-8") as f:
+        f.write(f"{calificacion.id_lugar},{calificacion.puntaje},{calificacion.comentario}\n")
 
         
-def actualizar_calificacion_promedio_csv(ruta_csv_lugares, arbol):
-    """
-    Lee el CSV original de lugares, actualiza la columna de calificación
-    con el promedio almacenado en los objetos Lugar del árbol, y sobrescribe el archivo.
-    """
-    filas_actualizadas = []
+def cargar_calificaciones_csv(archivo="calificaciones.csv", arbol_calificaciones=None, arbol_lugares=None):
+    if arbol_calificaciones is None or arbol_lugares is None:
+        raise ValueError("Se requieren ambos árboles: calificaciones y lugares")
 
-    with open(s_lugares, mode='r', encoding='utf-8') as archivo:
-        lector = csv.DictReader(archivo)
-        campos = lector.fieldnames
+    try:
+        with open(archivo, "r", encoding="utf-8") as f:
+            reader = csv.reader(f)
+            next(reader)  # Saltar encabezado
+            for fila in reader:
+                if len(fila) >= 2:
+                    try:
+                        id_lugar = int(fila[0])
+                    except ValueError:
+                        continue  # Ignorar fila con id no válido
 
-        for fila in lector:
-            id_lugar = int(fila['Id'])
-            lugar = arbol.buscar(id_lugar)
-            if lugar:
-                # Actualizar solo la calificación promedio en la fila
-                fila['Calificación en Google'] = f"{lugar.calificacion:.2f}"
-            filas_actualizadas.append(fila)
+                    try:
+                        puntaje = float(fila[1])
+                    except ValueError:
+                        puntaje = 0.0
 
-    # Sobrescribir archivo con las filas actualizadas
-    with open(ruta_csv_lugares, mode='w', newline='', encoding='utf-8') as archivo:
-        escritor = csv.DictWriter(archivo, fieldnames=campos)
-        escritor.writeheader()
-        escritor.writerows(filas_actualizadas)
+                    comentario = ",".join(fila[2:]) if len(fila) > 2 else ""
+                    calif = Calificacion(id_lugar, puntaje, comentario)
 
-#Funcion para exportar los documentos en formato CSV
+                    # Insertar en árbol de calificaciones
+                    arbol_calificaciones.insertar(id_lugar, calif)
+
+                    # Actualizar promedio en árbol de lugares
+                    lugar = arbol_lugares.buscar(id_lugar)  # o tu función para obtener lugar por ID
+                    if lugar:
+                        cantidad_actual = getattr(lugar, 'cantidad_calificaciones', 0)
+                        promedio_actual = getattr(lugar, 'calificacion', 0.0)
+
+                        nuevo_promedio = (promedio_actual * cantidad_actual + puntaje) / (cantidad_actual + 1)
+                        lugar.calificacion = nuevo_promedio
+                        lugar.cantidad_calificaciones = cantidad_actual + 1
+
+                        # Si tienes función para guardar lugar, la llamas
+                        # guardar_lugar(lugar) # Opcional si persistes los lugares
+    except FileNotFoundError:
+        pass
+
+
+
+# --- Exportar datos.csv desde árbol B ---
+
+
+def exportar_datos_csv_desde_arbol(arbol_lugares):
+    escritorio = os.path.join(os.path.expanduser('~'), 'Desktop')
+    ruta = os.path.join(escritorio, 'datos.csv')
+
+    with open(ruta, mode='w', newline='', encoding='utf-8') as archivo:
+        writer = csv.writer(archivo)
+        writer.writerow(['Nombre', 'Descripción', 'Categoría', 'Precio', 'Tiempo Estadia', 'Latitud', 'Longitud'])
+
+        lugares = []
+
+        def recorrer_nodo(nodo):
+            if nodo is None:
+                return
+            # Nodo puede tener claves (lugares) y subnodos (hijos)
+            for i in range(len(nodo.claves)):
+                # Recorrer hijo izquierdo
+                if nodo.hijos and len(nodo.hijos) > i:
+                    recorrer_nodo(nodo.hijos[i])
+                # Agregar clave actual
+                lugares.append(nodo.claves[i])
+            # Recorrer último hijo derecho
+            if nodo.hijos and len(nodo.hijos) > len(nodo.claves):
+                recorrer_nodo(nodo.hijos[len(nodo.claves)])
+
+        recorrer_nodo(arbol_lugares.raiz)
+
+        for lugar in lugares:
+            writer.writerow([
+                getattr(lugar, 'nombre', ''),
+                getattr(lugar, 'descripcion', ''),
+                getattr(lugar, 'categoria', ''),
+                getattr(lugar, 'precio', 0),
+                getattr(lugar, 'tiempo_estadia', 0),
+                getattr(lugar, 'latitud', 0),
+                getattr(lugar, 'longitud', 0)
+            ])
+
+    print(f"datos.csv actualizado guardado en: {ruta}")
+
+# --- Exportar ratings.csv desde árbol de calificaciones ---
+
+def exportar_ratings_csv_desde_arbol(arbol_calificaciones):
+    escritorio = os.path.join(os.path.expanduser('~'), 'Desktop')
+    ruta = os.path.join(escritorio, 'ratings.csv')
+
+    with open(ruta, mode='w', newline='', encoding='utf-8') as archivo:
+        writer = csv.writer(archivo)
+        writer.writerow(['IdLugar', 'Puntaje', 'Comentario'])
+
+        calificaciones = []
+
+        def recorrer_nodo_cal(nodo):
+            if nodo is None:
+                return
+            for i in range(len(nodo.claves)):
+                if nodo.hijos and len(nodo.hijos) > i:
+                    recorrer_nodo_cal(nodo.hijos[i])
+                calificaciones.append(nodo.claves[i])
+            if nodo.hijos and len(nodo.hijos) > len(nodo.claves):
+                recorrer_nodo_cal(nodo.hijos[len(nodo.claves)])
+
+        recorrer_nodo_cal(arbol_calificaciones.raiz)
+
+        # calificaciones aquí son nodos CalificacionNodo, con lista enlazada dentro
+        for calif_nodo in calificaciones:
+            actual = calif_nodo.calificaciones.primero
+            while actual:
+                c = actual.dato
+                writer.writerow([c.id_lugar, c.puntaje, c.comentario])
+                actual = actual.siguiente
+
+    print(f"ratings.csv actualizado guardado en: {ruta}")
+
+# --- Exportar recomendaciones.csv (tuya) ---
+
 def exportar_recomendaciones_csv(nodos, aristas):
     escritorio = os.path.join(os.path.expanduser('~'), 'Desktop')
     ruta = os.path.join(escritorio, 'recomendaciones.csv')
 
     with open(ruta, mode='w', newline='', encoding='utf-8') as archivo:
         writer = csv.writer(archivo)
-        writer.writerow(['Nodo Principal', nodos[0]])
+        writer.writerow(['Nodo Principal', nodos[0] if nodos else ''])
         writer.writerow([])
         writer.writerow(['Recomendación', 'Peso'])
 
         for arista in aristas:
-            if arista['origen'] == nodos[0]:
+            if arista['origen'] == (nodos[0] if nodos else None):
                 writer.writerow([arista['destino'], arista['peso']])
-    
+
     print(f"recomendaciones.csv guardado en: {ruta}")
 
-def exportar_datos_csv(lista_lugares):
-    escritorio = os.path.join(os.path.expanduser('~'), 'Desktop')
-    ruta = os.path.join(escritorio, 'datos.csv')
-
-    with open(ruta, mode='w', newline='', encoding='utf-8') as archivo:
-        writer = csv.writer(archivo)
-        writer.writerow(['Nombre', 'Descripción', 'Categoría', 'Precio', 'Tiempo Estadia', 'Latitud', 'Longitud'])  # Ajusta según campos reales
-
-        actual = lista_lugares.primero  # Asumiendo lista enlazada personalizada
-        while actual:
-            lugar = actual.valor
-            writer.writerow([
-                lugar.nombre,
-                lugar.descripcion,
-                lugar.categoria,
-                lugar.precio,
-                lugar.tiempo_estadia,
-                lugar.latitud,
-                lugar.longitud
-            ])
-            actual = actual.siguiente
-
-    print(f"datos.csv actualizado guardado en: {ruta}")
-
-nodos = []     
-aristas = []   
-lugares_arbol = None  
+# --- Handler de salida ---
 
 def handler_exit(signum, frame):
     print("Servidor cerrándose. Exportando datos...")
 
     try:
         exportar_recomendaciones_csv(nodos, aristas)
-        exportar_datos_csv(lugares_arbol)  # Este debe ser tu árbol u otra estructura de lugares
+        exportar_datos_csv_desde_arbol(lugares_arbol)
+        exportar_ratings_csv_desde_arbol(arbol_calificaciones)
+        exportar_ratings_csv_desde_arbol(hospedajes_arbol)
         print("Datos exportados correctamente.")
     except Exception as e:
         print(f"Error al exportar: {e}")

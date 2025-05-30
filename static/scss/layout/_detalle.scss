@@ -132,6 +132,7 @@
     }
 
     button {
+      margin-top: 1rem;
       align-self: flex-end;
       background-color: v.$negro;
       color: white;
@@ -144,7 +145,7 @@
       transition: background-color 0.3s ease;
 
       &:hover {
-        background-color: color.adjust(v.$negro, $lightness: 10%);
+        background-color: v.$turquesa;
       }
     }
   }
@@ -154,6 +155,9 @@
     flex-direction: column;
     gap: 1.5rem;
     text-align: left;
+    font-family: v.$subtitulo;
+    font-size: 1.4rem;
+    padding: 2rem;
 
     .comentario-card {
       background-color: white;
@@ -176,4 +180,20 @@
 }
 .recomendaciones{
   font-family: v.$contenido2;
+}
+#btn-generar-grafo {
+  margin-top: 2rem;
+  background-color: v.$negro;
+  color: white;
+  font-family: v.$contenido;
+  font-size: 1.4rem;
+  padding: 0.8rem 2rem;
+  border-radius: 2rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: v.$turquesa;
+  }
 }

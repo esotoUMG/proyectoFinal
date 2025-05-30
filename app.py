@@ -1,11 +1,11 @@
 from flask import Flask, render_template, url_for, jsonify, redirect, request
 import  os, csv, re, asyncio, aiohttp, math
-from backend.arbolB import BTree
-from backend.carga_csv import cargar_lugares_csv, guardar_lugar_en_csv, guardar_calificaciones_en_csv
+from backend.arbolB import BTree, CalificacionNodo
+from backend.carga_csv import cargar_lugares_csv, guardar_lugar_en_csv, guardar_calificacion_csv
 from backend.modelos.utilidadesGrafo import UtilidadesGrafo
 from backend.modelos.GrafoPonderado import generar_grafo_ponderado  
 from backend.modelos.lugar import Lugar
-from backend.modelos.calificaciones import load_data
+from backend.modelos.calificacion import Calificacion
 
 
 app = Flask(__name__)
@@ -17,6 +17,7 @@ cache_tiempos_traslado = {}
 #Diccionario para crear arboles segun el tipo de actividad
 arbol_lugares = BTree(grado=5)     # Para turismo, comida, entretenimiento
 arbol_hospedaje = BTree(grado=5)  # Para hospedaje
+arbol_calificaciones = BTree(grado=5) #Para las calificaciones
 
 
 #Carga automatica del CSV al iniciar el servidor
@@ -48,56 +49,120 @@ def obtener_siguiente_id(path='data/datos.csv'):
                     continue
     return id_max + 1
 
-#API's PARA LUGARES
 
-@app.route('/lugares/detalle/<int:idx>')
-def lugar_por_idx(idx):
-    lugar = arbol_lugares.obtener_por_idx(idx) 
-    if lugar:
-        return jsonify({"lugar": lugar.to_dict()})
-    return jsonify({"error": "Lugar no encontrado"}), 404
-@app.route('/submit_rating', methods=['POST'])
-def submit_rating():
-    RATINGS_CSV = './data/calificaciones.csv'
-    data = load_data()  # Tu función que carga los lugares
 
-    selected_row = request.form.get('selected_row')
-    rating_str = request.form.get('rating')
-    comment = request.form.get('comment', '').strip()
+#API PARA CALIFICACIONES
+ARCHIVO = "./data/datos.csv"
 
-    if selected_row is None or rating_str is None or comment == '':
-        return jsonify({"error": "Seleccione un destino, calificación y deje un comentario."}), 400
+def insertar_calificacion_en_arbol(arbol_calificaciones, calificacion):
+    nodo = arbol_calificaciones.buscar(calificacion.id_lugar)
+    if nodo is None:
+        nuevo = CalificacionNodo(calificacion.id_lugar)
+        nuevo.agregar(calificacion)
+        arbol_calificaciones.insertar(nuevo)
+    else:
+        nodo.agregar(calificacion)
+
+
+def obtener_lugar_por_id(id_lugar):
+    # Leer todos los lugares, devolver objeto lugar que tenga id_lugar
+    with open(ARCHIVO, newline='', encoding='utf-8') as f:
+        reader = csv.reader(f)
+        next(reader)  # saltar header
+        for fila in reader:
+            if int(fila[0]) == id_lugar:
+                # Crear un objeto simple para representar lugar (o usar tu clase Lugar)
+                lugar = type('Lugar', (), {})()
+                lugar.id = int(fila[0])
+                lugar.departamento = fila[1]
+                lugar.municipio = fila[2]
+                lugar.nombre = fila[3]
+                lugar.tipo = fila[4]
+                lugar.direccion = fila[5]
+                lugar.latitud = float(fila[6])
+                lugar.longitud = float(fila[7])
+                lugar.calificacion = float(fila[8]) if fila[8] else 0.0
+                lugar.precio = float(fila[9]) if fila[9] else 0.0
+                lugar.tiempo_estadia = float(fila[10]) if fila[10] else 0.0
+
+                # Puedes agregar cantidad_calificaciones si quieres, o manejar aparte
+                lugar.cantidad_calificaciones = getattr(lugar, 'cantidad_calificaciones', 0)
+
+                return lugar
+    return None
+
+
+def guardar_lugar(lugar):
+    # Leer todo el CSV, actualizar el lugar con id_lugar, reescribir el CSV
+    lugares = []
+    with open(ARCHIVO, newline='', encoding='utf-8') as f:
+        reader = csv.reader(f)
+        header = next(reader)
+        for fila in reader:
+            if int(fila[0]) == lugar.id:
+                # Actualizar la calificación promedio en la columna índice 8
+                fila[8] = f"{lugar.calificacion:.2f}"
+            lugares.append(fila)
+
+    with open(ARCHIVO, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow(header)
+        writer.writerows(lugares)
+
+
+def calcular_promedio_calificaciones(arbol_calificaciones, id_lugar):
+    calificaciones = arbol_calificaciones.obtener_todas_calificaciones_por_id(id_lugar)
+    if not calificaciones:
+        return 0.0
+    suma = sum(c.puntaje for c in calificaciones)
+    promedio = suma / len(calificaciones)
+    return promedio
+
+@app.route('/api/calificar', methods=['POST'])
+def api_calificar():
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No se recibieron datos JSON"}), 400
 
     try:
-        idx = int(selected_row)
-        rating_new = float(rating_str)
-    except ValueError:
-        return jsonify({"error": "Índice o calificación inválida."}), 400
+        id_lugar = int(data.get("id_lugar"))
+        puntaje = float(data.get("puntaje"))
+    except (ValueError, TypeError):
+        return jsonify({"error": "id_lugar debe ser entero y puntaje numérico"}), 400
 
-    if idx < 0 or idx >= len(data):
-        return jsonify({"error": "Destino seleccionado inválido."}), 400
+    comentario = data.get("comentario", "")
 
-    nombre_lugar = data[idx].nombre  # Obtener el nombre del lugar a partir del índice
+    lugar = obtener_lugar_por_id(id_lugar)
+    if lugar is None:
+        return jsonify({"error": "Lugar no encontrado"}), 404
 
-    # Guardar la calificación
-    file_exists = os.path.exists(RATINGS_CSV)
-    with open(RATINGS_CSV, 'a', newline='', encoding='utf-8') as csvfile:
-        fieldnames = ['dest_idx', 'rating', 'comment']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+    promedio_actual = getattr(lugar, 'calificacion', 0.0)
+    cantidad_actual = getattr(lugar, 'cantidad_calificaciones', 0)
 
-        if not file_exists:
-            writer.writeheader()
+    nuevo_promedio = (promedio_actual * cantidad_actual + puntaje) / (cantidad_actual + 1)
 
-        writer.writerow({
-            'dest_idx': selected_row,
-            'rating': rating_new,
-            'comment': comment
-        })
+    lugar.calificacion = nuevo_promedio
+    lugar.cantidad_calificaciones = cantidad_actual + 1
 
-    # Redirigir al detalle del lugar con su nombre y una estrella temporal como referencia
-    return redirect(url_for('detalle_lugar', nombre=nombre_lugar, star=int(rating_new)))
+    guardar_lugar(lugar)
+
+    calif = Calificacion(id_lugar, puntaje, comentario)
+    insertar_calificacion_en_arbol(arbol_calificaciones, calif)
+    guardar_calificacion_csv(calif)
+
+    return jsonify({"mensaje": "Calificación registrada", "nuevo_promedio": nuevo_promedio}), 200
+
+@app.route('/api/calificaciones/<int:id_lugar>', methods=['GET'])
+def api_obtener_calificaciones(id_lugar):
+    calificaciones = arbol_calificaciones.buscar(id_lugar)
+    if not calificaciones:
+        return jsonify({"calificaciones": []})
+    
+    calif_dicts = [c.to_dict() for c in calificaciones.calificaciones.recorrer()]
+    return jsonify({"calificaciones": calif_dicts})
 
 
+#API's PARA LUGARES
 #API PARA SOLAMENTE OBTENER UN LUGAR EN ESPECIFICO
 @app.route('/api/lugar', methods=['GET'])
 def api_lugar():
@@ -110,6 +175,7 @@ def api_lugar():
         return jsonify({"error": "Lugar no encontrado"}), 404
 
     lugar_dict = {
+        "id" : lugar.id,
         "nombre": lugar.nombre,
         "direccion": lugar.direccion,
         "municipio": lugar.municipio,
@@ -390,7 +456,7 @@ def api_recomendaciones():
         )
     ]
 
-    usar_api_google = False  # Cambia a True para usar API Google Distance Matrix
+    usar_api_google = False  # Cambiar a True para usar API Google Distance Matrix (No utilizada por el momento)
 
     async def filtrar_y_calcular():
         if usar_api_google:
@@ -764,38 +830,6 @@ def api_recomendaciones_hospedajes():
     
     return {"recomendaciones": lista_recomendaciones}
 
-
-
-
-# @app.route('/api/cargar-calificaciones', methods=['POST'])
-# def cargar_calificaciones():
-#     if 'archivo' not in request.files:
-#         return jsonify({'error': 'No se envió ningún archivo.'}), 400
-
-#     archivo = request.files['archivo']
-#     try:
-#         cargar_calificaciones_csv(archivo, arbol)
-#         return jsonify({'mensaje': 'Calificaciones cargadas correctamente.'}), 200
-#     except Exception as e:
-#         return jsonify({'error': str(e)}), 500
-
-# @app.route('/api/rutas', methods=['GET'])
-# def obtener_rutas():
-#     origen = request.args.get('origen')
-#     if not origen:
-#         return jsonify({'error': 'Parámetro "origen" requerido'}), 400
-#     try:
-#         distancias = grafo.dijkstra(origen)
-#         return jsonify({'distancias': distancias}), 200
-#     except Exception as e:
-#         return jsonify({'error': str(e)}), 500
-# # @app.route("/grafo")
-# # def mostrar_grafo():
-# #     image_path = graficar_grafo(places_graph)
-# #     return render_template_string(f"""
-# #     <h2>Visualización del Grafo Ponderado</h2>
-# #     <img src="{image_path}" alt="Grafo Ponderado">
-# #     """)
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -13,11 +13,9 @@ function initMap() {
   });
 
   let lugarPrincipalCoords = null;
-  let infoWindowPrincipal = null;  // Guardar el infowindow principal
+  let infoWindowPrincipal = null;
   let directionsService = new google.maps.DirectionsService();
-  let directionsRenderer = new google.maps.DirectionsRenderer({
-    suppressMarkers: true
-  });
+  let directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true });
   directionsRenderer.setMap(mapa);
 
   let currentInfoWindow = null;
@@ -39,11 +37,10 @@ function initMap() {
     if (esLugarPrincipal) {
       infowindow.open(mapa, marker);
       currentInfoWindow = infowindow;
-      infoWindowPrincipal = infowindow; // Guardamos la infoWindow principal
+      infoWindowPrincipal = infowindow;
     }
 
     marker.addListener("click", () => {
-      // Solo cerramos currentInfoWindow si no es el infowindow principal
       if (currentInfoWindow && currentInfoWindow !== infoWindowPrincipal) {
         currentInfoWindow.close();
       }
@@ -67,74 +64,94 @@ function initMap() {
       if (status === 'OK') {
         directionsRenderer.setDirections(result);
 
-        // Cerramos la infoWindow actual solo si no es la principal
         if (currentInfoWindow && currentInfoWindow !== infoWindowPrincipal) {
           currentInfoWindow.close();
         }
 
-        // Abrimos la infoWindow del destino
         destinoInfoWindow.open(mapa, destinoMarker);
         currentInfoWindow = destinoInfoWindow;
 
-        // Reabrir siempre la infoWindow principal para que nunca desaparezca
         if (infoWindowPrincipal) {
           infoWindowPrincipal.open(mapa);
         }
-
       } else {
         console.error('Error al trazar ruta:', status);
       }
     });
   }
 
-  // Cargar lugar principal
+  // Opcional: mostrar ubicación actual del usuario con marcador especial
+  function mostrarUbicacionActual() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(pos => {
+        const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        new google.maps.Marker({
+          position: coords,
+          map: mapa,
+          title: "Tu ubicación",
+          icon: 'icono-usuario.png' // Cambia o elimina si quieres
+        });
+      }, err => {
+        console.warn("Error obteniendo ubicación:", err);
+      });
+    }
+  }
+
+  // Primero: cargar lugar principal
   fetch(`/api/lugar?nombre=${encodeURIComponent(nombreLugar)}`)
     .then(res => res.json())
     .then(data => {
-      if (data.lugar) {
-        const lat = parseFloat(data.lugar.latitud);
-        const lng = parseFloat(data.lugar.longitud);
-        if (!isNaN(lat) && !isNaN(lng)) {
-          lugarPrincipalCoords = { lat, lng };
-          mapa.setCenter(lugarPrincipalCoords);
-          mapa.setZoom(15);
+      if (!data.lugar) throw new Error("Lugar principal no encontrado");
 
-          const { marker, infowindow } = addMarker(lugarPrincipalCoords, data.lugar.nombre, true);
-          // Guardar o exponer el lugar principal si necesitas
-        }
+      const lat = parseFloat(data.lugar.latitud);
+      const lng = parseFloat(data.lugar.longitud);
+
+      if (isNaN(lat) || isNaN(lng)) throw new Error("Coordenadas inválidas del lugar principal");
+
+      lugarPrincipalCoords = { lat, lng };
+      mapa.setCenter(lugarPrincipalCoords);
+      mapa.setZoom(15);
+
+      addMarker(lugarPrincipalCoords, data.lugar.nombre, true);
+
+      // Ahora sí: cargar recomendaciones
+      return Promise.all([
+        fetch(`/api/recomendaciones?nombre=${encodeURIComponent(nombreLugar)}`).then(r => r.json()),
+        fetch(`/api/recomendaciones_hospedajes?nombre=${encodeURIComponent(nombreLugar)}`).then(r => r.json())
+      ]);
+    })
+    .then(([recomendacionesLugares, recomendacionesHospedajes]) => {
+      if (recomendacionesLugares.recomendaciones) {
+        recomendacionesLugares.recomendaciones.forEach(lugar => {
+          const lat = parseFloat(lugar.latitud);
+          const lng = parseFloat(lugar.longitud);
+          if (!isNaN(lat) && !isNaN(lng)) {
+            const coords = { lat, lng };
+            const { marker, infowindow } = addMarker(coords, lugar.nombre);
+            marcadoresRecomendados.set(lugar.nombre, { coords, marker, infowindow });
+          }
+        });
       }
+
+      if (recomendacionesHospedajes.recomendaciones) {
+        recomendacionesHospedajes.recomendaciones.forEach(hospedaje => {
+          const lat = parseFloat(hospedaje.latitud);
+          const lng = parseFloat(hospedaje.longitud);
+          if (!isNaN(lat) && !isNaN(lng)) {
+            const coords = { lat, lng };
+            const { marker, infowindow } = addMarker(coords, hospedaje.nombre);
+            marcadoresRecomendados.set(hospedaje.nombre, { coords, marker, infowindow });
+          }
+        });
+      }
+
+      mostrarUbicacionActual();
+    })
+    .catch(err => {
+      console.error('Error inicializando mapa:', err);
     });
 
-  // Cargar recomendaciones y crear marcadores, sin trazar rutas aún
-  Promise.all([
-    fetch(`/api/recomendaciones?nombre=${encodeURIComponent(nombreLugar)}`).then(res => res.json()),
-    fetch(`/api/recomendaciones_hospedajes?nombre=${encodeURIComponent(nombreLugar)}`).then(res => res.json())
-  ]).then(([recomendacionesLugares, recomendacionesHospedajes]) => {
-    if (recomendacionesLugares.recomendaciones) {
-      recomendacionesLugares.recomendaciones.forEach(lugar => {
-        const lat = parseFloat(lugar.latitud);
-        const lng = parseFloat(lugar.longitud);
-        if (!isNaN(lat) && !isNaN(lng)) {
-          const coords = { lat, lng };
-          const { marker, infowindow } = addMarker(coords, lugar.nombre);
-          marcadoresRecomendados.set(lugar.nombre, { coords, marker, infowindow });
-        }
-      });
-    }
-    if (recomendacionesHospedajes.recomendaciones) {
-      recomendacionesHospedajes.recomendaciones.forEach(hospedaje => {
-        const lat = parseFloat(hospedaje.latitud);
-        const lng = parseFloat(hospedaje.longitud);
-        if (!isNaN(lat) && !isNaN(lng)) {
-          const coords = { lat, lng };
-          const { marker, infowindow } = addMarker(coords, hospedaje.nombre);
-          marcadoresRecomendados.set(hospedaje.nombre, { coords, marker, infowindow });
-        }
-      });
-    }
-  });
-
-  // Función que el frontend (tarjetas) debe llamar para trazar ruta y mostrar infowindow
+  // Función expuesta para que el frontend pueda trazar ruta al lugar recomendado
   window.seleccionarLugarRecomendado = function(nombreLugarSeleccionado) {
     const destino = marcadoresRecomendados.get(nombreLugarSeleccionado);
     if (destino && lugarPrincipalCoords) {
