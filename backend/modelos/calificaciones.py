@@ -17,18 +17,39 @@ def load_data():
     return data
 
 def load_ratings():
-    ratings = {}
+    ratings_list = []
     if os.path.exists(RATINGS_CSV):
         with open(RATINGS_CSV, newline='', encoding='utf-8') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
-                key = row['selected_row']
-                entry = {'rating': float(row['rating']), 'comment': row['comment']}
-                if key in ratings:
-                    ratings[key].append(entry)
-                else:
-                    ratings[key] = [entry]
-    return ratings
+                ratings_list.append({
+                    'dest_idx': row.get('dest_idx'),
+                    'rating': float(row.get('rating',0)),
+                    'comment': row.get('comment','')
+                })
+    return ratings_list
+
+def aggregate_ratings(ratings_list):
+    agg = {}
+    for r in ratings_list:
+        idx = r['dest_idx']
+        if idx not in agg:
+            agg[idx] = {
+                'ratings': [],
+                'comments': []
+            }
+        agg[idx]['ratings'].append(r['rating'])
+        agg[idx]['comments'].append(r['comment'])
+    # compute average ratings and count
+    result = {}
+    for idx, vals in agg.items():
+        avg = sum(vals['ratings'])/len(vals['ratings']) if vals['ratings'] else None
+        result[idx] = {
+            'average': round(avg,2) if avg is not None else None,
+            'count': len(vals['ratings']),
+            'comments': vals['comments']
+        }
+    return result
 
 def save_ratings(ratings):
     with open(RATINGS_CSV, 'w', newline='', encoding='utf-8') as csvfile:
@@ -59,30 +80,32 @@ def calculate_average(rating_list):
 @app.route('/submit_rating', methods=['POST'])
 def submit_rating():
     data = load_data()
-    ratings = load_ratings()
 
     selected_row = request.form.get('selected_row')
     rating_str = request.form.get('rating')
     comment = request.form.get('comment', '').strip()
 
-    if not selected_row or not rating_str or not comment:
+    if selected_row is None or rating_str is None or comment == '':
         return "Error: Seleccione un destino, calificación y deje un comentario.", 400
-
     try:
         rating_new = float(rating_str)
     except ValueError:
         return "Calificación inválida.", 400
-
     if selected_row not in [str(i) for i in range(len(data))]:
         return "Destino seleccionado inválido.", 400
 
-    if selected_row in ratings:
-        ratings[selected_row].append({'rating': rating_new, 'comment': comment})
-    else:
-        ratings[selected_row] = [{'rating': rating_new, 'comment': comment}]
-
-    save_ratings(ratings)
-
+    file_exists = os.path.exists(RATINGS_CSV)
+    with open(RATINGS_CSV, 'a', newline='', encoding='utf-8') as csvfile:
+        fieldnames = ['dest_idx','rating','comment']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        if not file_exists:
+            writer.writeheader()
+        writer.writerow({
+            'dest_idx': selected_row,
+            'rating': rating_str,
+            'comment': comment
+        })
+    
     return """
     <!DOCTYPE html>
     <html lang="es">
@@ -118,7 +141,6 @@ def submit_rating():
     </body>
     </html>
     """
-
 
 
 if __name__ == '__main__':
