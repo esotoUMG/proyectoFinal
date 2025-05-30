@@ -3,14 +3,14 @@ function toggleSearchbar(href) {
     const filtrosForm = document.getElementById('filtros-form');
     if (!filtrosForm) return;
 
-    if (href === '/cargar' ) {
+    if (href === '/cargar') {
         filtrosForm.style.display = 'none';
     } else {
         filtrosForm.style.display = '';
     }
 }
 
-// --- Función para cargar contenido dinámicamente ---
+// --- Función para cargar contenido dinámicamente (solo para enlaces) ---
 function cargarContenido(e) {
     e.preventDefault();
 
@@ -65,77 +65,37 @@ function cargarContenido(e) {
         });
 }
 
-
-// --- Función para actualizar filtros según tipo de página ---
-function actualizarFiltros(tipo) {
-    const selectsContainer = document.getElementById('selects-container');
-    const inputBusqueda = document.querySelector('#filtros-form input[name="busqueda"]');
-
-    if (!selectsContainer || !inputBusqueda) return;
-
-    selectsContainer.innerHTML = '';
-    inputBusqueda.classList.remove('lugares-style', 'hospedajes-style');
-
-    if (tipo === "lugares") {
-        selectsContainer.innerHTML = `
-            <select name="tipo">
-              <option value="">Tipo</option>
-              <option value="playa">Comida</option>
-              <option value="montaña">Entretenimiento</option>
-              <option value="monumento">Turismo</option>
-            </select>
-            <select name="precio">
-              <option value="">Precio</option>
-              <option value="economico">Económico</option>
-              <option value="medio">Medio</option>
-              <option value="lujo">Lujo</option>
-            </select>
-        `;
-        inputBusqueda.placeholder = "Buscar lugares...";
-        inputBusqueda.classList.add('lugares-style');
-    } else if (tipo === "hospedajes") {
-        selectsContainer.innerHTML = `
-            <select name="categoria">
-              <option value="">Categoría</option>
-              <option value="hotel">Hotel</option>
-              <option value="hostel">Hostel</option>
-              <option value="departamento">Departamento</option>
-            </select>
-            <select name="servicios">
-              <option value="">Servicios</option>
-              <option value="wifi">WiFi</option>
-              <option value="desayuno">Desayuno</option>
-              <option value="mascotas">Mascotas</option>
-            </select>
-        `;
-        inputBusqueda.placeholder = "Buscar hospedajes...";
-        inputBusqueda.classList.add('hospedajes-style');
-    } else {
-        inputBusqueda.placeholder = "Buscar...";
-    }
-}
-
-//FIJAR EL HEADER CUANDO EL USUARIO HAGA SCROLL
-const header = document.querySelector('header');
-const menu = document.querySelector('.menu.opciones');
-
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 150) {
-      header.classList.add('fixed');
-    } else {
-      header.classList.remove('fixed');
-    }
-  
-    if (menu.classList.contains('menu-grande')) {
-      menu.classList.remove('menu-grande');
-    }
-  });
-
-//CAMBIAR LA BARRA DE NAVEGACION SEGUN LA OPCION QUE HAYA ELEGIDO EL USUARIO
+// --- Evento DOMContentLoaded ---
 document.addEventListener('DOMContentLoaded', () => {
-    // Obtener la ruta actual
-    const path = window.location.pathname;
+    // Asignar cargarContenido SOLO a enlaces de navegación dentro de .opciones
+    document.querySelectorAll('.opciones a').forEach(link => {
+        link.addEventListener('click', cargarContenido);
+    });
 
+    // Manejar submit del formulario de filtros
+    const filtrosForm = document.getElementById('filtros-form');
+    if (filtrosForm) {
+        filtrosForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(filtrosForm);
+            const busqueda = formData.get('busqueda').trim();
+            const presupuesto = formData.get('presupuesto').trim();
+
+            const params = new URLSearchParams();
+            if (busqueda) params.append('departamento', busqueda);
+            if (presupuesto) params.append('presupuesto', presupuesto);
+
+            // Redirigir a la página de filtro con parámetros
+            window.location.href = `/lugares/filtro?${params.toString()}`;
+        });
+    }
+
+    // Mostrar u ocultar el searchbar según la ruta actual
+    const path = window.location.pathname;
+    toggleSearchbar(path);
+
+    // Actualizar filtros según la ruta
     if (path.startsWith('/lugares')) {
         actualizarFiltros('lugares');
     } else if (path.startsWith('/hospedajes')) {
@@ -143,12 +103,25 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         actualizarFiltros(null);
     }
-
-    // Mostrar u ocultar el searchbar si vas a /cargar
-    toggleSearchbar(path);
 });
 
-//BLOQUEAR EL ZOOM DE LA PAGINA WEB 
+// FIJAR EL HEADER CUANDO EL USUARIO HAGA SCROLL
+const header = document.querySelector('header');
+const menu = document.querySelector('.menu.opciones');
+
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 150) {
+        header.classList.add('fixed');
+    } else {
+        header.classList.remove('fixed');
+    }
+
+    if (menu.classList.contains('menu-grande')) {
+        menu.classList.remove('menu-grande');
+    }
+});
+
+// BLOQUEAR EL ZOOM DE LA PAGINA WEB 
 // Bloquear zoom con Ctrl + scroll del mouse
 window.addEventListener('wheel', function(e) {
     if (e.ctrlKey) {

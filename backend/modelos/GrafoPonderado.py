@@ -50,3 +50,15 @@ class GrafoPonderado:
         output_path = "static/grafo_ponderado"
         dot.render(output_path, format="png", cleanup=True)
         return f"/{output_path}.png"
+    
+def calcular_peso_total(lugar1, lugar2, tiempo_traslado):
+    # Peso calificación: menor si la calificación es más alta
+    peso_calificacion = 5 - ((lugar1.calificacion + lugar2.calificacion) / 2)
+
+    # Peso total (ajusta los coeficientes según prioridad)
+    return (
+        (lugar1.precio + lugar2.precio) * 1.0 +
+        (lugar1.tiempo_estadia + lugar2.tiempo_estadia) * 1.5 +
+        tiempo_traslado * 2.0 +
+        peso_calificacion * 3.0
+    )

@@ -6,7 +6,7 @@ header {
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
-  padding: 3rem 0;           // padding original
+  padding: 3rem 0;
   margin: 0;
   border-bottom: 1px solid v.$negro;
   box-shadow: 5px 5px 10px 3px rgba(0, 0, 0, 0.2);
@@ -59,6 +59,7 @@ header {
     display: flex;
     gap: 3rem;
     margin-top: 1rem;
+
     a {
       position: relative;
       padding-bottom: 0.5rem;
@@ -114,7 +115,6 @@ header {
     width: 100%;
     max-width: 900px;
     display: flex;
-    gap: 0;
     justify-content: center;
     background: white;
     border-radius: 9999px;
@@ -125,6 +125,7 @@ header {
       margin 0.5s cubic-bezier(0.4, 0, 0.2, 1),
       border-radius 0.5s cubic-bezier(0.4, 0, 0.2, 1),
       box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    gap: 0;
 
     .input-busqueda {
       flex: 1 1 250px;
@@ -138,6 +139,33 @@ header {
         border-radius: 9999px 0 0 9999px;
         outline: none;
         box-sizing: border-box;
+        background-color: transparent;
+        color: v.$negro;
+
+        &::placeholder {
+          color: #888;
+        }
+      }
+    }
+
+    .input-presupuesto {
+      flex: 0 0 200px;
+      position: relative;
+      border-left: 1px solid #ddd;
+
+      input {
+        width: 100%;
+        font-size: 1.6em;
+        padding: 1.3rem 2rem;
+        border: none;
+        outline: none;
+        background-color: transparent;
+        box-sizing: border-box;
+        color: v.$negro;
+
+        &::placeholder {
+          color: #888;
+        }
       }
     }
 
@@ -151,6 +179,13 @@ header {
       border-left: 1px solid #ddd;
       cursor: pointer;
       box-sizing: border-box;
+      color: v.$negro;
+      transition: background-color 0.3s ease;
+
+      &:hover,
+      &:focus {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
     }
 
     button {
@@ -182,7 +217,7 @@ header.fixed {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 3.6rem 0;              // padding original sin cambios
+  padding: 3.6rem 0;
   background: white;
   z-index: 1000;
   max-width: 100%;
@@ -239,13 +274,39 @@ header.fixed {
     z-index: 1001;
 
     .input-busqueda {
+      flex: 1 1 400px;
+
       input {
         font-size: 1.3rem;
         padding: 0.6rem 1.2rem 0.6rem 2rem;
         border: none;
         outline: none;
         width: 100%;
+        background: transparent;
         transition: font-size 0.7s ease;
+
+        &::placeholder {
+          color: #888;
+        }
+      }
+    }
+
+    .input-presupuesto {
+      flex: 0 0 250px;
+      border-left: 1px solid #ddd;
+
+      input {
+        width: 100%;
+        padding: 1.3rem 1.5rem;
+        font-size: 1.3rem;
+        border: none;
+        outline: none;
+        background: transparent;
+        box-sizing: border-box;
+
+        &::placeholder {
+          color: #888;
+        }
       }
     }
 
@@ -257,6 +318,8 @@ header.fixed {
       background: transparent;
       outline: none;
       transition: font-size 0.7s ease;
+      color: v.$negro;
+      cursor: pointer;
     }
 
     button {

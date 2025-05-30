@@ -24,44 +24,14 @@ function cargarHospedajesDesdeAPI() {
                 return;
             }
 
-            const crearTituloClickeable = (titulo, itemsTipo, filtroParametros = {}) => {
-                const h2 = document.createElement('h2');
-                h2.classList.add('carrusel-titulo');
-                h2.textContent = titulo;
-
-                if (itemsTipo.length > 7) {
-                    h2.classList.add('clickeable');
-                    h2.title = "Ver todos";
-                    h2.style.cursor = "pointer";
-                    h2.addEventListener('click', () => {
-                        const params = new URLSearchParams();
-
-                        // tipo es obligatorio para el backend
-                        if (filtroParametros.tipo) {
-                            params.append('tipo', filtroParametros.tipo.toLowerCase());
-                        } else {
-                            params.append('tipo', 'hotel');
-                        }
-
-                        if (filtroParametros.departamento) {
-                            params.append('departamento', filtroParametros.departamento.toLowerCase());
-                        }
-
-                        const url = `/hospedajes/filtro?${params.toString()}`;
-                        // console.log para debug
-                        console.log("Redirigiendo a:", url);
-                        window.location.href = url;
-                    });
-                }
-
-                return h2;
-            };
-
-            const crearCarrusel = (hospedajesArray, titulo, filtroParametros = {}) => {
+            const crearCarrusel = (hospedajesArray, titulo) => {
                 const seccion = document.createElement('div');
                 seccion.classList.add('carrusel-contenedor');
 
-                const h2 = crearTituloClickeable(titulo, hospedajesArray, filtroParametros);
+                // Agregamos solo el título sin clickeable
+                const h2 = document.createElement('h2');
+                h2.classList.add('carrusel-titulo');
+                h2.textContent = titulo;
                 seccion.appendChild(h2);
 
                 const carrusel = document.createElement('div');
@@ -73,10 +43,7 @@ function cargarHospedajesDesdeAPI() {
                     const item = document.createElement('div');
                     item.classList.add('lugar-card');
 
-                    // Precio con validación
                     const precio = hospedaje.precio === 0 ? "Gratis" : `Desde Q ${hospedaje.precio}`;
-
-                    // Crear estrellas para la calificación
                     const estrellasHTML = generarEstrellasHTML(hospedaje.calificacion);
 
                     item.innerHTML = `
@@ -142,24 +109,22 @@ function cargarHospedajesDesdeAPI() {
                 return estrellas;
             };
 
-            const filtrarYLlenarCarrusel = (titulo, filtroFn, filtroParametros = {}) => {
+            const filtrarYLlenarCarrusel = (titulo, filtroFn) => {
                 const hospedajesFiltrados = data.hospedajes.filter(filtroFn);
                 if (hospedajesFiltrados.length) {
-                    contenedor.appendChild(crearCarrusel(hospedajesFiltrados, titulo, filtroParametros));
+                    contenedor.appendChild(crearCarrusel(hospedajesFiltrados, titulo));
                 }
             };
 
             // FILTROS
             filtrarYLlenarCarrusel(
                 "Hospedajes en Guatemala",
-                h => h.departamento.toLowerCase() === 'guatemala' && h.tipo.toLowerCase() === 'hotel',
-                { tipo: 'hotel', departamento: 'Guatemala' }
+                h => h.departamento.toLowerCase() === 'guatemala' && h.tipo.toLowerCase() === 'hotel'
             );
 
             filtrarYLlenarCarrusel(
                 "Todos los hospedajes",
-                h => h.tipo.toLowerCase() === 'hotel',
-                { tipo: 'hotel' }
+                h => h.tipo.toLowerCase() === 'hotel'
             );
 
         })
