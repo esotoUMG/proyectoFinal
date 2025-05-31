@@ -1,5 +1,3 @@
-#Node modules
-node_modules/
 
 # Entornos virtuales de Python
 venv/
@@ -10,7 +8,6 @@ __pycache__/
 .DS_Store
 
 # Archivos de configuración de entorno y editor
-.env
 *.swp
 .vscode/
 .idea/
@@ -24,7 +21,5 @@ package-lock.json
 *.bak
 
 # Archivos específicos del proyecto
-data/*.csv
-data/*.xlsx
 static/uploads/
 
