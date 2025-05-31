@@ -1,25 +1,19 @@
-
-# Entornos virtuales de Python
+# Python
 venv/
 __pycache__/
 *.py[cod]
-
-# Archivos de sistema
-.DS_Store
-
-# Archivos de configuración de entorno y editor
-*.swp
-.vscode/
-.idea/
+*.pyo
 
 # Node.js
 node_modules/
-package-lock.json
 
-# Archivos generados
-*.log
+
+# Archivos de sistema y editores
+.DS_Store
+*.swp
+*.swo
 *.bak
-
-# Archivos específicos del proyecto
-static/uploads/
-
+*.log
+.env
+.vscode/
+.idea/
