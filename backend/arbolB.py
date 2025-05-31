@@ -228,7 +228,6 @@ class CalificacionNodo:
             "calificaciones": [c.to_dict() for c in self.calificaciones.recorrer()]
         }
     
-
     # Para que el BTree pueda ordenar y comparar nodos correctamente:
     def __lt__(self, other):
         return self.id < other.id

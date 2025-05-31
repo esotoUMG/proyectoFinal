@@ -2,6 +2,7 @@ import csv, signal, sys, os
 from backend.modelos.lugar import Lugar
 from backend.modelos.calificacion import Calificacion 
 from backend.modelos.recomendaciones import Recomendaciones
+from .arbolB import CalificacionNodo
 
 
 def safe_float(valor, default=0.0):
@@ -15,6 +16,8 @@ def safe_int(valor, default=0):
         return int(valor)
     except (ValueError, TypeError):
         return default
+
+
 
 # Función para cargar lugares desde archivo CSV
 def cargar_lugares_csv(archivo, arbol_lugares, arbol_hospedaje):
@@ -97,6 +100,17 @@ def guardar_calificacion_csv(calificacion, archivo="./data/ratings.csv"):
     with open(archivo, "a", encoding="utf-8") as f:
         f.write(f"{calificacion.id_lugar},{calificacion.puntaje},{calificacion.comentario}\n")
 
+def insertar_calificacion_en_arbol(arbol_calificaciones, calificacion):
+    nodo = arbol_calificaciones.buscar(calificacion.id_lugar)
+    if nodo is None:
+        nuevo = CalificacionNodo(calificacion.id_lugar)
+        nuevo.agregar(calificacion)
+        arbol_calificaciones.insertar(nuevo)
+    else:
+        nodo.agregar(calificacion)
+
+
+
 def cargar_calificaciones_csv(archivo="calificaciones.csv", arbol_calificaciones=None, arbol_lugares=None):
     if arbol_calificaciones is None or arbol_lugares is None:
         raise ValueError("Se requieren ambos árboles: calificaciones y lugares")
@@ -104,39 +118,32 @@ def cargar_calificaciones_csv(archivo="calificaciones.csv", arbol_calificaciones
     try:
         with open(archivo, "r", encoding="utf-8") as f:
             reader = csv.reader(f)
-            next(reader)  # Saltar encabezado
+            next(reader)  # saltar encabezado
             for fila in reader:
                 if len(fila) >= 2:
                     try:
                         id_lugar = int(fila[0])
-                    except ValueError:
-                        continue  # Ignorar fila con id no válido
-
-                    try:
                         puntaje = float(fila[1])
+                        comentario = ",".join(fila[2:]) if len(fila) > 2 else ""
                     except ValueError:
-                        puntaje = 0.0
+                        continue
 
-                    comentario = ",".join(fila[2:]) if len(fila) > 2 else ""
                     calif = Calificacion(id_lugar, puntaje, comentario)
+                    insertar_calificacion_en_arbol(arbol_calificaciones, calif)
 
-                    # Insertar en árbol de calificaciones
-                    arbol_calificaciones.insertar(id_lugar, calif)
-
-                    # Actualizar promedio en árbol de lugares
-                    lugar = arbol_lugares.buscar(id_lugar)  # o tu función para obtener lugar por ID
+                    # actualizar promedio en árbol de lugares (igual que antes)
+                    lugar = arbol_lugares.buscar(id_lugar)
                     if lugar:
                         cantidad_actual = getattr(lugar, 'cantidad_calificaciones', 0)
                         promedio_actual = getattr(lugar, 'calificacion', 0.0)
-
                         nuevo_promedio = (promedio_actual * cantidad_actual + puntaje) / (cantidad_actual + 1)
                         lugar.calificacion = nuevo_promedio
                         lugar.cantidad_calificaciones = cantidad_actual + 1
 
-                        # Si tienes función para guardar lugar, la llamas
-                        # guardar_lugar(lugar) # Opcional si persistes los lugares
     except FileNotFoundError:
         pass
+
+
 
 def guardar_recomendaciones_csv(recomendaciones, archivo="./data/recomendaciones.csv"):
     os.makedirs(os.path.dirname(archivo), exist_ok=True)

@@ -1,12 +1,11 @@
 from flask import Flask, render_template, url_for, jsonify, redirect, request
 import  os, csv, re, asyncio, aiohttp, math
 from backend.arbolB import BTree, CalificacionNodo
-from backend.carga_csv import cargar_lugares_csv, guardar_lugar_en_csv, guardar_calificacion_csv, guardar_recomendaciones_csv
+from backend.carga_csv import cargar_lugares_csv, guardar_lugar_en_csv, guardar_calificacion_csv,cargar_calificaciones_csv, guardar_recomendaciones_csv, insertar_calificacion_en_arbol 
 from backend.modelos.utilidadesGrafo import UtilidadesGrafo
 from backend.modelos.GrafoPonderado import generar_grafo_ponderado  
 from backend.modelos.lugar import Lugar
 from backend.modelos.calificacion import Calificacion
-from backend.modelos.recomendacion import Recomendaciones
 
 
 app = Flask(__name__)
@@ -20,18 +19,23 @@ arbol_lugares = BTree(grado=5)     # Para turismo, comida, entretenimiento
 arbol_hospedaje = BTree(grado=5)  # Para hospedaje
 arbol_calificaciones = BTree(grado=5) #Para las calificaciones
 
-
-#Carga automatica del CSV al iniciar el servidor
+# Carga automática del CSV al iniciar el servidor
 try:
     with open('data/datos.csv', 'rb') as archivo_csv:
         cargar_lugares_csv(archivo_csv, arbol_lugares, arbol_hospedaje)
         print("Lugares y hospedajes cargados correctamente")
 
+    cargar_calificaciones_csv("ratings.csv", arbol_calificaciones, arbol_lugares)
+    print("Calificaciones cargadas correctamente")
+
+    # Exportar árboles
     UtilidadesGrafo.exportarArbol(arbol_lugares, "arbol_lugares")
     UtilidadesGrafo.exportarArbol(arbol_hospedaje, "arbol_hospedajes")
+    UtilidadesGrafo.exportarArbol(arbol_calificaciones, "arbol_calificaciones")
 
     print(f"Lugares cargados: {len(arbol_lugares.obtener_lugares())}")
     print(f"Hospedajes cargados: {len(arbol_hospedaje.obtener_lugares())}")
+    print(f"Calificaciones cargadas: {arbol_calificaciones.contar_nodos()}")
 except Exception as e:
     print(f"Error al cargar datos: {e}")
 
@@ -54,15 +58,6 @@ def obtener_siguiente_id(path='data/datos.csv'):
 
 #API PARA CALIFICACIONES
 ARCHIVO = "./data/datos.csv"
-
-def insertar_calificacion_en_arbol(arbol_calificaciones, calificacion):
-    nodo = arbol_calificaciones.buscar(calificacion.id_lugar)
-    if nodo is None:
-        nuevo = CalificacionNodo(calificacion.id_lugar)
-        nuevo.agregar(calificacion)
-        arbol_calificaciones.insertar(nuevo)
-    else:
-        nodo.agregar(calificacion)
 
 
 def obtener_lugar_por_id(id_lugar):
