@@ -1,10 +1,10 @@
-# 🌍 TravelMap
+# TravelMap
 
 **TravelMap** es una aplicación web desarrollada como proyecto final del curso **Programación III** en la Universidad Mariano Gálvez, sede Naranjo. El sistema permite a los usuarios **registrar, consultar y calificar lugares turísticos y hospedajes**, generar **rutas recomendadas personalizadas** según sus preferencias, visualizar recorridos en un **mapa interactivo**, y todo esto respaldado con estructuras de datos propias como **Árbol B** y **grafos ponderados**.
 
 ---
 
-## 🎯 Objetivo del Proyecto
+## Objetivo del Proyecto
 
 Desarrollar un sistema de planificación turística inteligente que ayude a los usuarios a:
 - Tomar decisiones informadas sobre qué lugares visitar
@@ -14,18 +14,18 @@ Desarrollar un sistema de planificación turística inteligente que ayude a los 
 
 ---
 
-## 🚀 Funcionalidades principales
+## Funcionalidades principales
 
-- 📁 **Carga masiva** de lugares turísticos y hospedajes desde archivos CSV
-- 🧭 **Generación de rutas recomendadas** usando grafos ponderados y árboles de decisión
-- 🗺️ **Visualización de rutas** en mapa interactivo con Google Maps
-- ⭐ **Sistema de calificaciones** y comentarios por parte de los usuarios
-- 📊 **Estructuras internas eficientes** como Árbol B para almacenamiento y búsqueda
-- 🌐 **Interfaz intuitiva** construida con HTML, CSS y JavaScript
+- **Carga masiva** de lugares turísticos y hospedajes desde archivos CSV
+- **Generación de rutas recomendadas** usando grafos ponderados y árboles de decisión
+- **Visualización de rutas** en mapa interactivo con Google Maps
+- **Sistema de calificaciones** y comentarios por parte de los usuarios
+- **Estructuras internas eficientes** como Árbol B para almacenamiento y búsqueda
+- **Interfaz intuitiva** construida con HTML, CSS y JavaScript
 
 ---
 
-## 🛠️ Tecnologías y Herramientas Utilizadas
+## Tecnologías y Herramientas Utilizadas
 
 | Herramienta           | Descripción                                                        |
 |------------------------|--------------------------------------------------------------------|
@@ -40,7 +40,7 @@ Desarrollar un sistema de planificación turística inteligente que ayude a los 
 
 ---
 
-## ✅ Requisitos Previos
+## Requisitos Previos
 
 - Python 3.11 o superior  
 - pip instalado  
@@ -49,7 +49,7 @@ Desarrollar un sistema de planificación turística inteligente que ayude a los 
 
 ---
 
-## 🔧 Instalación y Configuración
+## Instalación y Configuración
 
 1. **Clona el repositorio:**
 
@@ -76,7 +76,7 @@ http://localhost:5000
 
 ```
 
-## 📦 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```bash
 TravelMap/
@@ -100,7 +100,7 @@ TravelMap/
 
 ```
 
-## 🧾 Formato del Archivo CSV
+## Formato del Archivo CSV
 
 ```bash
 nombre,tipo,departamento,precio,calificacion
@@ -108,7 +108,7 @@ Tikal,turismo,Petén,100,4.7
 Hotel Real,hospedaje,Zacapa,150,4.3
 
 ```
-## 📌 Uso del Sistema
+## Uso del Sistema
 ```bash
 1. Cargar Lugares
 Ir a la sección "Cargar Lugares"
@@ -143,7 +143,7 @@ Se abre Google Maps con la ruta y marcadores
 
 
 ```
-## 🔁 Rutas mediante Grafos Ponderados
+## Rutas mediante Grafos Ponderados
 
 ```bash
 El sistema genera rutas utilizando grafos ponderados, donde:
@@ -156,7 +156,7 @@ Se utiliza el algoritmo de Dijkstra para encontrar la mejor ruta desde el origen
 
 
 ```
-## 🌳 Árboles de Rutas
+## Árboles de Rutas
 ```bash
 TravelMap también genera internamente un árbol de decisiones:
 
@@ -171,7 +171,7 @@ Ayuda a estructurar las recomendaciones que recibe el usuario.
 
 ```
 
-## 🧠 Algoritmos y Estructuras Usadas
+## Algoritmos y Estructuras Usadas
 ```bash
 Árbol B: para almacenamiento eficiente de lugares
 
