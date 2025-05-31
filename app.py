@@ -843,8 +843,7 @@ def api_recomendaciones_hospedajes():
         })
     return {"recomendaciones": lista_recomendaciones}
 
-
-def guardar_lugares_csv(archivo="lugares.csv"):
+def guardar_lugares_csv(archivo="hospedajes.csv"):
     with open(archivo, "w", encoding="utf-8", newline="") as f:
         writer = csv.writer(f)
         writer.writerow([
