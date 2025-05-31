@@ -15,7 +15,7 @@ cache_tiempos_traslado = {}
 
 
 #Diccionario para crear arboles segun el tipo de actividad
-arbol_lugares = BTree(grado=5)     # Para turismo, comida, entretenimiento
+arbol_lugares = BTree(grado=5) # Para turismo, comida, entretenimiento
 arbol_hospedaje = BTree(grado=5)  # Para hospedaje
 arbol_calificaciones = BTree(grado=5) #Para las calificaciones
 
@@ -112,8 +112,12 @@ def calcular_promedio_calificaciones(arbol_calificaciones, id_lugar):
     promedio = suma / len(calificaciones)
     return promedio
 
+ultimo_id_calificacion = 0  # Variable global para llevar el conteo
+
 @app.route('/api/calificar', methods=['POST'])
 def api_calificar():
+    global ultimo_id_calificacion
+
     data = request.get_json()
     if not data:
         return jsonify({"error": "No se recibieron datos JSON"}), 400
@@ -130,23 +134,26 @@ def api_calificar():
     if lugar is None:
         return jsonify({"error": "Lugar no encontrado"}), 404
 
+    # Actualizar promedio y cantidad de calificaciones
     promedio_actual = getattr(lugar, 'calificacion', 0.0)
     cantidad_actual = getattr(lugar, 'cantidad_calificaciones', 0)
 
     nuevo_promedio = (promedio_actual * cantidad_actual + puntaje) / (cantidad_actual + 1)
-
     lugar.calificacion = nuevo_promedio
     lugar.cantidad_calificaciones = cantidad_actual + 1
 
     guardar_lugar(lugar)
 
-    calif = Calificacion(id_lugar, puntaje, comentario)
+    # Incrementar ID secuencial y crear calificación nueva
+    ultimo_id_calificacion += 1
+    id_calificacion = ultimo_id_calificacion
+
+    calif = Calificacion(id_calificacion, id_lugar, puntaje, comentario)
     insertar_calificacion_en_arbol(arbol_calificaciones, calif)
     guardar_calificacion_csv(calif)
-    # recom = Recomendacion(id,departamento,municipio,nombre,tipo,direccion,latitud,longitud,calificacion,tiempo,precio,calificaciones)
-    # guardar_recomendaciones_csv()
 
     return jsonify({"mensaje": "Calificación registrada", "nuevo_promedio": nuevo_promedio}), 200
+
 
 @app.route('/api/calificaciones/<int:id_lugar>', methods=['GET'])
 def api_obtener_calificaciones(id_lugar):

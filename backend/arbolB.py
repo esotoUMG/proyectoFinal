@@ -196,12 +196,23 @@ class BTree:
             if lugar.nombre.strip().lower() == nombre.strip().lower():
                 return lugar
         return None
+    
+    def contar_nodos(self):
+        return self._contar_nodos_rec(self.raiz)
+
+    def _contar_nodos_rec(self, nodo):
+        if nodo is None:
+            return 0
+        cuenta = 1  # Cuenta el nodo actual
+        for i in range(nodo.hijos.longitud()):
+            cuenta += self._contar_nodos_rec(nodo.hijos.obtener(i))
+        return cuenta
 
 
 class CalificacionNodo:
     def __init__(self, id_lugar):
         self.id_lugar = id_lugar
-        self.calificaciones = Lista()  # lista enlazada personalizada
+        self.calificaciones = Lista()
 
     @property
     def id(self):
@@ -227,11 +238,11 @@ class CalificacionNodo:
             "promedio": self.promedio(),
             "calificaciones": [c.to_dict() for c in self.calificaciones.recorrer()]
         }
-    
-    # Para que el BTree pueda ordenar y comparar nodos correctamente:
+
     def __lt__(self, other):
         return self.id < other.id
 
     def __eq__(self, other):
         return self.id == other.id
+
 

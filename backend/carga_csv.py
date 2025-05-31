@@ -100,18 +100,25 @@ def guardar_calificacion_csv(calificacion, archivo="./data/ratings.csv"):
     with open(archivo, "a", encoding="utf-8") as f:
         f.write(f"{calificacion.id_lugar},{calificacion.puntaje},{calificacion.comentario}\n")
 
+
 def insertar_calificacion_en_arbol(arbol_calificaciones, calificacion):
     nodo = arbol_calificaciones.buscar(calificacion.id_lugar)
-    if nodo is None:
-        nuevo = CalificacionNodo(calificacion.id_lugar)
-        nuevo.agregar(calificacion)
-        arbol_calificaciones.insertar(nuevo)
-    else:
+    if nodo:
+        # Nodo ya existe, agregamos calificación a la lista interna del nodo
         nodo.agregar(calificacion)
+    else:
+        # Nodo no existe, creamos un nodo nuevo con la clave id_lugar y agregamos la calificación
+        nuevo_nodo = CalificacionNodo(calificacion.id_lugar)
+        nuevo_nodo.agregar(calificacion)
+        arbol_calificaciones.insertar(nuevo_nodo)
 
+
+ultimo_id_calificacion = 0  # inicializamos
 
 
 def cargar_calificaciones_csv(archivo="calificaciones.csv", arbol_calificaciones=None, arbol_lugares=None):
+    global ultimo_id_calificacion
+
     if arbol_calificaciones is None or arbol_lugares is None:
         raise ValueError("Se requieren ambos árboles: calificaciones y lugares")
 
@@ -128,10 +135,14 @@ def cargar_calificaciones_csv(archivo="calificaciones.csv", arbol_calificaciones
                     except ValueError:
                         continue
 
-                    calif = Calificacion(id_lugar, puntaje, comentario)
+                    # Incrementar ID secuencial de calificación
+                    ultimo_id_calificacion += 1
+                    id_calificacion = ultimo_id_calificacion
+
+                    calif = Calificacion(id_calificacion, id_lugar, puntaje, comentario)
                     insertar_calificacion_en_arbol(arbol_calificaciones, calif)
 
-                    # actualizar promedio en árbol de lugares (igual que antes)
+                    # actualizar promedio en árbol de lugares
                     lugar = arbol_lugares.buscar(id_lugar)
                     if lugar:
                         cantidad_actual = getattr(lugar, 'cantidad_calificaciones', 0)
