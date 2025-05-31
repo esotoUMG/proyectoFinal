@@ -21,11 +21,11 @@ arbol_calificaciones = BTree(grado=5) #Para las calificaciones
 
 # Carga automática del CSV al iniciar el servidor
 try:
-    with open('data/datos.csv', 'rb') as archivo_csv:
+    with open('data/datos.csv', 'r', encoding='utf-8-sig') as archivo_csv:
         cargar_lugares_csv(archivo_csv, arbol_lugares, arbol_hospedaje)
-        print("Lugares y hospedajes cargados correctamente")
+    print("Lugares y hospedajes cargados correctamente")
 
-    cargar_calificaciones_csv("ratings.csv", arbol_calificaciones, arbol_lugares)
+    cargar_calificaciones_csv("data/ratings.csv", arbol_calificaciones, arbol_lugares)
     print("Calificaciones cargadas correctamente")
 
     # Exportar árboles
@@ -35,9 +35,11 @@ try:
 
     print(f"Lugares cargados: {len(arbol_lugares.obtener_lugares())}")
     print(f"Hospedajes cargados: {len(arbol_hospedaje.obtener_lugares())}")
-    print(f"Calificaciones cargadas: {arbol_calificaciones.contar_nodos()}")
+    print(f"Calificaciones cargadas: {len(arbol_calificaciones.obtener_calificaciones())}")
+
 except Exception as e:
     print(f"Error al cargar datos: {e}")
+
 
 
 #FUNCION PARA SEGUIR LOS ID'S DEL ARCHIVO DATOS.CSV

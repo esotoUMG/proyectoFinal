@@ -21,8 +21,7 @@ def safe_int(valor, default=0):
 
 # Función para cargar lugares desde archivo CSV
 def cargar_lugares_csv(archivo, arbol_lugares, arbol_hospedaje):
-    decoded = archivo.read().decode('utf-8-sig').splitlines()
-    reader = csv.DictReader(decoded)
+    reader = csv.DictReader(archivo)
 
     for fila in reader:
         id_lugar = fila['ï»¿Id'] if 'ï»¿Id' in fila else fila.get('Id')
@@ -137,9 +136,6 @@ def cargar_calificaciones_csv(archivo="calificaciones.csv", arbol_calificaciones
                         continue
 
                     calif = Calificacion(id_calificacion, id_lugar, puntaje, comentario)
-
-                    print(f"Calificación cargada: {calif}")
-
                     insertar_calificacion_en_arbol(arbol_calificaciones, calif)
 
                     # Actualizar promedio en el árbol de lugares

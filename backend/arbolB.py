@@ -183,6 +183,11 @@ class BTree:
         lugares = []
         self._recorrer(self.raiz, lugares)
         return lugares
+    
+    def obtener_calificaciones(self):
+        calificaciones = []
+        self._recorrer(self.raiz, calificaciones)
+        return calificaciones
 
     def _recorrer(self, nodo, lista):
         for i in range(nodo.claves.longitud()):
@@ -197,25 +202,15 @@ class BTree:
                 return lugar
         return None
     
-    def contar_nodos(self):
-        return self._contar_nodos_rec(self.raiz)
-
-    def _contar_nodos_rec(self, nodo):
-        if nodo is None:
-            return 0
-        cuenta = 1  # Cuenta el nodo actual
-        for i in range(nodo.hijos.longitud()):
-            cuenta += self._contar_nodos_rec(nodo.hijos.obtener(i))
-        return cuenta
-
 
 class CalificacionNodo:
     def __init__(self, id_lugar):
-        self.id_lugar = id_lugar
-        self.calificaciones = Lista()
+        self.id_lugar = id_lugar  # Identificador del lugar, clave del nodo
+        self.calificaciones = Lista()  # Lista de objetos Calificacion
 
     @property
     def id(self):
+        # Esto es lo que usa el árbol para indexar (no cambiar)
         return self.id_lugar
 
     def agregar(self, calificacion):
@@ -234,15 +229,44 @@ class CalificacionNodo:
 
     def to_dict(self):
         return {
+            "id": self.id_lugar,
             "id_lugar": self.id_lugar,
             "promedio": self.promedio(),
             "calificaciones": [c.to_dict() for c in self.calificaciones.recorrer()]
         }
+
+    def buscar_calificacion(self, id_calificacion):
+        actual = self.calificaciones.primero
+        while actual:
+            if actual.dato.id_calificacion == id_calificacion:
+                return actual.dato
+            actual = actual.siguiente
+        return None
+
+    def eliminar_calificacion(self, id_calificacion):
+        actual = self.calificaciones.primero
+        prev = None
+        indice = 0
+        while actual:
+            if actual.dato.id_calificacion == id_calificacion:
+                # eliminar en lista enlazada
+                if prev is None:
+                    self.calificaciones.primero = actual.siguiente
+                else:
+                    prev.siguiente = actual.siguiente
+                self.calificaciones._longitud -= 1
+                return True
+            prev = actual
+            actual = actual.siguiente
+            indice += 1
+        return False
 
     def __lt__(self, other):
         return self.id < other.id
 
     def __eq__(self, other):
         return self.id == other.id
+
+
 
 
