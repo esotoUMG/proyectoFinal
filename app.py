@@ -1,7 +1,7 @@
 from flask import Flask, render_template, url_for, jsonify, redirect, request
-import  os, csv, re, asyncio, aiohttp, math
+import  os, csv, re, asyncio, aiohttp, math, atexit, signal, sys
 from backend.arbolB import BTree, CalificacionNodo
-from backend.carga_csv import cargar_lugares_csv, guardar_lugar_en_csv, guardar_calificacion_csv,cargar_calificaciones_csv, guardar_recomendaciones_csv, insertar_calificacion_en_arbol 
+from backend.carga_csv import cargar_lugares_csv, guardar_lugar_en_csv, guardar_calificacion_csv,cargar_calificaciones_csv, insertar_calificacion_en_arbol 
 from backend.modelos.utilidadesGrafo import UtilidadesGrafo
 from backend.modelos.GrafoPonderado import generar_grafo_ponderado  
 from backend.modelos.lugar import Lugar
@@ -843,6 +843,56 @@ def api_recomendaciones_hospedajes():
         })
     return {"recomendaciones": lista_recomendaciones}
 
+
+def guardar_lugares_csv(archivo="lugares.csv"):
+    with open(archivo, "w", encoding="utf-8", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow([
+            "id", "departamento", "municipio", "nombre", "tipo", "direccion",
+            "latitud", "longitud", "calificacion", "tiempo", "precio", "cantidad_calificaciones"
+        ])
+        for lugar in arbol_lugares.recorrer():
+            writer.writerow([
+                lugar.id,
+                lugar.departamento,
+                lugar.municipio,
+                lugar.nombre,
+                lugar.tipo,
+                lugar.direccion,
+                lugar.latitud,
+                lugar.longitud,
+                lugar.calificacion,
+                lugar.tiempo if lugar.tiempo is not None else "",
+                lugar.precio,
+                len(lugar.calificaciones) if hasattr(lugar, "calificaciones") else 0
+            ])
+
+
+def guardar_calificaciones_completas_csv(archivo="calificaciones.csv"):
+    with open(archivo, "w", encoding="utf-8", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["id", "id_lugar", "puntaje", "comentario"])
+        for nodo in arbol_calificaciones.recorrer():  # cada nodo representa un id_lugar
+            for calif in nodo.calificaciones.recorrer():
+                writer.writerow([calif.id, calif.id_lugar, calif.puntaje, calif.comentario])
+
+
+def guardar_todo():
+    print("\n Guardando datos antes de cerrar el programa...")
+    guardar_lugares_csv()
+    guardar_calificaciones_completas_csv()
+    print("Datos guardados correctamente.")
+
+# Se ejecuta cuando el programa termina normalmente
+atexit.register(guardar_todo)
+
+# Se ejecuta si se presiona Ctrl+C (SIGINT)
+def manejar_salida_signal(sig, frame):
+    guardar_todo()
+    sys.exit(0)
+
+# Registrar la señal de interrupción (Ctrl+C)
+signal.signal(signal.SIGINT, manejar_salida_signal)
 
 if __name__ == "__main__":
     app.run(debug=True)

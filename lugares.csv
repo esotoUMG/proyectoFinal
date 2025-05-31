@@ -1,0 +1,65 @@
+id,departamento,municipio,nombre,tipo,direccion,latitud,longitud,calificacion,tiempo,precio,cantidad_calificaciones
+37,Retalhuleu,Retalhuleu,Xetulul,Entretenimiento,Xetulul,14.5,-91.478,5.0,5.0,100.0,0
+9,Izabal,Puerto Barrios,Río Dulce,Turismo,Río Dulce,15.4733,-88.7369,4.6,3.0,75.0,0
+18,Guatemala,Ciudad de Guatemala,San Martín,Comida,"8a Avenida 12-10, Zona 4",14.6315,-90.517,4.0,1.0,75.0,0
+3,Sololá,Panajachel,Lago de Atitlán,Turismo,Panajachel,14.6849,-91.1512,4.666666666666667,6.0,60.0,0
+6,Baja Verapaz,Salamá,Cueva de las Piñuelas,Turismo,Salamá,15.3487,-89.5749,4.5,2.0,50.0,0
+1,Petén,Flores,Tikal,Turismo,Parque Nacional Tikal,17.2216,-89.6236,4.0,5.0,50.0,0
+2,Alta Verapaz,Lanquín,Semuc Champey,Turismo,Semuc Champey,15.7794,-90.3794,4.7,4.0,50.0,0
+4,Sacatepéquez,La Antigua Guatemala,Antigua Guatemala,Turismo,Calle Real de Guadalupe,14.559,-90.7308,3.0,6.0,0.0,0
+5,Chimaltenango,Parramos,Volcán de Fuego,Turismo,Volcán de Fuego,14.4733,-90.883,4.7,4.0,150.0,0
+7,Quetzaltenango,Quetzaltenango,Fuentes Georginas,Turismo,Fuentes Georginas,14.83,-91.51,4.7,3.0,50.0,0
+8,San Marcos,San Pedro,Lago de Xolotlan,Turismo,"San Pedro, San Marcos",14.7813,-91.4775,4.7,4.0,50.0,0
+12,Guatemala,Ciudad de Guatemala,Restaurante El Cafetal,Comida,"Avenida Reforma 6-55, Zona 10",14.6342,-90.5066,1.0,1.0,100.0,0
+15,Guatemala,Ciudad de Guatemala,El Mercado,Comida,"8a Avenida 10-30, Zona 10",14.634,-90.51,4.5,1.0,65.0,0
+10,Jalapa,Jalapa,Parque Nacional Sierra de las Minas,Turismo,Jalapa,14.5394,-89.8964,4.7,2.0,75.0,0
+11,Guatemala,Ciudad de Guatemala,Gracia Cocina de Autor,Comida,"6a Avenida 14-55, Zona 10",14.6349,-90.5069,4.0,1.0,95.0,0
+13,Guatemala,Ciudad de Guatemala,Hacienda Real,Comida,"Boulevard Austriaco 37-01, Zona 16",14.6113,-90.5222,4.5,1.0,125.0,0
+14,Guatemala,Ciudad de Guatemala,Saúl Bistro,Comida,"6a Avenida 10-20, Zona 10",14.6329,-90.5082,4.0,1.0,75.0,0
+16,Guatemala,Ciudad de Guatemala,Los Cebollines,Comida,"2a Avenida 10-21, Zona 10",14.6301,-90.5087,4.6,1.0,85.0,0
+17,Guatemala,Ciudad de Guatemala,Café Barista,Comida,"9a Avenida 18-15, Zona 14",14.6357,-90.5034,4.4,1.0,20.0,0
+31,Escuintla,Puerto San José,Puerto de San José,Turismo,Puerto San José,13.9755,-90.9314,4.4,5.0,60.0,0
+34,Quiché,Santa Cruz del Quiché,Lagunas de Ixcán,Turismo,Santa Cruz del Quiché,15.0081,-90.4165,4.7,4.0,50.0,0
+19,Guatemala,Ciudad de Guatemala,Cocina de la Abuela,Comida,"2a Avenida 4-14, Zona 2",14.6202,-90.5121,4.6,1.0,50.0,0
+20,Guatemala,Ciudad de Guatemala,The Market,Comida,"1a Avenida 1-45, Zona 10",14.6301,-90.5045,4.6,1.0,60.0,0
+32,Jalapa,Jalapa,Parque Nacional Sierra de las Minas,Turismo,Jalapa,14.5394,-89.8964,4.7,3.0,75.0,0
+33,Sacatepéquez,San Miguel Dueñas,Volcán de Pacaya,Turismo,Volcán Pacaya,14.3403,-90.6022,4.8,3.0,135.0,0
+35,Chimaltenango,Parramos,Volcán de Fuego,Turismo,Volcán de Fuego,14.4733,-90.883,4.7,4.0,135.0,0
+36,Izabal,Morales,Playa Blanca,Turismo,Morales,15.761,-88.5187,4.5,3.0,25.0,0
+46,Guatemala,Ciudad de Guatemala,Café San Martín,Comida,"8a Avenida 6-45, Zona 4",14.6319,-90.5145,4.0,1.0,81.0,0
+65,Santa Rosa,Nueva Santa Rosa,Balneario Los Chorritos,Turismo,"Aldea Espitia Real, Nueva Santa Rosa",14.6345,-90.206,4.5,3.0,50.0,0
+74,Guatemala,Ciudad de Guatemala,Pollo Campero,Comida,Diversas ubicaciones en la ciudad,14.6345,-90.506,4.0,1.0,55.0,0
+40,Guatemala,Ciudad de Guatemala,Zoológico La Aurora,Entretenimiento,"2a Calle 15-05, Zona 13",14.6343,-90.5196,4.5,4.0,50.0,0
+43,Guatemala,Ciudad de Guatemala,Restaurante Casa del Conde,Comida,"8a Avenida 6-14, Zona 10",14.6329,-90.5127,4.0,1.0,104.0,0
+38,Santa Rosa,Cuilapa,Parque Natural Montañas de Cuilapa,Turismo,Cuilapa,14.1311,-90.0431,4.6,3.0,20.0,0
+39,Baja Verapaz,Cobán,Biotopo del Quetzal,Turismo,Cobán,15.5333,-90.4278,4.7,6.0,75.0,0
+41,Guatemala,Ciudad de Guatemala,La Cocina de la Abuela,Comida,"6a Avenida 8-10, Zona 10",14.6345,-90.505,4.5,1.0,57.0,0
+42,Guatemala,Ciudad de Guatemala,Restaurante La Fonda,Comida,"3a Avenida 12-15, Zona 1",14.6203,-90.511,4.5,1.0,109.0,0
+44,Escuintla,Puerto San José,Mariscos El Muelle,Comida,Puerto San José,13.9763,-90.9312,4.4,1.0,65.0,0
+45,Sacatepéquez,Antigua Guatemala,Restaurante Los Tres Tiempos,Comida,"6a Calle 7-34, Zona 2",14.5568,-90.7294,4.6,1.0,71.0,0
+49,Escuintla,Puerto San José,Restaurante El Velero,Comida,Puerto San José,13.976,-90.9308,4.4,1.0,110.0,0
+62,Guatemala,Ciudad de Guatemala,Ciudad Cayalá,Entretenimiento,"Zona 16, Ciudad de Guatemala",14.6345,-90.506,4.7,4.0,0.0,0
+47,Quetzaltenango,Quetzaltenango,La Casa de la Abuela,Comida,"4a Calle 8-50, Zona 1",14.8396,-91.5161,3.0,1.0,66.0,0
+48,Guatemala,Ciudad de Guatemala,The Market Kitchen,Comida,"2a Avenida 14-45, Zona 10",14.6334,-90.5084,5.0,1.0,56.0,0
+50,Petén,Flores,Restaurante Las Palmas,Comida,"Calle Principal, Flores",17.2222,-89.629,4.5,1.0,87.0,0
+61,Jalapa,Jalapa,Parque Ecológico Pino Dulce,Entretenimiento,Jalapa,14.6345,-89.992,4.6,4.0,75.0,0
+63,Sacatepéquez,Sumpango,Festival de Barriletes Gigantes,Entretenimiento,Sumpango,14.6345,-90.7294,4.8,5.0,0.0,0
+64,Alta Verapaz,San Juan Chamelco,Grutas del Rey Marcos,Turismo,San Juan Chamelco,15.6345,-90.406,4.7,2.0,50.0,0
+68,Alta Verapaz,San Pedro Carchá,Balneario Las Islas,Turismo,San Pedro Carchá,15.6345,-90.406,4.6,4.0,50.0,0
+71,Guatemala,Ciudad de Guatemala,Shukos y Dobladas 4 Grados Norte,Turismo,"3 Avenida A & 9 Calle, Zona 4",14.6205,-90.5133,4.5,1.0,50.0,0
+66,Escuintla,La Democracia,Finca Monte Alto,Turismo,La Democracia,14.6345,-90.806,4.6,2.0,25.0,0
+67,Guatemala,Fraijanes,Sitio Arqueológico Santa Isabel,Turismo,Fraijanes,14.6345,-90.506,4.5,3.0,50.0,0
+69,Escuintla,Tiquisate,Playa El Semillero,Turismo,Tiquisate,14.6345,-90.906,4.7,2.0,50.0,0
+70,Quiché,Chichicastenango,Iglesia de Santo Tomás,Turismo,Chichicastenango,14.6345,-90.706,4.8,1.0,50.0,0
+72,Guatemala,Ciudad de Guatemala,Las Carnes de Rodrigo,Turismo,"7a Avenida, Zona 9",14.6166,-90.5147,4.6,1.0,50.0,0
+73,Guatemala,Ciudad de Guatemala,Tre Fratelli Fontabella,Turismo,"Plaza Fontabella, Zona 10",14.61,-90.513,4.5,1.0,50.0,0
+77,Guatemala,Ciudad de Guatemala,Chiltepe,Comida,"7 Avenida 2-30, Zona 4",14.6345,-90.506,4.2,1.0,55.0,0
+80,Guatemala,Ciudad de Guatemala,Divina Gula GT,Comida,"Vía 4 1-00, Edificio Campus Tec 1",14.6345,-90.506,4.6,1.0,60.0,0
+75,Guatemala,Ciudad de Guatemala,Los Ranchos Avia,Comida,Zona 10,14.61,-90.513,4.5,1.0,60.0,0
+76,Guatemala,Ciudad de Guatemala,Taquería Las Flautas,Comida,"7a Avenida 9-63, Zona 1",14.6345,-90.506,4.6,1.0,55.0,0
+78,Guatemala,Ciudad de Guatemala,Castor's Pizza (Zona 4),Comida,"Edificio Séptimo, Zona 4",14.6345,-90.506,4.3,1.0,85.0,0
+79,Guatemala,Ciudad de Guatemala,En Un Dos Por Crepes,Comida,"8a Calle & 4 A Avenida, Zona 10",14.6345,-90.506,1.0,1.0,45.0,0
+81,Guatemala,Ciudad de Guatemala,Hotel Real Intercontinental,Comida,"14 Calle 2-51, Zona 10",14.61,-90.513,4.5,1.0,85.0,0
+82,Guatemala,Ciudad de Guatemala,Hyatt Centric Guatemala City,Comida,"12 Calle 2-25, Zona 10",14.61,-90.513,4.0,1.0,75.0,0
+83,Guatemala,Ciudad de Guatemala,The Westin Camino Real,Comida,"Avenida la Reforma y 14 Calle, Zona 10",14.61,-90.513,4.0,1.0,75.0,0
+91,Sacatepéquez,San Lucas,Cerro Alux,turismo,kilómetro 26.5 de la Carretera Nacional 1,14.601935139733321,-90.64447987860687,4.0,2.0,25.0,0

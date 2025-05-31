@@ -1,5 +1,7 @@
 import math
 
+
+
 # Clase NodoLista: Nodo individual de una lista enlazada
 class NodoLista:
     def __init__(self, dato):
@@ -100,6 +102,7 @@ class Nodo:
 
 # Clase BTree: Árbol B usando Lista personalizada
 class BTree:
+    
     def __init__(self, grado):
         self.grado = grado
         self.raiz = Nodo(grado, True)
@@ -202,6 +205,12 @@ class BTree:
                 return lugar
         return None
     
+    def recorrer(self):
+        resultados = []
+        self._recorrer(self.raiz, resultados)
+        return resultados
+    
+
 
 class CalificacionNodo:
     def __init__(self, id_lugar):
