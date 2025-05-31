@@ -156,17 +156,22 @@ def api_calificar():
 
     return jsonify({"mensaje": "Calificación registrada", "nuevo_promedio": nuevo_promedio}), 200
 
-
 @app.route('/api/calificaciones/<int:id_lugar>', methods=['GET'])
 def api_obtener_calificaciones(id_lugar):
     nodo_calificaciones = arbol_calificaciones.buscar(id_lugar)
-    if not nodo_calificaciones:
+    if not nodo_calificaciones or not nodo_calificaciones.calificaciones:
         return jsonify({"id_lugar": id_lugar, "promedio": 0, "calificaciones": []})
 
+    calif_list = nodo_calificaciones.calificaciones.recorrer()
+    calif_dicts = [c.to_dict() for c in calif_list]
+
+    # Calcular promedio dinámicamente para evitar inconsistencias
+    promedio = sum(c.puntaje for c in calif_list) / len(calif_list) if calif_list else 0
+
     return jsonify({
-        "id_lugar": nodo_calificaciones.id_lugar,
-        "promedio": nodo_calificaciones.promedio(),
-        "calificaciones": [c.to_dict() for c in nodo_calificaciones.calificaciones.recorrer()]
+        "id_lugar": id_lugar,
+        "promedio": promedio,
+        "calificaciones": calif_dicts
     })
 
 

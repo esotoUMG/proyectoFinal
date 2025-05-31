@@ -72,25 +72,6 @@ function mostrarInfoLugar(lugar) {
         <p>${precio}</p>
     `;
 
-    // Intentar cargar el promedio actualizado desde el backend
-    fetch(`/api/calificaciones/${lugar.id}`)
-        .then(res => res.json())
-        .then(data => {
-            if (data.promedio !== undefined) {
-                const promedio = Number(data.promedio).toFixed(1);
-                const estrellasProm = generarEstrellasHTML(promedio);
-
-                const califCont = document.getElementById('calificacion-promedio');
-                if (califCont) {
-                    califCont.innerHTML = `
-                        <span class="calificacion-valor">${promedio}</span>
-                        <span class="estrellas">${estrellasProm}</span>
-                    `;
-                }
-            }
-        })
-        .catch(err => console.warn("No se pudo cargar el promedio actualizado:", err));
-
     // Mostrar mapa si está disponible
     if (typeof initMap === "function") {
         initMap();
@@ -417,9 +398,7 @@ async function cargarCalificaciones(idLugar) {
   } catch (error) {
     contenedor.innerHTML = `<p>Error: ${error.message}</p>`;
   }
-}
-
-  
+}  
   const formComentario = document.getElementById('form-comentario');
   const inputComentario = document.getElementById('input-comentario');
 
@@ -466,6 +445,7 @@ async function cargarCalificaciones(idLugar) {
         alert(data.mensaje);
         formComentario.reset();
         cargarCalificaciones(idLugar); // Recarga los comentarios para mostrar el nuevo
+        window.location.reload();
       } else {
         alert("Error: " + (data.error || "No se pudo enviar la calificación"));
       }
@@ -475,8 +455,7 @@ async function cargarCalificaciones(idLugar) {
     }
   });
 
-  // Ejemplo de función para obtener el id del lugar activo (ajusta según tu app)
+
   function obtenerIdLugarActivo() {
-    // Si usas URL, o algún atributo en el DOM, o variable JS global, etc.
     return window.idLugarActual || null;
   }

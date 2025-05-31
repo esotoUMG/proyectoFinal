@@ -2,7 +2,8 @@ import csv, signal, sys, os
 from backend.modelos.lugar import Lugar
 from backend.modelos.calificacion import Calificacion 
 from backend.modelos.recomendaciones import Recomendaciones
-from .arbolB import CalificacionNodo
+from backend.arbolB import CalificacionNodo
+
 
 
 def safe_float(valor, default=0.0):
@@ -150,6 +151,26 @@ def cargar_calificaciones_csv(archivo="calificaciones.csv", arbol_calificaciones
     except FileNotFoundError:
         print("Archivo de calificaciones no encontrado.")
 
+def cargar_calificaciones_desde_csv(id_lugar, archivo="calificaciones.csv"):
+    calificaciones = []
+    try:
+        with open(archivo, "r", encoding="utf-8") as f:
+            reader = csv.reader(f)
+            next(reader)  # saltar encabezado
+            for fila in reader:
+                if len(fila) >= 3:
+                    try:
+                        id_calif = int(fila[0])
+                        id_lug = int(fila[1])
+                        puntaje = float(fila[2])
+                        comentario = ",".join(fila[3:]) if len(fila) > 3 else ""
+                        if id_lug == id_lugar:
+                            calificaciones.append(Calificacion(id_calif, id_lug, puntaje, comentario))
+                    except:
+                        continue
+    except FileNotFoundError:
+        pass
+    return calificaciones
 
 def guardar_recomendaciones_csv(recomendaciones, archivo="./data/recomendaciones.csv"):
     os.makedirs(os.path.dirname(archivo), exist_ok=True)

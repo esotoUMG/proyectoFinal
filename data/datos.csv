@@ -38,15 +38,15 @@
 37,Retalhuleu,Retalhuleu,Xetulul,Entretenimiento,Xetulul,14.5,-91.478,5.00,100,5
 38,Santa Rosa,Cuilapa,Parque Natural Montañas de Cuilapa,Turismo,Cuilapa,14.1311,-90.0431,4.6,20,3
 39,Baja Verapaz,Cobán,Biotopo del Quetzal,Turismo,Cobán,15.5333,-90.4278,4.7,75,6
-40,Guatemala,Ciudad de Guatemala,Zoológico La Aurora,Entretenimiento,"2a Calle 15-05, Zona 13",14.6343,-90.5196,4.6,50,4
+40,Guatemala,Ciudad de Guatemala,Zoológico La Aurora,Entretenimiento,"2a Calle 15-05, Zona 13",14.6343,-90.5196,4.00,50,4
 41,Guatemala,Ciudad de Guatemala,La Cocina de la Abuela,Comida,"6a Avenida 8-10, Zona 10",14.6345,-90.505,4.5,57,1
 42,Guatemala,Ciudad de Guatemala,Restaurante La Fonda,Comida,"3a Avenida 12-15, Zona 1",14.6203,-90.511,4.5,109,1
 43,Guatemala,Ciudad de Guatemala,Restaurante Casa del Conde,Comida,"8a Avenida 6-14, Zona 10",14.6329,-90.5127,4.00,104,1
 44,Escuintla,Puerto San José,Mariscos El Muelle,Comida,Puerto San José,13.9763,-90.9312,4.4,65,1
 45,Sacatepéquez,Antigua Guatemala,Restaurante Los Tres Tiempos,Comida,"6a Calle 7-34, Zona 2",14.5568,-90.7294,4.6,71,1
 46,Guatemala,Ciudad de Guatemala,Café San Martín,Comida,"8a Avenida 6-45, Zona 4",14.6319,-90.5145,4.00,81,1
-47,Quetzaltenango,Quetzaltenango,La Casa de la Abuela,Comida,"4a Calle 8-50, Zona 1",14.8396,-91.5161,4.7,66,1
-48,Guatemala,Ciudad de Guatemala,The Market Kitchen,Comida,"2a Avenida 14-45, Zona 10",14.6334,-90.5084,4.7,56,1
+47,Quetzaltenango,Quetzaltenango,La Casa de la Abuela,Comida,"4a Calle 8-50, Zona 1",14.8396,-91.5161,2.00,66,1
+48,Guatemala,Ciudad de Guatemala,The Market Kitchen,Comida,"2a Avenida 14-45, Zona 10",14.6334,-90.5084,5.00,56,1
 49,Escuintla,Puerto San José,Restaurante El Velero,Comida,Puerto San José,13.976,-90.9308,4.4,110,1
 50,Petén,Flores,Restaurante Las Palmas,Comida,"Calle Principal, Flores",17.2222,-89.629,4.5,87,1
 51,Guatemala,Ciudad de Guatemala,Hotel Conquistador,Hotel,"6a Avenida 10-40, Zona 10",14.63,-90.5105,4.4,350,0
@@ -89,4 +89,4 @@
 88,Guatemala,Ciudad de Guatemala,Tikal Futura Hotel,Hotel,"Calzada Roosevelt 22-43, Zona 11",14.61,-90.513,3.9,425,0
 89,Guatemala,Ciudad de Guatemala,Wyndham Garden Guatemala City,Hotel,"1a Avenida 12-46, Zona 10",14.61,-90.513,3.8,460,0
 90,Guatemala,Ciudad de Guatemala,Hotel Biltmore,Hotel,"15 Calle 0-31, Zona 10",14.61,-90.513,4.6,510,0
-91,Sacatepéquez,San Lucas,Cerro Alux,turismo,kilómetro 26.5 de la Carretera Nacional 1,14.601935139733321,-90.64447987860687,4.00,25.0,2.0
+91,Sacatepéquez,San Lucas,Cerro Alux,turismo,kilómetro 26.5 de la Carretera Nacional 1,14.601935139733321,-90.64447987860687,5.00,25.0,2.0
