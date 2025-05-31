@@ -1,7 +1,7 @@
 ﻿Id,Departamento,Municipio,Nombre,Tipo,Dirección,Latitud,Longitud,Calificación en Google,Precio,Tiempo estadia
 1,Petén,Flores,Tikal,Turismo,Parque Nacional Tikal,17.2216,-89.6236,4.00,50,5
 2,Alta Verapaz,Lanquín,Semuc Champey,Turismo,Semuc Champey,15.7794,-90.3794,4.7,50,4
-3,Sololá,Panajachel,Lago de Atitlán,Turismo,Panajachel,14.6849,-91.1512,4.8,60,6
+3,Sololá,Panajachel,Lago de Atitlán,Turismo,Panajachel,14.6849,-91.1512,5.00,60,6
 4,Sacatepéquez,La Antigua Guatemala,Antigua Guatemala,Turismo,Calle Real de Guadalupe,14.559,-90.7308,4.8,0,6
 5,Chimaltenango,Parramos,Volcán de Fuego,Turismo,Volcán de Fuego,14.4733,-90.883,4.7,150,4
 6,Baja Verapaz,Salamá,Cueva de las Piñuelas,Turismo,Salamá,15.3487,-89.5749,4.5,50,2
@@ -9,7 +9,7 @@
 8,San Marcos,San Pedro,Lago de Xolotlan,Turismo,"San Pedro, San Marcos",14.7813,-91.4775,4.7,50,4
 9,Izabal,Puerto Barrios,Río Dulce,Turismo,Río Dulce,15.4733,-88.7369,4.6,75,3
 10,Jalapa,Jalapa,Parque Nacional Sierra de las Minas,Turismo,Jalapa,14.5394,-89.8964,4.7,75,2
-11,Guatemala,Ciudad de Guatemala,Gracia Cocina de Autor,Comida,"6a Avenida 14-55, Zona 10",14.6349,-90.5069,4.6,95,1
+11,Guatemala,Ciudad de Guatemala,Gracia Cocina de Autor,Comida,"6a Avenida 14-55, Zona 10",14.6349,-90.5069,4.00,95,1
 12,Guatemala,Ciudad de Guatemala,Restaurante El Cafetal,Comida,"Avenida Reforma 6-55, Zona 10",14.6342,-90.5066,1.00,100,1
 13,Guatemala,Ciudad de Guatemala,Hacienda Real,Comida,"Boulevard Austriaco 37-01, Zona 16",14.6113,-90.5222,4.5,125,1
 14,Guatemala,Ciudad de Guatemala,Saúl Bistro,Comida,"6a Avenida 10-20, Zona 10",14.6329,-90.5082,4.00,75,1
@@ -35,7 +35,7 @@
 34,Quiché,Santa Cruz del Quiché,Lagunas de Ixcán,Turismo,Santa Cruz del Quiché,15.0081,-90.4165,4.7,50,4
 35,Chimaltenango,Parramos,Volcán de Fuego,Turismo,Volcán de Fuego,14.4733,-90.883,4.7,135,4
 36,Izabal,Morales,Playa Blanca,Turismo,Morales,15.761,-88.5187,4.5,25,3
-37,Retalhuleu,Retalhuleu,Xetulul,Entretenimiento,Xetulul,14.5,-91.478,4.00,100,5
+37,Retalhuleu,Retalhuleu,Xetulul,Entretenimiento,Xetulul,14.5,-91.478,5.00,100,5
 38,Santa Rosa,Cuilapa,Parque Natural Montañas de Cuilapa,Turismo,Cuilapa,14.1311,-90.0431,4.6,20,3
 39,Baja Verapaz,Cobán,Biotopo del Quetzal,Turismo,Cobán,15.5333,-90.4278,4.7,75,6
 40,Guatemala,Ciudad de Guatemala,Zoológico La Aurora,Entretenimiento,"2a Calle 15-05, Zona 13",14.6343,-90.5196,4.6,50,4

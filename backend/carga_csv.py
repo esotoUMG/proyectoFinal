@@ -98,26 +98,26 @@ def guardar_calificacion_csv(calificacion, archivo="./data/ratings.csv"):
     os.makedirs(os.path.dirname(archivo), exist_ok=True)
 
     with open(archivo, "a", encoding="utf-8") as f:
-        f.write(f"{calificacion.id_lugar},{calificacion.puntaje},{calificacion.comentario}\n")
+        f.write(f"{calificacion.id},{calificacion.id_lugar},{calificacion.puntaje},{calificacion.comentario}\n")
 
 
 def insertar_calificacion_en_arbol(arbol_calificaciones, calificacion):
     nodo = arbol_calificaciones.buscar(calificacion.id_lugar)
     if nodo:
-        # Nodo ya existe, agregamos calificación a la lista interna del nodo
+        # Nodo existe, agregamos calificación
         nodo.agregar(calificacion)
     else:
-        # Nodo no existe, creamos un nodo nuevo con la clave id_lugar y agregamos la calificación
+        # Nodo no existe, creamos uno nuevo y agregamos
         nuevo_nodo = CalificacionNodo(calificacion.id_lugar)
         nuevo_nodo.agregar(calificacion)
         arbol_calificaciones.insertar(nuevo_nodo)
 
 
-ultimo_id_calificacion = 0  # inicializamos
-
+ultimo_id_calificacion = 0 
 
 def cargar_calificaciones_csv(archivo="calificaciones.csv", arbol_calificaciones=None, arbol_lugares=None):
     global ultimo_id_calificacion
+    ultimo_id_calificacion = 0  # Reiniciar ID global solo si se usan IDs automáticos
 
     if arbol_calificaciones is None or arbol_lugares is None:
         raise ValueError("Se requieren ambos árboles: calificaciones y lugares")
@@ -127,22 +127,22 @@ def cargar_calificaciones_csv(archivo="calificaciones.csv", arbol_calificaciones
             reader = csv.reader(f)
             next(reader)  # saltar encabezado
             for fila in reader:
-                if len(fila) >= 2:
+                if len(fila) >= 3:  # Necesita al menos ID, ID_lugar, puntaje
                     try:
-                        id_lugar = int(fila[0])
-                        puntaje = float(fila[1])
-                        comentario = ",".join(fila[2:]) if len(fila) > 2 else ""
+                        id_calificacion = int(fila[0])
+                        id_lugar = int(fila[1])
+                        puntaje = float(fila[2])
+                        comentario = ",".join(fila[3:]) if len(fila) > 3 else ""
                     except ValueError:
                         continue
 
-                    # Incrementar ID secuencial de calificación
-                    ultimo_id_calificacion += 1
-                    id_calificacion = ultimo_id_calificacion
-
                     calif = Calificacion(id_calificacion, id_lugar, puntaje, comentario)
+
+                    print(f"Calificación cargada: {calif}")
+
                     insertar_calificacion_en_arbol(arbol_calificaciones, calif)
 
-                    # actualizar promedio en árbol de lugares
+                    # Actualizar promedio en el árbol de lugares
                     lugar = arbol_lugares.buscar(id_lugar)
                     if lugar:
                         cantidad_actual = getattr(lugar, 'cantidad_calificaciones', 0)
@@ -152,8 +152,7 @@ def cargar_calificaciones_csv(archivo="calificaciones.csv", arbol_calificaciones
                         lugar.cantidad_calificaciones = cantidad_actual + 1
 
     except FileNotFoundError:
-        pass
-
+        print("Archivo de calificaciones no encontrado.")
 
 
 def guardar_recomendaciones_csv(recomendaciones, archivo="./data/recomendaciones.csv"):
