@@ -357,44 +357,47 @@ function generarEstrellas(puntaje) {
     const apellido = apellidos[Math.floor(Math.random() * apellidos.length)];
     return `${nombre} ${apellido}`;
   }  
-async function cargarCalificaciones(idLugar) {
+  
+  async function cargarCalificaciones(idLugar) {
     const contenedor = document.getElementById('lista-comentarios');
     contenedor.innerHTML = "<p>Cargando calificaciones...</p>";
-
+  
     try {
       const response = await fetch(`/api/calificaciones/${idLugar}`);
       if (!response.ok) throw new Error('Error al cargar calificaciones');
-
+  
       const data = await response.json();
       const calificaciones = data.calificaciones;
-
+      const promedio = data.promedio;
+  
       if (calificaciones.length === 0) {
         contenedor.innerHTML = "<p>No hay calificaciones aún.</p>";
         return;
       }
-
-      // Limpiar contenedor
-      contenedor.innerHTML = "";
-
+  
+      // Mostrar promedio
+      contenedor.innerHTML = `<p>Promedio: ${promedio.toFixed(1)} / 5 ⭐</p>`;
+  
       calificaciones.forEach(c => {
         const div = document.createElement('div');
         div.className = "comentario";
-      
+  
         const usuario = generarNombreAleatorio();
-      
+  
         div.innerHTML = `
           <strong>${usuario}</strong><br>
           <strong>Puntaje: ${generarEstrellas(c.puntaje)}</strong><br>
           <em>${c.comentario || "Sin comentario"}</em>
         `;
-      
+  
         contenedor.appendChild(div);
       });
-      
+  
     } catch (error) {
       contenedor.innerHTML = `<p>Error: ${error.message}</p>`;
     }
   }
+  
   const formComentario = document.getElementById('form-comentario');
   const inputComentario = document.getElementById('input-comentario');
 

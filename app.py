@@ -159,12 +159,16 @@ def api_calificar():
 
 @app.route('/api/calificaciones/<int:id_lugar>', methods=['GET'])
 def api_obtener_calificaciones(id_lugar):
-    calificaciones = arbol_calificaciones.buscar(id_lugar)
-    if not calificaciones:
-        return jsonify({"calificaciones": []})
-    
-    calif_dicts = [c.to_dict() for c in calificaciones.calificaciones.recorrer()]
-    return jsonify({"calificaciones": calif_dicts})
+    nodo_calificaciones = arbol_calificaciones.buscar(id_lugar)
+    if not nodo_calificaciones:
+        return jsonify({"id_lugar": id_lugar, "promedio": 0, "calificaciones": []})
+
+    return jsonify({
+        "id_lugar": nodo_calificaciones.id_lugar,
+        "promedio": nodo_calificaciones.promedio(),
+        "calificaciones": [c.to_dict() for c in nodo_calificaciones.calificaciones.recorrer()]
+    })
+
 
 
 #API's PARA LUGARES
