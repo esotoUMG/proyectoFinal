@@ -1,6 +1,7 @@
 import csv, signal, sys, os
 from backend.modelos.lugar import Lugar
 from backend.modelos.calificacion import Calificacion 
+from backend.modelos.recomendaciones import Recomendaciones
 
 
 def safe_float(valor, default=0.0):
@@ -96,7 +97,6 @@ def guardar_calificacion_csv(calificacion, archivo="./data/ratings.csv"):
     with open(archivo, "a", encoding="utf-8") as f:
         f.write(f"{calificacion.id_lugar},{calificacion.puntaje},{calificacion.comentario}\n")
 
-        
 def cargar_calificaciones_csv(archivo="calificaciones.csv", arbol_calificaciones=None, arbol_lugares=None):
     if arbol_calificaciones is None or arbol_lugares is None:
         raise ValueError("Se requieren ambos árboles: calificaciones y lugares")
@@ -138,7 +138,11 @@ def cargar_calificaciones_csv(archivo="calificaciones.csv", arbol_calificaciones
     except FileNotFoundError:
         pass
 
+def guardar_recomendaciones_csv(recomendaciones, archivo="./data/recomendaciones.csv"):
+    os.makedirs(os.path.dirname(archivo), exist_ok=True)
 
+    with open(archivo, "b", encoding="utf-8") as f:
+        f.write(f"{recomendacion.id},{recomendacion.departamento},{recomendacion.municipio},{recomendacion.nombre},{recomendacion.tipo},{recomendacion.direccion},{recomendacion.latitud},{recomendacion.longitud},{recomendacion.calificacion},{recomendacion.tiempo},{recomendacion.precio},{recomendacion.calificaciones},\n")
 
 # --- Exportar datos.csv desde árbol B ---
 

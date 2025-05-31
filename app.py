@@ -1,11 +1,12 @@
 from flask import Flask, render_template, url_for, jsonify, redirect, request
 import  os, csv, re, asyncio, aiohttp, math
 from backend.arbolB import BTree, CalificacionNodo
-from backend.carga_csv import cargar_lugares_csv, guardar_lugar_en_csv, guardar_calificacion_csv
+from backend.carga_csv import cargar_lugares_csv, guardar_lugar_en_csv, guardar_calificacion_csv, guardar_recomendaciones_csv
 from backend.modelos.utilidadesGrafo import UtilidadesGrafo
 from backend.modelos.GrafoPonderado import generar_grafo_ponderado  
 from backend.modelos.lugar import Lugar
 from backend.modelos.calificacion import Calificacion
+from backend.modelos.recomendacion import Recomendaciones
 
 
 app = Flask(__name__)
@@ -84,8 +85,6 @@ def obtener_lugar_por_id(id_lugar):
                 lugar.calificacion = float(fila[8]) if fila[8] else 0.0
                 lugar.precio = float(fila[9]) if fila[9] else 0.0
                 lugar.tiempo_estadia = float(fila[10]) if fila[10] else 0.0
-
-                # Puedes agregar cantidad_calificaciones si quieres, o manejar aparte
                 lugar.cantidad_calificaciones = getattr(lugar, 'cantidad_calificaciones', 0)
 
                 return lugar
@@ -149,6 +148,8 @@ def api_calificar():
     calif = Calificacion(id_lugar, puntaje, comentario)
     insertar_calificacion_en_arbol(arbol_calificaciones, calif)
     guardar_calificacion_csv(calif)
+    # recom = Recomendacion(id,departamento,municipio,nombre,tipo,direccion,latitud,longitud,calificacion,tiempo,precio,calificaciones)
+    # guardar_recomendaciones_csv()
 
     return jsonify({"mensaje": "Calificación registrada", "nuevo_promedio": nuevo_promedio}), 200
 
@@ -524,6 +525,7 @@ def api_recomendaciones():
 @app.route('/api/generar_grafo', methods=['POST'])
 def api_generar_grafo():
     data = request.get_json()
+
     if not data:
         return jsonify({'error': 'No se recibió data JSON'}), 400
 
@@ -541,7 +543,6 @@ def api_generar_grafo():
         ruta = generar_grafo_ponderado(nodos, aristas, id_grafo)
         return jsonify({'exito': True, 'mensaje': 'Grafo generado', 'rutaArchivo': ruta})
     except Exception as e:
-        # Aquí podrías agregar logging.error(f"Error al generar grafo: {e}")
         return jsonify({'exito': False, 'error': f'Error interno: {str(e)}'}), 500
     
 #PAGINAS WEB
@@ -645,7 +646,7 @@ def lugares_filtro():
             try:
                 presupuesto = float(presupuesto_str)
             except ValueError:
-                presupuesto = None  # O puedes manejar el error mostrando mensaje
+                presupuesto = None
 
         lugares = arbol_lugares.obtener_lugares()
 
@@ -752,7 +753,7 @@ def hospedajes_filtro():
             try:
                 presupuesto = float(presupuesto_str)
             except ValueError:
-                presupuesto = None  # Puedes manejar el error más adelante si quieres
+                presupuesto = None  
 
         hospedajes = arbol_hospedaje.obtener_lugares()
 
@@ -827,7 +828,6 @@ def api_recomendaciones_hospedajes():
             "calificacion": getattr(r, "calificacion", "N/A"),
             "precio" :getattr (r, "precio", None)
         })
-    
     return {"recomendaciones": lista_recomendaciones}
 
 

@@ -10,13 +10,13 @@
 9,Izabal,Puerto Barrios,Río Dulce,Turismo,Río Dulce,15.4733,-88.7369,4.6,75,3
 10,Jalapa,Jalapa,Parque Nacional Sierra de las Minas,Turismo,Jalapa,14.5394,-89.8964,4.7,75,2
 11,Guatemala,Ciudad de Guatemala,Gracia Cocina de Autor,Comida,"6a Avenida 14-55, Zona 10",14.6349,-90.5069,4.6,95,1
-12,Guatemala,Ciudad de Guatemala,Restaurante El Cafetal,Comida,"Avenida Reforma 6-55, Zona 10",14.6342,-90.5066,4.7,100,1
+12,Guatemala,Ciudad de Guatemala,Restaurante El Cafetal,Comida,"Avenida Reforma 6-55, Zona 10",14.6342,-90.5066,1.00,100,1
 13,Guatemala,Ciudad de Guatemala,Hacienda Real,Comida,"Boulevard Austriaco 37-01, Zona 16",14.6113,-90.5222,4.5,125,1
 14,Guatemala,Ciudad de Guatemala,Saúl Bistro,Comida,"6a Avenida 10-20, Zona 10",14.6329,-90.5082,4.7,75,1
 15,Guatemala,Ciudad de Guatemala,El Mercado,Comida,"8a Avenida 10-30, Zona 10",14.634,-90.51,4.5,65,1
 16,Guatemala,Ciudad de Guatemala,Los Cebollines,Comida,"2a Avenida 10-21, Zona 10",14.6301,-90.5087,4.6,85,1
 17,Guatemala,Ciudad de Guatemala,Café Barista,Comida,"9a Avenida 18-15, Zona 14",14.6357,-90.5034,4.4,20,1
-18,Guatemala,Ciudad de Guatemala,San Martín,Comida,"8a Avenida 12-10, Zona 4",14.6315,-90.517,4.7,75,1
+18,Guatemala,Ciudad de Guatemala,San Martín,Comida,"8a Avenida 12-10, Zona 4",14.6315,-90.517,4.00,75,1
 19,Guatemala,Ciudad de Guatemala,Cocina de la Abuela,Comida,"2a Avenida 4-14, Zona 2",14.6202,-90.5121,4.6,50,1
 20,Guatemala,Ciudad de Guatemala,The Market,Comida,"1a Avenida 1-45, Zona 10",14.6301,-90.5045,4.6,60,1
 21,Guatemala,Ciudad de Guatemala,Real InterContinental Guatemala,Hotel,"14 Calle 3-08, Zona 10",14.6349,-90.5069,4.6,450,0
@@ -77,7 +77,7 @@
 76,Guatemala,Ciudad de Guatemala,Taquería Las Flautas,Comida,"7a Avenida 9-63, Zona 1",14.6345,-90.506,4.6,55,1
 77,Guatemala,Ciudad de Guatemala,Chiltepe,Comida,"7 Avenida 2-30, Zona 4",14.6345,-90.506,4.2,55,1
 78,Guatemala,Ciudad de Guatemala,Castor's Pizza (Zona 4),Comida,"Edificio Séptimo, Zona 4",14.6345,-90.506,4.3,85,1
-79,Guatemala,Ciudad de Guatemala,En Un Dos Por Crepes,Comida,"8a Calle & 4 A Avenida, Zona 10",14.6345,-90.506,4.8,45,1
+79,Guatemala,Ciudad de Guatemala,En Un Dos Por Crepes,Comida,"8a Calle & 4 A Avenida, Zona 10",14.6345,-90.506,1.00,45,1
 80,Guatemala,Ciudad de Guatemala,Divina Gula GT,Comida,"Vía 4 1-00, Edificio Campus Tec 1",14.6345,-90.506,4.6,60,1
 81,Guatemala,Ciudad de Guatemala,Hotel Real Intercontinental,Comida,"14 Calle 2-51, Zona 10",14.61,-90.513,4.5,85,1
 82,Guatemala,Ciudad de Guatemala,Hyatt Centric Guatemala City,Comida,"12 Calle 2-25, Zona 10",14.61,-90.513,4,75,1
