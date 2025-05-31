@@ -1,7 +1,7 @@
 ﻿Id,Departamento,Municipio,Nombre,Tipo,Dirección,Latitud,Longitud,Calificación en Google,Precio,Tiempo estadia
 1,Petén,Flores,Tikal,Turismo,Parque Nacional Tikal,17.2216,-89.6236,4.00,50,5
 2,Alta Verapaz,Lanquín,Semuc Champey,Turismo,Semuc Champey,15.7794,-90.3794,4.7,50,4
-3,Sololá,Panajachel,Lago de Atitlán,Turismo,Panajachel,14.6849,-91.1512,5.00,60,6
+3,Sololá,Panajachel,Lago de Atitlán,Turismo,Panajachel,14.6849,-91.1512,4.00,60,6
 4,Sacatepéquez,La Antigua Guatemala,Antigua Guatemala,Turismo,Calle Real de Guadalupe,14.559,-90.7308,4.8,0,6
 5,Chimaltenango,Parramos,Volcán de Fuego,Turismo,Volcán de Fuego,14.4733,-90.883,4.7,150,4
 6,Baja Verapaz,Salamá,Cueva de las Piñuelas,Turismo,Salamá,15.3487,-89.5749,4.5,50,2

@@ -65,19 +65,40 @@ function mostrarInfoLugar(lugar) {
         <p>${lugar.direccion}</p>
         <p>${lugar.municipio}, ${lugar.departamento}</p>
         <p>${lugar.tipo}</p>
-        <p>
+        <p id="calificacion-promedio">
             <span class="calificacion-valor">${calificacion.toFixed(1)}</span>
             <span class="estrellas">${estrellas}</span>
         </p>
         <p>${precio}</p>
     `;
 
+    // Intentar cargar el promedio actualizado desde el backend
+    fetch(`/api/calificaciones/${lugar.id}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.promedio !== undefined) {
+                const promedio = Number(data.promedio).toFixed(1);
+                const estrellasProm = generarEstrellasHTML(promedio);
+
+                const califCont = document.getElementById('calificacion-promedio');
+                if (califCont) {
+                    califCont.innerHTML = `
+                        <span class="calificacion-valor">${promedio}</span>
+                        <span class="estrellas">${estrellasProm}</span>
+                    `;
+                }
+            }
+        })
+        .catch(err => console.warn("No se pudo cargar el promedio actualizado:", err));
+
+    // Mostrar mapa si está disponible
     if (typeof initMap === "function") {
         initMap();
     } else {
         console.error("initMap no está definida");
     }
 }
+
 
 function generarEstrellasHTML(calificacion) {
     const maxEstrellas = 5;
@@ -357,46 +378,47 @@ function generarEstrellas(puntaje) {
     const apellido = apellidos[Math.floor(Math.random() * apellidos.length)];
     return `${nombre} ${apellido}`;
   }  
-  
-  async function cargarCalificaciones(idLugar) {
-    const contenedor = document.getElementById('lista-comentarios');
-    contenedor.innerHTML = "<p>Cargando calificaciones...</p>";
-  
-    try {
-      const response = await fetch(`/api/calificaciones/${idLugar}`);
-      if (!response.ok) throw new Error('Error al cargar calificaciones');
-  
-      const data = await response.json();
-      const calificaciones = data.calificaciones;
-      const promedio = data.promedio;
-  
-      if (calificaciones.length === 0) {
-        contenedor.innerHTML = "<p>No hay calificaciones aún.</p>";
-        return;
-      }
-  
-      // Mostrar promedio
-      contenedor.innerHTML = `<p>Promedio: ${promedio.toFixed(1)} / 5 ⭐</p>`;
-  
-      calificaciones.forEach(c => {
-        const div = document.createElement('div');
-        div.className = "comentario";
-  
-        const usuario = generarNombreAleatorio();
-  
-        div.innerHTML = `
-          <strong>${usuario}</strong><br>
-          <strong>Puntaje: ${generarEstrellas(c.puntaje)}</strong><br>
-          <em>${c.comentario || "Sin comentario"}</em>
-        `;
-  
-        contenedor.appendChild(div);
-      });
-  
-    } catch (error) {
-      contenedor.innerHTML = `<p>Error: ${error.message}</p>`;
+
+async function cargarCalificaciones(idLugar) {
+  const contenedor = document.getElementById('lista-comentarios');
+  contenedor.innerHTML = "<p>Cargando calificaciones...</p>";
+
+  try {
+    const response = await fetch(`/api/calificaciones/${idLugar}`);
+    if (!response.ok) throw new Error('Error al cargar calificaciones');
+
+    const data = await response.json();
+    const calificaciones = data.calificaciones;
+    const promedio = data.promedio;
+
+    if (calificaciones.length === 0) {
+      contenedor.innerHTML = "<p>No hay calificaciones aún.</p>";
+      return;
     }
+
+    // Limpiar contenedor para mostrar comentarios
+    contenedor.innerHTML = "";
+
+    calificaciones.forEach(c => {
+      const div = document.createElement('div');
+      div.className = "comentario";
+
+      const usuario = generarNombreAleatorio();
+
+      div.innerHTML = `
+        <strong>${usuario}</strong><br>
+        <strong>Puntaje: ${generarEstrellas(c.puntaje)}</strong><br>
+        <em>${c.comentario || "Sin comentario"}</em>
+      `;
+
+      contenedor.appendChild(div);
+    });
+
+  } catch (error) {
+    contenedor.innerHTML = `<p>Error: ${error.message}</p>`;
   }
+}
+
   
   const formComentario = document.getElementById('form-comentario');
   const inputComentario = document.getElementById('input-comentario');
